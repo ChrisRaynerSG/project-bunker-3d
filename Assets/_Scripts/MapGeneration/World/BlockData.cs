@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class WorldBlock
+public class BlockData
 {
     private int x;
     public int X

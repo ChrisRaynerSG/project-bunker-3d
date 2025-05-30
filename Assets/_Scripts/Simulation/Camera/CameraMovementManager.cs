@@ -3,7 +3,7 @@ using UnityEngine;
 public class CameraMovementManager : MonoBehaviour
 {
     public float moveSpeed = 20f;
-    public float scrollSpeed = 2f;
+    public float scrollSpeed = 20f;
     public float minY = -50f;
     public float maxY = 50f;
 

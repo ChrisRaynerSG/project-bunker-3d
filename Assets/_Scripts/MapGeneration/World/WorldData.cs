@@ -10,14 +10,14 @@ public class WorldData
 
     // chunk by vertical slice so that we can go up and down and see underground areas with ease
 
-    private VerticalSlice[] ySlices;
-    public VerticalSlice[] YSlices
+    private VerticalSliceData[] ySlices;
+    public VerticalSliceData[] YSlices
     {
         get { return ySlices; }
         set { ySlices = value; }
     }
 
-    private WorldBlock[][,] grid;
+    private BlockData[][,] grid;
 
     private static WorldData instance;
     public static WorldData Instance
@@ -35,27 +35,28 @@ public class WorldData
     public void Initialise(int maxX, int maxY, int maxZ, int minElevation)
     {
         int numberOfslices = maxY - minElevation;
-        ySlices = new VerticalSlice[numberOfslices];
-        
+        ySlices = new VerticalSliceData[numberOfslices];
+
         for (int i = 0; i < numberOfslices; i++)
         {
-            ySlices[i] = new VerticalSlice(i + minElevation, maxX, maxZ);
+            ySlices[i] = new VerticalSliceData(i + minElevation, maxX, maxZ);
         }   
     }
 
     public void PrintWorldData()
     {
-        for (int y = 0; y < ySlices.Length; y++)
+        Debug.Log("World Data:");
+        for (int i = 0; i < ySlices.Length; i++)
         {
-            Debug.Log("Vertical Slice: " + y);
-            for (int x = 0; x < ySlices[y].Grid.Length; x++)
+            Debug.Log($"Slice {i + 1} at Y={ySlices[i].Y}");
+            for (int x = 0; x < ySlices[i].Chunks.Length; x++)
             {
-                for (int z = 0; z < ySlices[y].Grid[x].Length; z++)
+                for (int z = 0; z < ySlices[i].Chunks[x].Length; z++)
                 {
-                    Debug.Log("Block: " + ySlices[y].Grid[x][z].X + ", " + ySlices[y].Grid[x][z].Y + ", " + ySlices[y].Grid[x][z].Z);
-                    Debug.Log("IsSolid: " + ySlices[y].Grid[x][z].IsSolid);
+                    Debug.Log($"Chunk at ({x * ChunkData.CHUNK_SIZE}, {ySlices[i].Y}, {z * ChunkData.CHUNK_SIZE})");
                 }
             }
         }
+        
     }
 }

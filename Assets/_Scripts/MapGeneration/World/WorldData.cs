@@ -32,13 +32,15 @@ public class WorldData
         }
     }
 
-    public void Initialise(int maxX, int maxY, int maxZ)
+    public void Initialise(int maxX, int maxY, int maxZ, int minElevation)
     {
-        ySlices = new VerticalSlice[maxY];
-        for (int y = 0; y < maxY; y++)
+        int numberOfslices = maxY - minElevation;
+        ySlices = new VerticalSlice[numberOfslices];
+        
+        for (int i = 0; i < numberOfslices; i++)
         {
-            ySlices[y] = new VerticalSlice(y, maxX, maxZ);
-        }
+            ySlices[i] = new VerticalSlice(i + minElevation, maxX, maxZ);
+        }   
     }
 
     public void PrintWorldData()

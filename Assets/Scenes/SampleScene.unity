@@ -457,13 +457,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9ef343a5b0cf634590d0ee47e96fb7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxX: 16
-  maxZ: 16
+  maxX: 256
+  maxZ: 256
   frequency: 0.005
   seed: 5
   maxY: 32
   minElevation: 0
-  YSlicePrefab: {fileID: 0}
+  YSlicePrefab: {fileID: 7267588843004917064, guid: 29a8f40d95895804a8385f643f8b0213, type: 3}
 --- !u!33 &1644170865
 MeshFilter:
   m_ObjectHideFlags: 0

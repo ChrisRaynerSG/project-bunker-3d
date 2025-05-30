@@ -36,8 +36,8 @@ public class World : MonoBehaviour
 
     private IEnumerator GenerateWorldCoroutine()
     {
-        WorldData.Instance.Initialise(maxX, maxY, maxZ);
-        MeshData meshData = new MeshData();
+        WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
+        // MeshData meshData = new MeshData();
 
         FastNoise noise = new FastNoise();
         noise.SetNoiseType(FastNoise.NoiseType.Simplex);
@@ -58,13 +58,16 @@ public class World : MonoBehaviour
 
         for (int y = minElevation; y < maxY; y++)
         {
+            MeshData meshData = new MeshData();
+
             for (int x = 0; x < maxX; x++)
             {
                 for (int z = 0; z < maxZ; z++)
                 {
                     if (y < heights[x, z])
                     {
-                        WorldData.Instance.YSlices[y].Grid[x][z].IsSolid = true;
+                        int yIndex = y - minElevation;
+                        WorldData.Instance.YSlices[yIndex].Grid[x][z].IsSolid = true;
 
                         Vector3 targetPosition = new Vector3(x, y, z);
                         MeshUtilities.CreateFaceUp(meshData, targetPosition);
@@ -76,7 +79,15 @@ public class World : MonoBehaviour
                     }
                 }
             }
-            LoadMeshData(meshData);
+
+            GameObject ySliceObject = Instantiate(YSlicePrefab, transform);
+            ySliceObject.name = $"YSlice_{y}";
+            ySliceObject.transform.position = Vector3.zero;
+
+            MeshFilter ySliceFilter = ySliceObject.GetComponent<MeshFilter>();
+
+            LoadMeshData(meshData, ySliceFilter);
+            ySlices.Add(ySliceObject);
             yield return null;
         }
     }
@@ -95,27 +106,28 @@ public class World : MonoBehaviour
         filter.mesh = mesh;
     }
 
-    // private IEnumerator GenerateVerticalSliceCoroutine(int minElevation, int height, int x, int z, MeshData meshData)
-    // {
-    //     for (int y = minElevation; y < height; y++)
-    //     {
-    //         WorldData.Instance.YSlices[y].Grid[x][z].IsSolid = true; // Set the block to solid as we are generating a solid block
+    public void LoadMeshData(MeshData meshData, MeshFilter filter)
+    {
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 
-    //                 Vector3 targetPosition = new Vector3(x, y, z);
-    //                 MeshUtilities.CreateFaceUp(meshData, targetPosition);
-    //                 MeshUtilities.CreateFaceDown(meshData, targetPosition);
-    //                 MeshUtilities.CreateFaceNorth(meshData, targetPosition);
-    //                 MeshUtilities.CreateFaceEast(meshData, targetPosition);
-    //                 MeshUtilities.CreateFaceSouth(meshData, targetPosition);
-    //                 MeshUtilities.CreateFaceWest(meshData, targetPosition);
-    //         yield return null;
-    //     }
-    //  }
+        mesh.vertices = meshData.vertices.ToArray();
+        mesh.triangles = meshData.triangles.ToArray();
+        mesh.uv = meshData.uvs.ToArray();
 
-    // This is a placeholder for the SetState method
-    // Wil be used to set the state of the world on load
-    // public void LoadFromSaveData(SaveData saveData)
-    // {
+        mesh.RecalculateNormals();
 
-    // }
+        filter.mesh = mesh;
+    }
+
+    private void SetWorldLayerVisibility(int y)
+    {
+        for (int i = y + 1; i < maxY; i++)
+        {
+            if (ySlices[i] != null)
+            {
+                ySlices[i].GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,9 +11,11 @@ public class World : MonoBehaviour
     public int seed = 0;
     public int maxY = 32;
     public int minElevation = 0;
+    private int currentElevation;
     public static World Instance;
     public GameObject YSlicePrefab;
     private List<GameObject> ySlices = new List<GameObject>();
+    public static event Action<int> OnCurrentElevationChanged;
 
     void Awake()
     {
@@ -31,7 +34,12 @@ public class World : MonoBehaviour
     {
         filter = GetComponent<MeshFilter>();
         StartCoroutine(GenerateWorldCoroutine());
+        SetWorldLayerVisibility(maxY);
+    }
 
+    void Update()
+    {
+        HandleElevationChange();
     }
 
     private IEnumerator GenerateWorldCoroutine()
@@ -122,12 +130,49 @@ public class World : MonoBehaviour
 
     private void SetWorldLayerVisibility(int y)
     {
-        for (int i = y + 1; i < maxY; i++)
+         for (int i = 0; i < ySlices.Count; i++)
         {
+            int layerY = i + minElevation;
+
             if (ySlices[i] != null)
             {
-                ySlices[i].GetComponent<MeshRenderer>().enabled = false;
+                bool shouldBeVisible = layerY <= y;
+                MeshRenderer renderer = ySlices[i].GetComponent<MeshRenderer>();
+                if (renderer != null)
+                {
+                    renderer.enabled = shouldBeVisible;
+                }
             }
+        }
+
+    currentElevation = y;
+    }
+
+    private void HandleElevationChange()
+    {
+        if (Input.GetKeyUp(KeyCode.PageUp))
+        {
+            if (currentElevation < maxY + 1)
+            {
+                currentElevation++;
+                SetWorldLayerVisibility(currentElevation);
+                OnCurrentElevationChanged?.Invoke(currentElevation);
+            }
+        }
+        else if (Input.GetKeyUp(KeyCode.PageDown))
+        {
+            if (currentElevation > minElevation + 1)
+            {
+                currentElevation--;
+                SetWorldLayerVisibility(currentElevation);
+                OnCurrentElevationChanged?.Invoke(currentElevation);
+            }
+        }
+        else if (Input.GetKeyUp(KeyCode.Home))
+        {
+            currentElevation = maxY + 1;
+            SetWorldLayerVisibility(currentElevation);
+            OnCurrentElevationChanged?.Invoke(currentElevation);
         }
     }
 }

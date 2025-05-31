@@ -23,10 +23,16 @@ public class MiningManager : MonoBehaviour
     {
         Debug.Log("Mining block at mouse position...");
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+
+        int layerMask = LayerMask.GetMask("Default");
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 200f, layerMask))
         {
             Debug.Log($"Hit block at position: {hit.point}, normal: {hit.normal}");
-            Vector3Int hitPosition = Vector3Int.FloorToInt(hit.point - hit.normal * 0.5f);
+            Vector3 hitOffset = hit.point - hit.normal * 0.5f;
+            Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
+
+
             blockAccessor.SetBlock(hitPosition, BlockData.BlockType.Air);
         }
     }

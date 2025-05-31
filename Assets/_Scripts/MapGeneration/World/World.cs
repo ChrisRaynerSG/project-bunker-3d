@@ -13,7 +13,7 @@ public class World : MonoBehaviour
     public int maxY = 32;
 
     public int minElevation = 0;
-    private int currentElevation;
+    public int currentElevation;
     public static World Instance;
     public GameObject YSlicePrefab;
     public GameObject ChunkPrefab;
@@ -146,6 +146,7 @@ public class World : MonoBehaviour
                     }
                     LoadMeshData(meshData, chunkFilter);
                     chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
+                    chunkObject.layer = 0; // Set default tag for chunks
                 }
             }
             yield return null;
@@ -199,6 +200,18 @@ public class World : MonoBehaviour
                 if (renderer != null)
                 {
                     renderer.enabled = shouldBeVisible;
+                }
+
+                if (layerY > y)
+                {
+                    chunk.layer = 3;
+                }
+                else
+                {
+                    if(chunk.layer == 3)
+                    {
+                        chunk.layer = 0;
+                    }
                 }
             }
         }

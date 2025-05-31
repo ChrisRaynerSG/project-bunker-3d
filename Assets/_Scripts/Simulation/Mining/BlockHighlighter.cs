@@ -8,9 +8,11 @@ public class BlockHighlighter : MonoBehaviour
     void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if(Physics.Raycast(ray, out RaycastHit hit))
+        int layerMask = LayerMask.GetMask("Default");
+        if (Physics.Raycast(ray, out RaycastHit hit, 200f, layerMask))
         {
-            Vector3Int hitPosition = Vector3Int.FloorToInt(hit.point - hit.normal * 0.5f);
+            Vector3 hitOffset = hit.point - hit.normal * 0.5f;
+            Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
             highlightCube.transform.position = hitPosition;
             highlightCube.SetActive(true);
         }

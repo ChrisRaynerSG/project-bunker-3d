@@ -4,6 +4,7 @@ public class CameraMovementManager : MonoBehaviour
 {
     public float moveSpeed = 20f;
     public float scrollSpeed = 20f;
+    public float rotationSpeed = 400f;
     public float minY = -50f;
     public float maxY = 50f;
 
@@ -48,7 +49,12 @@ public class CameraMovementManager : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 forward = mainCamera.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
         Vector3 right = mainCamera.transform.right;
+        right.y = 0f;
+        right.Normalize();
 
         Vector3 moveDirection = (forward * verticalInput + right * horizontalInput).normalized;
         mainCamera.transform.position += moveDirection * moveSpeed * Time.deltaTime;
@@ -74,7 +80,6 @@ public class CameraMovementManager : MonoBehaviour
 
         if (Input.GetMouseButton(1)) // Right mouse button for rotation
         {
-            float rotationSpeed = 100f;
             float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
             float rotationY = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
 

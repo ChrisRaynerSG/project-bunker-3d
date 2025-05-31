@@ -41,7 +41,7 @@ public class World : MonoBehaviour
     {
         filter = GetComponent<MeshFilter>();
         StartCoroutine(GenerateWorldCoroutine());
-        SetWorldLayerVisibility(maxY - minElevation, false);
+        SetWorldLayerVisibility(maxY, false);
     }
 
     void Update()
@@ -145,6 +145,8 @@ public class World : MonoBehaviour
             }
             yield return null;
         }
+        currentElevation = maxY;
+        OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
     }
 
     public void LoadMeshData(MeshData meshData)

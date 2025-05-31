@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,22 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbf746b1c8809bd4d96bf8f85f12905f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 20
+  scrollSpeed: 40
+  minY: -50
+  maxY: 50
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,11 +476,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxX: 256
   maxZ: 256
-  frequency: 0.005
-  seed: 5
+  frequency: 0.007
+  seed: 123456789
   maxY: 32
-  minElevation: 0
+  minElevation: -32
   YSlicePrefab: {fileID: 7267588843004917064, guid: 29a8f40d95895804a8385f643f8b0213, type: 3}
+  ChunkPrefab: {fileID: 5595582877656055663, guid: cc44970831e50b446b8ca839047d2e38, type: 3}
 --- !u!33 &1644170865
 MeshFilter:
   m_ObjectHideFlags: 0

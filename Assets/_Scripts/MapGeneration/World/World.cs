@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 public class World : MonoBehaviour
 {
     MeshFilter filter;
@@ -18,6 +19,8 @@ public class World : MonoBehaviour
     public GameObject ChunkPrefab;
     private List<GameObject> ySlices = new List<GameObject>();
     public static event Action<int> OnCurrentElevationChanged;
+    private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
+    private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
     // need to make chunks, 16x1x16 to make updating the world faster
 
@@ -38,7 +41,7 @@ public class World : MonoBehaviour
     {
         filter = GetComponent<MeshFilter>();
         StartCoroutine(GenerateWorldCoroutine());
-        SetWorldLayerVisibility(maxY);
+        SetWorldLayerVisibility(maxY - minElevation, false);
     }
 
     void Update()
@@ -99,9 +102,10 @@ public class World : MonoBehaviour
             GameObject ySliceObject = Instantiate(YSlicePrefab, transform);
             ySliceObject.name = $"YSlice_{y}";
             ySliceObject.transform.position = new Vector3(0, y, 0);
+            ySlices.Add(ySliceObject);
 
-            int ChunkXCount = maxX / ChunkData.CHUNK_SIZE;
-            int ChunkZCount = maxZ / ChunkData.CHUNK_SIZE;
+            // int ChunkXCount = maxX / ChunkData.CHUNK_SIZE;
+            // int ChunkZCount = maxZ / ChunkData.CHUNK_SIZE;
 
             for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
             {
@@ -137,7 +141,7 @@ public class World : MonoBehaviour
                         }
                     }
                     LoadMeshData(meshData, chunkFilter);
-                }     
+                }
             }
             yield return null;
         }
@@ -171,22 +175,29 @@ public class World : MonoBehaviour
         filter.mesh = mesh;
     }
 
-    private void SetWorldLayerVisibility(int y)
+    private void SetWorldLayerVisibility(int y, bool isGoingUp)
     {
         for (int i = 0; i < ySlices.Count; i++)
         {
             int layerY = i + minElevation;
+            bool shouldBeVisible = layerY <= y;
 
-            if (ySlices[i] != null)
+            Transform ySliceTransform = ySlices[i]?.transform;
+            if (ySliceTransform == null) continue;
+
+            for (int j = 0; j < ySliceTransform.childCount; j++)
             {
-                bool shouldBeVisible = layerY <= y;
-                MeshRenderer renderer = ySlices[i].GetComponent<MeshRenderer>();
+                GameObject chunk = ySliceTransform.GetChild(j).gameObject;
+                MeshRenderer renderer = chunk.GetComponent<MeshRenderer>();
                 if (renderer != null)
                 {
                     renderer.enabled = shouldBeVisible;
                 }
             }
         }
+
+        RebuildTopFacesForceTop(y);
+        if(isGoingUp) RebuildMeshAtLevel(y-1);
 
         currentElevation = y;
     }
@@ -198,7 +209,7 @@ public class World : MonoBehaviour
             if (currentElevation < maxY + 1)
             {
                 currentElevation++;
-                SetWorldLayerVisibility(currentElevation);
+                SetWorldLayerVisibility(currentElevation, true);
                 OnCurrentElevationChanged?.Invoke(currentElevation);
             }
         }
@@ -207,25 +218,18 @@ public class World : MonoBehaviour
             if (currentElevation > minElevation + 1)
             {
                 currentElevation--;
-                SetWorldLayerVisibility(currentElevation);
+                SetWorldLayerVisibility(currentElevation, false);
                 OnCurrentElevationChanged?.Invoke(currentElevation);
             }
         }
-        else if (Input.GetKeyUp(KeyCode.Home))
-        {
-            currentElevation = maxY + 1;
-            SetWorldLayerVisibility(currentElevation);
-            OnCurrentElevationChanged?.Invoke(currentElevation);
-        }
     }
-    
+
     private bool IsSolid(int x, int y, int z)
     {
         if (x < 0 || x >= maxX || z < 0 || z >= maxZ || y < minElevation || y >= maxY)
             return false;
 
         int yIndex = y - minElevation;
-
         int chunkX = x / ChunkData.CHUNK_SIZE;
         int chunkZ = z / ChunkData.CHUNK_SIZE;
         int chunkLocalX = x % ChunkData.CHUNK_SIZE;
@@ -233,5 +237,76 @@ public class World : MonoBehaviour
 
         return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid;
         // return WorldData.Instance.YSlices[yIndex].Grid[x][z].IsSolid;
+    }
+
+    private void RebuildTopFacesForceTop(int y)
+    {
+        // Rebuild the top faces of the current layer
+        GameObject ySliceObject = ySlices[y - minElevation];
+        for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
+        {
+            for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)
+            {
+                GameObject chunkObject = ySliceObject.transform.GetChild(chunkX * ChunkZCount + chunkZ).gameObject;
+                MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
+                MeshData meshData = new MeshData();
+
+                for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
+                {
+                    for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
+                    {
+                        int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
+                        int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
+
+                        if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, y, worldZ))
+                        {
+                            Vector3 targetPosition = new Vector3(x, y, z);
+                            MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                        }
+                    }
+                }
+                LoadMeshData(meshData, chunkFilter);
+            }
+        }
+    }
+    private void RebuildMeshAtLevel(int y)
+    {
+        // Rebuild the mesh at the current elevation
+        GameObject ySliceObject = ySlices[y - minElevation];
+        for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
+        {
+            for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)
+            {
+                GameObject chunkObject = ySliceObject.transform.GetChild(chunkX * ChunkZCount + chunkZ).gameObject;
+                MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
+                MeshData meshData = new MeshData();
+
+                for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
+                {
+                    for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
+                    {
+                        int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
+                        int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
+
+                        if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, y, worldZ))
+                        {
+                            Vector3 targetPosition = new Vector3(x, y, z);
+                            if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                        }
+                    }
+                }
+                LoadMeshData(meshData, chunkFilter);
+            }
+        }
     }
 }

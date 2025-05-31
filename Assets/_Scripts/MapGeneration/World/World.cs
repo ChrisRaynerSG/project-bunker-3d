@@ -88,7 +88,11 @@ public class World : MonoBehaviour
                         int chunkLocalX = x % ChunkData.CHUNK_SIZE;
                         int chunkLocalZ = z % ChunkData.CHUNK_SIZE;
 
-                        WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid = true;
+                        BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
+                        blockData.IsSolid = true;
+
+                        // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid = true;
+                        // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ] = 1;
                         // WorldData.Instance.YSlices[yIndex].Grid[x][z].IsSolid = true;
                     }
                 }
@@ -141,6 +145,7 @@ public class World : MonoBehaviour
                         }
                     }
                     LoadMeshData(meshData, chunkFilter);
+                    chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
                 }
             }
             yield return null;
@@ -199,7 +204,7 @@ public class World : MonoBehaviour
         }
 
         RebuildTopFacesForceTop(y);
-        if(isGoingUp) RebuildMeshAtLevel(y-1);
+        if (isGoingUp) RebuildMeshAtLevel(y - 1);
 
         currentElevation = y;
     }
@@ -276,7 +281,7 @@ public class World : MonoBehaviour
             }
         }
     }
-    private void RebuildMeshAtLevel(int y)
+    public void RebuildMeshAtLevel(int y)
     {
         // Rebuild the mesh at the current elevation
         GameObject ySliceObject = ySlices[y - minElevation];
@@ -311,4 +316,35 @@ public class World : MonoBehaviour
             }
         }
     }
+
+    public ChunkData GetChunkAtPosition(int x, int y, int z)
+    {
+        int chunkX = x / ChunkData.CHUNK_SIZE;
+        int chunkZ = z / ChunkData.CHUNK_SIZE;
+        int chunkLocalX = x % ChunkData.CHUNK_SIZE;
+        int chunkLocalZ = z % ChunkData.CHUNK_SIZE;
+
+        if (chunkX < 0 || chunkZ < 0 || chunkX >= ChunkXCount || chunkZ >= ChunkZCount)
+            return null;
+
+        int yIndex = y - minElevation;
+        if (yIndex < 0 || yIndex >= WorldData.Instance.YSlices.Length)
+            return null;
+
+        return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
+    }
+
+    // public ChunkData GetChunkAtWorldPosition(Vector3Int position)
+    // {
+    //     Vector3Int chunkCoord = WorldToChunkCoord(position);
+
+    // }
+    // public Vector3Int WorldToChunkCoord(Vector3Int position)
+    // {
+    //     return new Vector3Int(
+    //         position.x / ChunkData.CHUNK_SIZE,
+    //         position.y,
+    //         position.z / ChunkData.CHUNK_SIZE
+    //     );
+    // }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 [Serializable]
 public class BlockData
 {
+
     private int x;
     public int X
     {
@@ -30,10 +31,31 @@ public class BlockData
         set { isSolid = value; }
     }
 
-    private String blockType; // may need to change to enum to make it easier to work with;
-    public String BlockType
+    public string BlockTypeName { get; set; }
+
+
+    public enum BlockType
     {
-        get { return blockType; }
-        set { blockType = value; }
+        Air,
+        Dirt,
+        Grass,
+        Stone,
+        Water,
+        IronOre,
+        CoalOre,
+        GoldOre,
+        CopperOre,
+        UraniumOre
     }
+
+    // private String blockType; // may need to change to enum to make it easier to work with;
+    // public String BlockType
+    // {
+    //     get { return blockType; }
+    //     set { blockType = value; }
+    // }
+
+
+
+    //values for temperature/radiation/etc?  bool for is indoors?
 }

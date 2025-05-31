@@ -33,7 +33,9 @@ public class BlockAccessor
         {
             block.BlockTypeName = blockType.ToString();
             block.IsSolid = blockType != BlockData.BlockType.Air;
+            
             world.RebuildMeshAtLevel(position.y);
+            world.RebuildMeshAtLevel(position.y + 1); // Rebuild the mesh at the block's Y level
             world.RebuildMeshAtLevel(position.y - 1); // Rebuild the mesh at the block's Y level
         }
 
@@ -51,7 +53,7 @@ public class BlockAccessor
             if (localX < 0) localX += ChunkData.CHUNK_SIZE;
             if (localZ < 0) localZ += ChunkData.CHUNK_SIZE;
 
-            Debug.Log($"Getting block at local coordinates: ({localX}, {localZ}) in chunk at ({chunk.ChunkX}, {chunk.ChunkZ})");
+            // Debug.Log($"Getting block at local coordinates: ({localX}, {localZ}) in chunk at ({chunk.ChunkX}, {chunk.ChunkZ})");
 
             return chunk.Grid[localX][localZ];
         }

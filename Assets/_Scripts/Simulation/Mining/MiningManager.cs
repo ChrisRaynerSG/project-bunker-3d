@@ -26,7 +26,7 @@ public class MiningManager : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             Debug.Log($"Hit block at position: {hit.point}, normal: {hit.normal}");
-            Vector3Int hitPosition = Vector3Int.FloorToInt(hit.point - hit.normal * 0.01f);
+            Vector3Int hitPosition = Vector3Int.FloorToInt(hit.point - hit.normal * 0.5f);
             blockAccessor.SetBlock(hitPosition, BlockData.BlockType.Air);
         }
     }

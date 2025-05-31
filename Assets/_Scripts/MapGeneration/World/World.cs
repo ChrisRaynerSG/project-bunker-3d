@@ -313,6 +313,7 @@ public class World : MonoBehaviour
                     }
                 }
                 LoadMeshData(meshData, chunkFilter);
+                chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
             }
         }
     }

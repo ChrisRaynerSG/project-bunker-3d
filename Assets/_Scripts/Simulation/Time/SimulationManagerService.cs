@@ -4,6 +4,7 @@ public class SimulationManagerService : ISimulation
 
 {
     public static SimulationManagerService Instance { get; private set; } // Singleton instance
+
     private bool isPaused;
     public bool IsPaused => isPaused;
 

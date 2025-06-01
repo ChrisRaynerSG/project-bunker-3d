@@ -5,4 +5,7 @@ public interface ISimulation
     void SetSimulationSpeed(int speed);
     void UpdateSimulationTime();
     bool IsPaused { get; }
+
+    // Need methods to get current time, day, month, year?
+
 }

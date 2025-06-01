@@ -14,7 +14,7 @@ public interface ISimulation
     int GetSimulationSpeed();
 
     // Accessor methods for current time, day, month, year
-    int GetCurrentTime();
+    float GetCurrentTime();
     int GetCurrentDay();
     int GetCurrentMonth();
     int GetCurrentYear();

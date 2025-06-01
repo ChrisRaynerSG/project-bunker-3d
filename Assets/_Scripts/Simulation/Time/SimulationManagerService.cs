@@ -77,7 +77,7 @@ public class SimulationManagerService : ISimulation
         return timeModel.SimulationSpeed;
     }
 
-    public int GetCurrentTime()
+    public float GetCurrentTime()
     {
         return timeModel.Time;
     }

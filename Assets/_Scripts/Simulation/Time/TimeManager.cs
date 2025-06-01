@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
-using NUnit.Framework;
 using TMPro;
+
 
 public class TimeManager : MonoBehaviour
 {
@@ -75,8 +75,8 @@ public class TimeManager : MonoBehaviour
 
     void HandleUiChanges()
     {
-        int hour = simulationManager.GetCurrentTime() / 15; // 360 degrees / 24 hours = 15 degrees per hour
-        int minute = (simulationManager.GetCurrentTime() % 15) * 4; // 30 degrees per hour / 60 minutes = 0.5 degrees per minute
+        int hour = (int)simulationManager.GetCurrentTime() / 15; // 360 degrees / 24 hours = 15 degrees per hour
+        int minute = (int)(simulationManager.GetCurrentTime() % 15 * (60f / 15f)); // or just *4.0f
         int month = simulationManager.GetCurrentMonth(); // integer between 0 and 11                                                
         string monthName = Enum.GetName(typeof(SimulationTimeModel.MonthType), month); // Get the name of the month from the enum
 

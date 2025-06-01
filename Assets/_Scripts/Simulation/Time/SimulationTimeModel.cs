@@ -3,8 +3,8 @@ using System;
 [Serializable]
 public class SimulationTimeModel
 {
-    private int time;
-    public int Time => time;
+    private float time;
+    public float Time => time;
     private int day;
     public int Day => day;
     private int month;
@@ -31,7 +31,7 @@ public class SimulationTimeModel
     private int simulationSpeed;
     public int SimulationSpeed => simulationSpeed;
 
-    public static event Action<int> OnTimeChanged;
+    public static event Action<float> OnTimeChanged;
     public static event Action<int> OnDayChanged;
     public static event Action<int> OnMonthChanged;
     public static event Action<int> OnYearChanged;
@@ -89,7 +89,7 @@ public class SimulationTimeModel
 
     public void IncrementTime()
     {
-        time += simulationSpeed;
+        time += simulationSpeed * 0.005f;
         OnTimeChanged?.Invoke(time);
         if (time >= 360)
         {

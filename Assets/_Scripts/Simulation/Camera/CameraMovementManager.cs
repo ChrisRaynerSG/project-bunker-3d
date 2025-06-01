@@ -57,7 +57,7 @@ public class CameraMovementManager : MonoBehaviour
         right.Normalize();
 
         Vector3 moveDirection = (forward * verticalInput + right * horizontalInput).normalized;
-        mainCamera.transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        mainCamera.transform.position += moveDirection * moveSpeed * Time.unscaledDeltaTime;
     }
 
     private void HandleZoom()
@@ -68,7 +68,7 @@ public class CameraMovementManager : MonoBehaviour
         if (scrollInput != 0)
         {
             Vector3 position = mainCamera.transform.position;
-            position.y -= scrollInput * scrollSpeed * 100f * Time.deltaTime; // Adjust zoom speed
+            position.y -= scrollInput * scrollSpeed * 100f * Time.unscaledDeltaTime; // Adjust zoom speed
             position.y = Mathf.Clamp(position.y, minY, maxY);
             mainCamera.transform.position = position;
         }
@@ -80,8 +80,8 @@ public class CameraMovementManager : MonoBehaviour
 
         if (Input.GetMouseButton(1)) // Right mouse button for rotation
         {
-            float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
-            float rotationY = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
+            float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * Time.unscaledDeltaTime;
+            float rotationY = Input.GetAxis("Mouse Y") * rotationSpeed * Time.unscaledDeltaTime;
 
             mainCamera.transform.Rotate(Vector3.up, rotationX, Space.World);
             mainCamera.transform.Rotate(Vector3.left, rotationY);

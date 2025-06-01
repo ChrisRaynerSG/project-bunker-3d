@@ -317,6 +317,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 20
   scrollSpeed: 40
+  rotationSpeed: 600
   minY: -50
   maxY: 50
 --- !u!1 &410087039
@@ -629,12 +630,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9ef343a5b0cf634590d0ee47e96fb7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxX: 32
-  maxZ: 32
+  maxX: 96
+  maxZ: 96
   frequency: 0.007
-  seed: 123456789
+  seed: 987654321
   maxY: 32
-  minElevation: 0
+  minElevation: -32
   currentElevation: 0
   YSlicePrefab: {fileID: 7267588843004917064, guid: 29a8f40d95895804a8385f643f8b0213, type: 3}
   ChunkPrefab: {fileID: 5595582877656055663, guid: cc44970831e50b446b8ca839047d2e38, type: 3}

@@ -1,11 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;
 public class World : MonoBehaviour
 {
     MeshFilter filter;
+
+    // world sizes will be: 
+    // 128x128 small world
+    // 192x192 medium world
+    // 256x256 large world
+    // 400x400 huge world
+    
     public int maxX = 16;
     public int maxZ = 16;
     public float frequency = 0.1f;
@@ -316,7 +324,14 @@ public class World : MonoBehaviour
                         if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, y, worldZ))
                         {
                             Vector3 targetPosition = new Vector3(x, y, z);
-                            if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                            if (currentElevation == y)
+                            {
+                                MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                            }
+                            else
+                            {
+                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                            }
                             if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
                             if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
                             if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
@@ -327,6 +342,51 @@ public class World : MonoBehaviour
                 }
                 LoadMeshData(meshData, chunkFilter);
                 chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
+            }
+        }
+    }
+
+    public void RebuildChunkMesh(ChunkData chunkData)
+    {
+        if (chunkData == null) return;
+
+        int chunkX = chunkData.ChunkX;
+        int chunkZ = chunkData.ChunkZ;
+        int yIndex = chunkData.OriginY - minElevation;
+
+        if (yIndex < 0 || yIndex >= WorldData.Instance.YSlices.Length) return;
+
+        GameObject chunkObject = ySlices[yIndex].transform.Find($"Chunk_{chunkX}_{chunkZ}_{chunkData.OriginY}").gameObject;
+
+        if (chunkObject == null) return;
+
+        MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
+        MeshData meshData = new MeshData();
+
+        for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
+        {
+            for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
+            {
+                int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
+                int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
+
+                if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, chunkData.OriginY, worldZ))
+                {
+                    Vector3 targetPosition = new Vector3(x, chunkData.OriginY, z);
+                    if (currentElevation == chunkData.OriginY)
+                        {
+                            MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                        }
+                        else
+                        {
+                            if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                        }
+                    if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
+                    if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
+                    if (!IsSolid(worldX - 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                }
             }
         }
     }

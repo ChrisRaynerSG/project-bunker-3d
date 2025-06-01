@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CameraMovementManager : MonoBehaviour
@@ -36,6 +37,17 @@ public class CameraMovementManager : MonoBehaviour
             return; // No movement keys pressed
         }
 
+        Vector3 direction = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W)) direction += Vector3.forward;
+        if (Input.GetKey(KeyCode.S)) direction += Vector3.back;
+        if (Input.GetKey(KeyCode.A)) direction += Vector3.left;
+        if (Input.GetKey(KeyCode.D)) direction += Vector3.right;
+
+        if (direction == Vector3.zero) return;
+
+        
+        
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {
             moveSpeed *= 2; // Double speed when shift is pressed
@@ -45,8 +57,8 @@ public class CameraMovementManager : MonoBehaviour
             moveSpeed /= 2; // Reset speed when shift is released
         }
 
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        // float horizontalInput = Input.GetAxis("Horizontal");
+        // float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 forward = mainCamera.transform.forward;
         forward.y = 0f;
@@ -56,7 +68,7 @@ public class CameraMovementManager : MonoBehaviour
         right.y = 0f;
         right.Normalize();
 
-        Vector3 moveDirection = (forward * verticalInput + right * horizontalInput).normalized;
+        Vector3 moveDirection = (forward * direction.z + right * direction.x).normalized;
         mainCamera.transform.position += moveDirection * moveSpeed * Time.unscaledDeltaTime;
     }
 

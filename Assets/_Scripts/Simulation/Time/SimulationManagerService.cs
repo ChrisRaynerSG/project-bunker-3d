@@ -59,7 +59,7 @@ public class SimulationManagerService : ISimulation
             timeModel.IncrementTime();
         }
     }
-    
+
     public void LoadTimeFromSave(string saveData)
     {
         int time = 90;
@@ -69,6 +69,32 @@ public class SimulationManagerService : ISimulation
         // Implement logic to load time from save data
         // This could involve parsing the saveData string and updating the timeModel accordingly
         // For now, we will just reset the timeModel to default values
-        timeModel.SetTimeAndDate(time,day, month, year);
+        timeModel.SetTimeAndDate(time, day, month, year);
     }
+
+    public int GetSimulationSpeed()
+    {
+        return timeModel.SimulationSpeed;
+    }
+
+    public int GetCurrentTime()
+    {
+        return timeModel.Time;
+    }
+
+    public int GetCurrentDay()
+    {
+        return timeModel.Day;
+    }
+
+    public int GetCurrentMonth()
+    {
+        return timeModel.Month;
+    }
+
+    public int GetCurrentYear()
+    {
+        return timeModel.Year;
+    }
+    
 }

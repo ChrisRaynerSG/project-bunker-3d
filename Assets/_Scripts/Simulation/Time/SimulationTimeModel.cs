@@ -1,5 +1,6 @@
 using System;
 
+[Serializable]
 public class SimulationTimeModel
 {
     private int time;
@@ -11,6 +12,21 @@ public class SimulationTimeModel
     private int year;
     public int Year => year;
     public int daysInMonth = 4;
+    public enum MonthType
+    {
+        January = 0,
+        February = 1,
+        March = 2,
+        April = 3,
+        May = 4,
+        June = 5,
+        July = 6,
+        August = 7,
+        September = 8,
+        October = 9,
+        November = 10,
+        December = 11
+    }
 
     private int simulationSpeed;
     public int SimulationSpeed => simulationSpeed;
@@ -42,6 +58,7 @@ public class SimulationTimeModel
         time = 0;
         day = 0;
         month = 0;
+        year = System.DateTime.Now.Year; // Initialize to current year
     }
 
     public static SimulationTimeModel GetInstance()
@@ -57,7 +74,7 @@ public class SimulationTimeModel
     {
         day++;
         time = 0;
-        if (day >= daysInMonth)
+        if (day > daysInMonth)
         {
             RolloverMonth();
             day = 0;
@@ -67,7 +84,7 @@ public class SimulationTimeModel
     private void RolloverMonth()
     {
         month++;
-        if (month >= 12)
+        if (month > 12)
         {
             RolloverYear();
             month = 0;

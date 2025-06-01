@@ -18,6 +18,7 @@ public class ChunkData
     {
         OriginX = originX;
         OriginZ = originZ;
+        OriginY = originY;
 
         // Initialize the grid with CHUNK_SIZE x CHUNK_SIZE blocks
         Grid = new BlockData[CHUNK_SIZE][];

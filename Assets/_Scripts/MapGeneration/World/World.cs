@@ -346,41 +346,47 @@ public class World : MonoBehaviour
         }
     }
 
-    public void RebuildChunkMesh(ChunkData chunkData)
+    public void RebuildChunkMesh(int x, int y, int z)
     {
+        //Debug.Log($"Rebuilding chunk mesh at: {x}, {y}, {z}");
+
+        ChunkData chunkData = GetChunkAtPosition(x, y, z);
         if (chunkData == null) return;
 
         int chunkX = chunkData.ChunkX;
         int chunkZ = chunkData.ChunkZ;
         int yIndex = chunkData.OriginY - minElevation;
 
+        //Debug.Log("Rebuilding chunk at: " + chunkX + ", " + chunkData.OriginY + ", " + chunkZ);
+
         if (yIndex < 0 || yIndex >= WorldData.Instance.YSlices.Length) return;
 
         GameObject chunkObject = ySlices[yIndex].transform.Find($"Chunk_{chunkX}_{chunkZ}_{chunkData.OriginY}").gameObject;
+        //Debug.Log("Found chunk object: " + chunkObject.name);
 
         if (chunkObject == null) return;
 
         MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
         MeshData meshData = new MeshData();
 
-        for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
+        for (int x1 = 0; x1 < ChunkData.CHUNK_SIZE; x1++)
         {
-            for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
+            for (int z1 = 0; z1 < ChunkData.CHUNK_SIZE; z1++)
             {
-                int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
-                int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
+                int worldX = chunkX * ChunkData.CHUNK_SIZE + x1;
+                int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z1;
 
                 if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, chunkData.OriginY, worldZ))
                 {
-                    Vector3 targetPosition = new Vector3(x, chunkData.OriginY, z);
+                    Vector3 targetPosition = new Vector3(x1, chunkData.OriginY, z1);
                     if (currentElevation == chunkData.OriginY)
-                        {
-                            MeshUtilities.CreateFaceUp(meshData, targetPosition);
-                        }
-                        else
-                        {
-                            if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
-                        }
+                    {
+                        MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                    }
+                    else
+                    {
+                        if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                    }
                     if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
                     if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
                     if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
@@ -389,6 +395,8 @@ public class World : MonoBehaviour
                 }
             }
         }
+        LoadMeshData(meshData, chunkFilter);
+        chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
     }
 
     public ChunkData GetChunkAtPosition(int x, int y, int z)

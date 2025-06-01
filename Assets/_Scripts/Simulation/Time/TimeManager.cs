@@ -19,6 +19,9 @@ public class TimeManager : MonoBehaviour
     void Awake()
     {
         simulationManager = SimulationManagerService.GetInstance();
+        Debug.Log("TimeManager initialized with simulation manager: " + simulationManager);
+        Debug.Log("Simulation is paused: " + simulationManager.IsPaused);
+        Debug.Log("Current time: " + simulationManager.GetCurrentTime());
     }
 
     void Start()

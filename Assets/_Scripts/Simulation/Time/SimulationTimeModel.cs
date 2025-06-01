@@ -37,22 +37,19 @@ public class SimulationTimeModel
     public static event Action<int> OnYearChanged;
     public static event Action<int> OnSimulationSpeedChanged;
 
-    public static SimulationTimeModel Instance
-    {
-        get => GetInstance();
-        private set
+    private static SimulationTimeModel _instance;
+    public static SimulationTimeModel Instance{
+        get
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = value;
+                _instance = new SimulationTimeModel();
             }
-            else
-            {
-                throw new InvalidOperationException("SimulationTimeModel instance already exists.");
-            }
+            return _instance;
         }
     }
 
+    
     private SimulationTimeModel()
     {
         time = 0;
@@ -61,14 +58,6 @@ public class SimulationTimeModel
         year = System.DateTime.Now.Year; // Initialize to current year
     }
 
-    public static SimulationTimeModel GetInstance()
-    {
-        if (Instance == null)
-        {
-            Instance = new SimulationTimeModel();
-        }
-        return Instance;
-    }
 
     private void RolloverDay()
     {

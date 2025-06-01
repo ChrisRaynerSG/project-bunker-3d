@@ -13,7 +13,7 @@ public class SimulationManagerService : ISimulation
 
     private SimulationManagerService()
     {
-        timeModel = SimulationTimeModel.GetInstance();
+        timeModel = SimulationTimeModel.Instance;
         timeModel.SetSimulationSpeed(0); // Initialize simulation speed to 0 (paused)
         Time.timeScale = 0; // Set Unity's time scale to 0 (paused)
         isPaused = false;

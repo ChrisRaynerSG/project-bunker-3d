@@ -11,7 +11,8 @@ public class SimulationManagerService : ISimulation
     private SimulationTimeModel timeModel;
     public static event Action<bool> OnSimulationPaused;
 
-    private SimulationManagerService(){
+    private SimulationManagerService()
+    {
         timeModel = SimulationTimeModel.GetInstance();
         timeModel.SetSimulationSpeed(0); // Initialize simulation speed to 0 (paused)
         Time.timeScale = 0; // Set Unity's time scale to 0 (paused)
@@ -35,7 +36,7 @@ public class SimulationManagerService : ISimulation
 
     public void PlaySimulation()
     {
-        if(timeModel.SimulationSpeed == 0)
+        if (timeModel.SimulationSpeed == 0)
         {
             timeModel.SetSimulationSpeed(1); // Set to normal speed
         }
@@ -57,5 +58,17 @@ public class SimulationManagerService : ISimulation
         {
             timeModel.IncrementTime();
         }
+    }
+    
+    public void LoadTimeFromSave(string saveData)
+    {
+        int time = 90;
+        int day = 0;
+        int month = 0;
+        int year = 0;
+        // Implement logic to load time from save data
+        // This could involve parsing the saveData string and updating the timeModel accordingly
+        // For now, we will just reset the timeModel to default values
+        timeModel.SetTimeAndDate(time,day, month, year);
     }
 }

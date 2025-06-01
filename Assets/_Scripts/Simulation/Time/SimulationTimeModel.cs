@@ -95,5 +95,17 @@ public class SimulationTimeModel
         simulationSpeed = speed;
         OnSimulationSpeedChanged?.Invoke(simulationSpeed);
     }
-    
+
+    public void SetTimeAndDate(int newTime, int newDay, int newMonth, int newYear)
+    {
+        time = newTime;
+        day = newDay;
+        month = newMonth;
+        year = newYear;
+
+        OnTimeChanged?.Invoke(time);
+        OnDayChanged?.Invoke(day);
+        OnMonthChanged?.Invoke(month);
+        OnYearChanged?.Invoke(year);
+    }
 }

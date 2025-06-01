@@ -6,6 +6,6 @@ public class GameState
 
     bool worldEnded = false;
     int daysUntilEndOfTheWorld = 30;
-    
+    SimulationTimeModel timeModel;
 
 }

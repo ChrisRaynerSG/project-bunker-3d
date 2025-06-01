@@ -6,6 +6,7 @@ public interface ISimulation
     void UpdateSimulationTime();
     bool IsPaused { get; }
 
+    void LoadTimeFromSave(string saveData);
     // Need methods to get current time, day, month, year?
 
 }

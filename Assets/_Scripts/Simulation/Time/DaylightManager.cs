@@ -24,9 +24,16 @@ public class DaylightManager : MonoBehaviour
     {
         if (simulationManager == null) return;
 
-        float sunlightRotation = time - 90f;
-        // Calculate the sun's rotation based on the time of day
-        SunDirectionLight.transform.rotation = Quaternion.Euler(sunlightRotation, 40, 0); // time is in degrees already
-
+        if (time >= 45f && time <= 330f)
+        {
+            float normalizedTime = (time - 90f) / (300f - 90f); // Normalize time to a 0-1 range for day
+            float sunlightRotation = normalizedTime * 180f;
+            SunDirectionLight.transform.rotation = Quaternion.Euler(sunlightRotation, 40, 0); // time is in degrees already
+        }
+        else
+        {
+            // Nighttime
+            SunDirectionLight.transform.rotation = Quaternion.Euler(-90f, 40, 0); // time is in degrees already
+        }
     }
 }

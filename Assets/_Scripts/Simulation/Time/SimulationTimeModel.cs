@@ -52,7 +52,7 @@ public class SimulationTimeModel
     
     private SimulationTimeModel()
     {
-        time = 0;
+        time = 90; // Initialize to 90 degrees (dawn)
         day = 0;
         month = 0;
         year = System.DateTime.Now.Year; // Initialize to current year

@@ -63,7 +63,7 @@ public class SimulationTimeModel
     {
         day++;
         time = 0;
-        if (day > daysInMonth)
+        if (day >= daysInMonth)
         {
             RolloverMonth();
             day = 0;
@@ -73,7 +73,7 @@ public class SimulationTimeModel
     private void RolloverMonth()
     {
         month++;
-        if (month > 12)
+        if (month >= 12)
         {
             RolloverYear();
             month = 0;

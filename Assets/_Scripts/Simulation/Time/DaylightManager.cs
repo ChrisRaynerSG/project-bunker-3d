@@ -24,11 +24,12 @@ public class DaylightManager : MonoBehaviour
 
     private void HandleSunMovement(float time)
     {
+        // maybe put the month rotation in here as well, so we can adjust everything based on the month
 
 
         if (simulationManager == null) return;
 
-        if (time >= 45f && time <= 330f)
+        if (time >= 60f && time <= 360f)
         {
             if (!isBrightening)
             {
@@ -46,7 +47,7 @@ public class DaylightManager : MonoBehaviour
             {
                 StartCoroutine(DimSunlight()); // Dim the sunlight when not in daytime
             }
-            SunDirectionLight.transform.rotation = Quaternion.Euler(-90f, GetMonthRotation(), 0); // time is in degrees already
+            // SunDirectionLight.transform.rotation = Quaternion.Euler(-90f, GetMonthRotation(), 0); // time is in degrees already
         }
     }
 
@@ -108,7 +109,7 @@ public class DaylightManager : MonoBehaviour
 
         float targetIntensity = 0f;
         float currentIntensity = SunDirectionLight.GetComponent<Light>().intensity;
-        float duration = 1f; // Duration to dim the sunlight
+        float duration = 10f; // Duration to dim the sunlight
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)
@@ -130,7 +131,7 @@ public class DaylightManager : MonoBehaviour
 
         float targetIntensity = 2f; // Assuming the light's intensity is 1 when fully bright
         float currentIntensity = SunDirectionLight.GetComponent<Light>().intensity;
-        float duration = 1f; // Duration to brighten the sunlight
+        float duration = 10f; // Duration to brighten the sunlight
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)

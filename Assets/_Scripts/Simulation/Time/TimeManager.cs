@@ -81,7 +81,7 @@ public class TimeManager : MonoBehaviour
         string monthName = Enum.GetName(typeof(SimulationTimeModel.MonthType), month); // Get the name of the month from the enum
 
         TimeText.text = hour.ToString("00") + ":" + minute.ToString("00");
-        DayText.text = simulationManager.GetCurrentDay()+1.ToString(); // get the current day from the simulation manager + 1 because days start at 0
+        DayText.text = (simulationManager.GetCurrentDay() +1 ).ToString(); // get the current day from the simulation manager + 1 because days start at 0
         MonthText.text = monthName; // display the name of the month
         // currently 4 days in a month 12 months in a year so 48 days in a year - may want to change this later depending on balance?
         YearText.text = simulationManager.GetCurrentYear().ToString();

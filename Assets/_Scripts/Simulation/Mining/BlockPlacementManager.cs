@@ -5,6 +5,10 @@ public class BlockPlacementManager : MonoBehaviour
     public Camera mainCamera;
     private BlockAccessor blockAccessor;
 
+    Vector3 clickDownPosition;
+    Vector3 clickUpPosition;
+
+
     void Start()
     {
         blockAccessor = new BlockAccessor(World.Instance);
@@ -12,10 +16,7 @@ public class BlockPlacementManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
-        {
-            TryPlaceBlock();
-        }
+        HandleInput();
     }
 
     private void TryPlaceBlock()
@@ -33,6 +34,27 @@ public class BlockPlacementManager : MonoBehaviour
 
             // Place a new block at the hit position
             blockAccessor.SetBlock(hitPosition, BlockData.BlockType.Dirt);
+        }
+    }
+
+    private void HandleInput()
+    {
+        if (Input.GetMouseButtonDown(1)) // Right mouse button to place block
+        {
+            clickDownPosition = Input.mousePosition;
+        }
+        if (Input.GetMouseButtonUp(1))
+        {
+            clickUpPosition = Input.mousePosition;
+
+            if (Vector3.Distance(clickDownPosition, clickUpPosition) < 0.1f) // Check if the click was a short press
+            {
+                TryPlaceBlock();
+            }
+            else
+            {
+                return;
+            }
         }
     }
 }

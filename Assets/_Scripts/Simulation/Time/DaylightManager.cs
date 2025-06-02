@@ -9,7 +9,6 @@ public class DaylightManager : MonoBehaviour
     void Start()
     {
         SunDirectionLight.transform.rotation = Quaternion.Euler(0, 0, 0);
-        //timeModel = SimulationTimeModel.GetInstance();
         simulationManager = SimulationManagerService.GetInstance();
         SimulationTimeModel.OnTimeChanged += HandleSunMovement;
     }
@@ -17,7 +16,6 @@ public class DaylightManager : MonoBehaviour
     void Update()
     {
         if (Time.timeScale == 0) return;
-        // HandleSunMovement();
     }
 
     private void HandleSunMovement(float time)

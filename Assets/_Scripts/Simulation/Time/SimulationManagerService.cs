@@ -50,6 +50,11 @@ public class SimulationManagerService : ISimulation
     {
         timeModel.SetSimulationSpeed(speed);
         Time.timeScale = timeModel.SimulationSpeed;
+        if(IsPaused)
+        {
+            isPaused = false; // Unpause if speed is set
+            OnSimulationPaused?.Invoke(isPaused);
+        }
     }
 
     public void UpdateSimulationTime()

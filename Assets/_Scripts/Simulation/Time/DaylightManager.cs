@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class DaylightManager : MonoBehaviour
@@ -5,6 +6,9 @@ public class DaylightManager : MonoBehaviour
     public GameObject SunDirectionLight;
     //private SimulationTimeModel timeModel;
     private ISimulation simulationManager;
+
+    private bool isDimming = false;
+    private bool isBrightening = false;
 
     void Start()
     {
@@ -21,28 +25,28 @@ public class DaylightManager : MonoBehaviour
     private void HandleSunMovement(float time)
     {
 
-    
+
         if (simulationManager == null) return;
 
         if (time >= 45f && time <= 330f)
         {
-            if (SunDirectionLight.activeSelf == false)
+            if (!isBrightening)
             {
-                SunDirectionLight.SetActive(true); // Enable the light during daytime
+                StartCoroutine(BrightenSunlight()); // Brighten the sunlight when in daytime
             }
-
+            
             float normalizedTime = (time - 90f) / (300f - 90f); // Normalize time to a 0-1 range for day
             float sunlightRotation = normalizedTime * 180f;
             SunDirectionLight.transform.rotation = Quaternion.Euler(sunlightRotation, GetMonthRotation(), 0); // time is in degrees already
-            
+
         }
         else
         {
-            if (SunDirectionLight.activeSelf == true)
+            if (!isDimming)
             {
-                SunDirectionLight.SetActive(false); // Disable the light during nighttime
-                SunDirectionLight.transform.rotation = Quaternion.Euler(-90f, GetMonthRotation(), 0); // time is in degrees already
+                StartCoroutine(DimSunlight()); // Dim the sunlight when not in daytime
             }
+            SunDirectionLight.transform.rotation = Quaternion.Euler(-90f, GetMonthRotation(), 0); // time is in degrees already
         }
     }
 
@@ -94,5 +98,49 @@ public class DaylightManager : MonoBehaviour
                 break;
         }
         return monthRotation; // Return the calculated rotation for the current month
+    }
+
+    private IEnumerator DimSunlight()
+    {
+        if (isDimming) yield break; // Prevent multiple coroutines from running simultaneously
+
+        isDimming = true; // Set the flag to prevent re-entry
+
+        float targetIntensity = 0f;
+        float currentIntensity = SunDirectionLight.GetComponent<Light>().intensity;
+        float duration = 1f; // Duration to dim the sunlight
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            SunDirectionLight.GetComponent<Light>().intensity = Mathf.Lerp(currentIntensity, targetIntensity, t);
+            yield return null;
+        }
+
+        isDimming = false; // Reset the flag after dimming
+    }
+
+    private IEnumerator BrightenSunlight()
+    {
+        if (isBrightening) yield break; // Prevent multiple coroutines from running simultaneously
+
+        isBrightening = true; // Set the flag to prevent re-entry
+
+        float targetIntensity = 2f; // Assuming the light's intensity is 1 when fully bright
+        float currentIntensity = SunDirectionLight.GetComponent<Light>().intensity;
+        float duration = 1f; // Duration to brighten the sunlight
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            SunDirectionLight.GetComponent<Light>().intensity = Mathf.Lerp(currentIntensity, targetIntensity, t);
+            yield return null;
+        }
+
+        isBrightening = false; // Reset the flag after brightening
     }
 }

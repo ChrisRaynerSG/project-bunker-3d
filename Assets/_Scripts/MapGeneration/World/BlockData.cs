@@ -34,7 +34,22 @@ public class BlockData
     public string BlockTypeName { get; set; }
 
 
-    public enum BlockType
+
+
+    public BlockType type { get; set; }
+
+    // private String blockType; // may need to change to enum to make it easier to work with;
+    // public String BlockType
+    // {
+    //     get { return blockType; }
+    //     set { blockType = value; }
+    // }
+
+
+    //values for temperature/radiation/etc?  bool for is indoors?
+}
+
+public enum BlockType
     {
         Air,
         Dirt,
@@ -47,15 +62,3 @@ public class BlockData
         CopperOre,
         UraniumOre
     }
-
-    // private String blockType; // may need to change to enum to make it easier to work with;
-    // public String BlockType
-    // {
-    //     get { return blockType; }
-    //     set { blockType = value; }
-    // }
-
-
-
-    //values for temperature/radiation/etc?  bool for is indoors?
-}

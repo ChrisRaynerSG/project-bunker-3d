@@ -33,7 +33,7 @@ public class BlockPlacementManager : MonoBehaviour
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
 
             // Place a new block at the hit position
-            blockAccessor.SetBlock(hitPosition, BlockData.BlockType.Dirt);
+            blockAccessor.SetBlock(hitPosition,BlockType.Dirt);
         }
     }
 

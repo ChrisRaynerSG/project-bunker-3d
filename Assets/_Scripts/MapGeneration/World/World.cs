@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Unity.Android.Gradle;
 using UnityEngine;
 using UnityEngine.UI;
 public class World : MonoBehaviour
@@ -13,7 +14,7 @@ public class World : MonoBehaviour
     // 192x192 medium world
     // 256x256 large world
     // 400x400 huge world
-    
+
     public int maxX = 16;
     public int maxZ = 16;
     public float frequency = 0.1f;
@@ -79,7 +80,7 @@ public class World : MonoBehaviour
             }
         }
 
-        // first pass to set solid blocks
+        // first pass to set solid blocks and block types
 
         for (int x = 0; x < maxX; x++)
         {
@@ -98,6 +99,7 @@ public class World : MonoBehaviour
 
                         BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
                         blockData.IsSolid = true;
+                        blockData.type = BlockType.Grass;
 
                         // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid = true;
                         // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ] = 1;
@@ -143,12 +145,8 @@ public class World : MonoBehaviour
                             if (worldX < maxX && worldZ < maxZ && y < heights[worldX, worldZ])
                             {
                                 Vector3 targetPosition = new Vector3(x, y, z);
-                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
-                                if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
-                                if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
-                                if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
-                                if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
-                                if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                                BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
+                                CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
                             }
                         }
                     }
@@ -161,6 +159,19 @@ public class World : MonoBehaviour
         }
         currentElevation = maxY;
         OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
+    }
+
+    private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData = null)
+    {
+
+        // need to figure out how to create faces based on the block data, specifically the block type. CreateFaceUp etc has a third parameter for tileIndex, which is used to get the texture from the atlas
+        
+        if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData?.type ?? BlockType.Air);
+        if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData?.type ?? BlockType.Air);
+        if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData?.type ?? BlockType.Air);
+        if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData?.type ?? BlockType.Air);
+        if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData?.type ?? BlockType.Air);
+        if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData?.type ?? BlockType.Air);
     }
 
     public void LoadMeshData(MeshData meshData)
@@ -216,7 +227,7 @@ public class World : MonoBehaviour
                 }
                 else
                 {
-                    if(chunk.layer == 3)
+                    if (chunk.layer == 3)
                     {
                         chunk.layer = 0;
                     }
@@ -288,13 +299,14 @@ public class World : MonoBehaviour
 
                         if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, y, worldZ))
                         {
+                            BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
                             Vector3 targetPosition = new Vector3(x, y, z);
-                            MeshUtilities.CreateFaceUp(meshData, targetPosition);
-                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
-                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
-                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
-                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
-                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                            MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                         }
                     }
                 }
@@ -323,20 +335,21 @@ public class World : MonoBehaviour
 
                         if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, y, worldZ))
                         {
+                            BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
                             Vector3 targetPosition = new Vector3(x, y, z);
                             if (currentElevation == y)
                             {
-                                MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                                MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                             }
                             else
                             {
-                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                             }
-                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
-                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
-                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
-                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
-                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                         }
                     }
                 }
@@ -378,20 +391,21 @@ public class World : MonoBehaviour
 
                 if (worldX < maxX && worldZ < maxZ && IsSolid(worldX, chunkData.OriginY, worldZ))
                 {
+                    BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[x1][z1];
                     Vector3 targetPosition = new Vector3(x1, chunkData.OriginY, z1);
                     if (currentElevation == chunkData.OriginY)
                     {
-                        MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                        MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
                     }
                     else
                     {
-                        if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition);
+                        if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                     }
-                    if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition);
-                    if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition);
-                    if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition);
-                    if (!IsSolid(worldX, chunkData.OriginY, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition);
-                    if (!IsSolid(worldX - 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition);
+                    if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                    if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
+                    if (!IsSolid(worldX - 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData?.type ?? BlockType.Dirt);
                 }
             }
         }
@@ -429,4 +443,7 @@ public class World : MonoBehaviour
     //         position.z / ChunkData.CHUNK_SIZE
     //     );
     // }
+
+    // need to get atlas index from the block data so we can make sure the textures are correct - block data should store all faces so that we can have blocks with different textures on different sides
+
 }

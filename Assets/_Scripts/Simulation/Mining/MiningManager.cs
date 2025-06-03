@@ -33,7 +33,7 @@ public class MiningManager : MonoBehaviour
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
 
 
-            blockAccessor.SetBlock(hitPosition, BlockData.BlockType.Air);
+            blockAccessor.SetBlock(hitPosition, BlockType.Air);
         }
     }
 }

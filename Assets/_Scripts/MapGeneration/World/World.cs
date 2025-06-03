@@ -99,7 +99,21 @@ public class World : MonoBehaviour
 
                         BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
                         blockData.IsSolid = true;
-                        blockData.type = BlockType.Grass;
+                        
+                        // for world gen I want to have grass on top, then dirt for the next few layers then stone
+
+                        if (y == heights[x, z] - 1)
+                        {
+                            blockData.type = BlockType.Grass;
+                        }
+                        else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
+                        {
+                            blockData.type = BlockType.Dirt;
+                        }
+                        else
+                        {
+                            blockData.type = BlockType.Stone;
+                        }
 
                         // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid = true;
                         // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ] = 1;
@@ -161,7 +175,7 @@ public class World : MonoBehaviour
         OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
     }
 
-    private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData = null)
+    private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
     {
 
         // need to figure out how to create faces based on the block data, specifically the block type. CreateFaceUp etc has a third parameter for tileIndex, which is used to get the texture from the atlas

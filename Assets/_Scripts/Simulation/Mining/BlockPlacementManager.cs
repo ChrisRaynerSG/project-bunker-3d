@@ -28,6 +28,10 @@ public class BlockPlacementManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, 200f, layerMask))
         {
+
+            //what happens if we try to place a block outside the world bounds? 
+            // at the moment it sometimes randomly places the block in the world in the same chunk at the same y level
+
             Debug.Log($"Hit position: {hit.point}, normal: {hit.normal}");
             Vector3 hitOffset = hit.point + hit.normal * 0.5f; // Offset to place block on the surface
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);

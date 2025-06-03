@@ -65,26 +65,11 @@ public class World : MonoBehaviour
 
         // Noises for terrain generation could these be split into different classes?
 
-        FastNoise noise = new FastNoise();
-        noise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        noise.SetFrequency(frequency);
-        noise.SetSeed(seed);
-
-        FastNoise coalNoise = new FastNoise();
-        FastNoise ironNoise = new FastNoise();
-        FastNoise copperNoise = new FastNoise();
-
-        coalNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        coalNoise.SetFrequency(frequency * 10f);
-        coalNoise.SetSeed(-seed + 1);
-        ironNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        ironNoise.SetFrequency(frequency * 10f);
-        ironNoise.SetSeed(-seed + 2);
-        copperNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        copperNoise.SetFrequency(frequency * 10f);
-        copperNoise.SetSeed(-seed + 3);
-
-
+        FastNoise noise = NoiseProvider.CreateNoise(frequency, seed);
+        FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
+        FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
+        FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
+    
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
         for (int x = 0; x < maxX; x++)
@@ -479,21 +464,4 @@ public class World : MonoBehaviour
 
         return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
     }
-
-    // public ChunkData GetChunkAtWorldPosition(Vector3Int position)
-    // {
-    //     Vector3Int chunkCoord = WorldToChunkCoord(position);
-
-    // }
-    // public Vector3Int WorldToChunkCoord(Vector3Int position)
-    // {
-    //     return new Vector3Int(
-    //         position.x / ChunkData.CHUNK_SIZE,
-    //         position.y,
-    //         position.z / ChunkData.CHUNK_SIZE
-    //     );
-    // }
-
-    // need to get atlas index from the block data so we can make sure the textures are correct - block data should store all faces so that we can have blocks with different textures on different sides
-
 }

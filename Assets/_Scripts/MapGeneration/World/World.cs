@@ -63,10 +63,27 @@ public class World : MonoBehaviour
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
         // MeshData meshData = new MeshData();
 
+        // Noises for terrain generation could these be split into different classes?
+
         FastNoise noise = new FastNoise();
         noise.SetNoiseType(FastNoise.NoiseType.Simplex);
         noise.SetFrequency(frequency);
         noise.SetSeed(seed);
+
+        FastNoise coalNoise = new FastNoise();
+        FastNoise ironNoise = new FastNoise();
+        FastNoise copperNoise = new FastNoise();
+
+        coalNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
+        coalNoise.SetFrequency(frequency * 2f);
+        coalNoise.SetSeed(seed + 1);
+        ironNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
+        ironNoise.SetFrequency(frequency * 3f);
+        ironNoise.SetSeed(seed + 2);
+        copperNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
+        copperNoise.SetFrequency(frequency * 4f);
+        copperNoise.SetSeed(seed + 3);
+
 
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
@@ -99,8 +116,9 @@ public class World : MonoBehaviour
 
                         BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
                         blockData.IsSolid = true;
-                        
+
                         // for world gen I want to have grass on top, then dirt for the next few layers then stone
+                        // Basic terrain generation logic need to do ore distribution and fancier features like trees and bushes later - also have a main road that passes from the edge of the map to the centre
 
                         if (y == heights[x, z] - 1)
                         {
@@ -113,11 +131,29 @@ public class World : MonoBehaviour
                         else
                         {
                             blockData.type = BlockType.Stone;
-                        }
 
-                        // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ].IsSolid = true;
-                        // WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ] = 1;
-                        // WorldData.Instance.YSlices[yIndex].Grid[x][z].IsSolid = true;
+                            // may need to change this generation logic to be more complex later, but will try with this for now
+
+                            if (y < maxY * 0.8f)
+                            {
+                                float coalNoiseValue = coalNoise.GetNoise(x, y, z);
+                                float ironNoiseValue = ironNoise.GetNoise(x, y, z);
+                                float copperNoiseValue = copperNoise.GetNoise(x, y, z);
+
+                                if (coalNoiseValue > 0.5f)
+                                {
+                                    blockData.type = BlockType.CoalOre;
+                                }
+                                else if (ironNoiseValue > 0.6f)
+                                {
+                                    blockData.type = BlockType.IronOre;
+                                }
+                                else if (copperNoiseValue > 0.7f)
+                                {
+                                    blockData.type = BlockType.CopperOre;
+                                }
+                            }
+                        }
                     }
                 }
             }

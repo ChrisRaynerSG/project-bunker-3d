@@ -129,10 +129,10 @@ public static class MeshUtilities
         float vMin = 1f - (y + 1) * tileHeight;
 
         Vector2[] uvs = new Vector2[4];
-        uvs[0] = new Vector2(uMin, vMin + tileHeight);
-        uvs[1] = new Vector2(uMin + tileWidth, vMin + tileHeight);
-        uvs[2] = new Vector2(uMin + tileWidth, vMin);
-        uvs[3] = new Vector2(uMin, vMin);
+        uvs[0] = new Vector2(uMin + tileWidth, vMin);                 
+        uvs[1] = new Vector2(uMin + tileWidth, vMin + tileHeight);    
+        uvs[2] = new Vector2(uMin, vMin + tileHeight);                
+        uvs[3] = new Vector2(uMin, vMin);                      
 
         meshData.uvs.AddRange(uvs);
     }

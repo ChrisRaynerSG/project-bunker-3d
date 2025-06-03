@@ -148,7 +148,7 @@ public class World : MonoBehaviour
                                 {
                                     blockData.type = BlockType.IronOre;
                                 }
-                                else if (copperNoiseValue > 0.7f)
+                                else if (copperNoiseValue > 0.85f)
                                 {
                                     blockData.type = BlockType.CopperOre;
                                 }

@@ -75,14 +75,14 @@ public class World : MonoBehaviour
         FastNoise copperNoise = new FastNoise();
 
         coalNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        coalNoise.SetFrequency(frequency * 2f);
-        coalNoise.SetSeed(seed + 1);
+        coalNoise.SetFrequency(frequency * 10f);
+        coalNoise.SetSeed(-seed + 1);
         ironNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        ironNoise.SetFrequency(frequency * 3f);
-        ironNoise.SetSeed(seed + 2);
+        ironNoise.SetFrequency(frequency * 10f);
+        ironNoise.SetSeed(-seed + 2);
         copperNoise.SetNoiseType(FastNoise.NoiseType.Simplex);
-        copperNoise.SetFrequency(frequency * 4f);
-        copperNoise.SetSeed(seed + 3);
+        copperNoise.SetFrequency(frequency * 10f);
+        copperNoise.SetSeed(-seed + 3);
 
 
         // Precompute all heights
@@ -132,7 +132,7 @@ public class World : MonoBehaviour
                         {
                             blockData.type = BlockType.Stone;
 
-                            // may need to change this generation logic to be more complex later, but will try with this for now
+                            // may need to change this generation logic to be more complex later, but will try with this for now maybe more dense ores lower down to promote mining further down?
 
                             if (y < maxY * 0.8f)
                             {
@@ -140,11 +140,11 @@ public class World : MonoBehaviour
                                 float ironNoiseValue = ironNoise.GetNoise(x, y, z);
                                 float copperNoiseValue = copperNoise.GetNoise(x, y, z);
 
-                                if (coalNoiseValue > 0.5f)
+                                if (coalNoiseValue > 0.8f)
                                 {
                                     blockData.type = BlockType.CoalOre;
                                 }
-                                else if (ironNoiseValue > 0.6f)
+                                else if (ironNoiseValue > 0.85f)
                                 {
                                     blockData.type = BlockType.IronOre;
                                 }

@@ -14,7 +14,7 @@ public class BlockAccessor
         BlockData block = GetBlock(position);
         if (block != null)
         {
-            block.BlockTypeName = blockType.ToString();
+            block.type = blockType;
             block.IsSolid = blockType != BlockType.Air;
 
             // world.RebuildMeshAtLevel(position.y);

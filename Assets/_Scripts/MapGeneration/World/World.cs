@@ -45,6 +45,7 @@ public class World : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
+        LoadTextures();
     }
     void Start()
     {
@@ -58,6 +59,14 @@ public class World : MonoBehaviour
         HandleElevationChange();
     }
 
+    void LoadTextures()
+    {
+        List<BlockDefinition> blocks = BlockLoader.LoadBlockDefinitions();
+        HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
+        List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
+        Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
+    }
+
     private IEnumerator GenerateWorldCoroutine()
     {
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
@@ -69,7 +78,7 @@ public class World : MonoBehaviour
         FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
         FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
         FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
-    
+
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
         for (int x = 0; x < maxX; x++)

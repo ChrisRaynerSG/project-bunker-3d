@@ -6,12 +6,12 @@ public class TextureAtlasBuilder
     public static Texture2D AtlasTexture;
     public static Dictionary<string, Rect> UVRects = new();
 
-    public static void BuildAtlas(List<Texture2D> textures, List<string> names)
+    public static Texture2D BuildAtlas(List<Texture2D> textures, List<string> names)
     {
         if (textures == null || textures.Count == 0)
         {
             Debug.LogWarning("No textures provided for atlas building.");
-            return;
+            return null;
         }
 
         int tileSize = textures[0].width;
@@ -41,5 +41,6 @@ public class TextureAtlasBuilder
         }
 
         AtlasTexture.Apply();
+        return AtlasTexture;
     }
 }

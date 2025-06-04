@@ -15,7 +15,7 @@ public class BlockAccessor
         if (block != null)
         {
             block.type = blockType;
-            block.IsSolid = blockType != BlockType.Air;
+            block.IsSolid = blockType.IsSolid;
 
             // world.RebuildMeshAtLevel(position.y);
             // world.RebuildMeshAtLevel(position.y + 1); // Rebuild the mesh at the block's Y level

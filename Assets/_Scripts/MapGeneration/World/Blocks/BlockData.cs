@@ -49,16 +49,16 @@ public class BlockData
     //values for temperature/radiation/etc?  bool for is indoors?
 }
 
-public enum BlockType
-    {
-        Air,
-        Dirt,
-        Grass,
-        Stone,
-        Water,
-        IronOre,
-        CoalOre,
-        GoldOre,
-        CopperOre,
-        UraniumOre
-    }
+// public enum BlockType
+//     {
+//         Air,
+//         Dirt,
+//         Grass,
+//         Stone,
+//         Water,
+//         IronOre,
+//         CoalOre,
+//         GoldOre,
+//         CopperOre,
+//         UraniumOre
+//     }

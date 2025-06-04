@@ -1271,6 +1271,7 @@ GameObject:
   - component: {fileID: 1644170864}
   - component: {fileID: 1644170868}
   - component: {fileID: 1644170869}
+  - component: {fileID: 1644170870}
   m_Layer: 0
   m_Name: WorldGenerator
   m_TagString: Untagged
@@ -1393,6 +1394,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 330585545}
+--- !u!114 &1644170870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644170863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d104daacc85b6f84997c922b21d9349e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1810381446
 GameObject:
   m_ObjectHideFlags: 0

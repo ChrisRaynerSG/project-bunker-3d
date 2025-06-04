@@ -15,6 +15,7 @@ public class BlockDatabase : MonoBehaviour
     {
         // Load all BlockType assets in the Resources/Blocks folder
         BlockType[] blockTypes = Resources.LoadAll<BlockType>("Blocks");
+        Debug.Log($"Loaded {blockTypes.Length} block types from Resources/Blocks");
 
         foreach (BlockType block in blockTypes)
         {

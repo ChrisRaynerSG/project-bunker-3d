@@ -80,7 +80,7 @@ public class CameraMovementManager : MonoBehaviour
         if (scrollInput != 0)
         {
             Vector3 position = mainCamera.transform.position;
-            position.y -= scrollInput * scrollSpeed * 100f * Time.unscaledDeltaTime; // Adjust zoom speed
+            position.y += scrollInput * scrollSpeed * 100f * Time.unscaledDeltaTime; // Adjust zoom speed
             position.y = Mathf.Clamp(position.y, minY, maxY);
             mainCamera.transform.position = position;
         }

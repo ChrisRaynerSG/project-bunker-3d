@@ -1,0 +1,15 @@
+{
+  "id": "bunker:grass_block",
+  "displayName": "Grass Block",
+  "description": "A block of grass",
+  "textures": {
+    "top": "bunker:grass_block_top",
+    "side": "bunker:grass_block_side",
+    "bottom": "bunker:grass_block_bottom"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 1,
+  "miningTime": 1
+}

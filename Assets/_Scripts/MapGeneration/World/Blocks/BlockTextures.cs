@@ -7,13 +7,13 @@ public static class BlockTextures
 
     public static Dictionary<BlockType, BlockTextureSet> BlockUVs = new Dictionary<BlockType, BlockTextureSet>
     {
-        { BlockType.Dirt, new BlockTextureSet(2, 2, 2) },
-        { BlockType.Grass, new BlockTextureSet(0, 2, 1) },
-        { BlockType.Stone, new BlockTextureSet(3, 3, 3) },
-        { BlockType.IronOre, new BlockTextureSet(6, 6, 6) },
-        { BlockType.CoalOre, new BlockTextureSet(5, 5, 5) },
-        {BlockType.CopperOre,  new BlockTextureSet(7, 7, 7) },
-        {BlockType.Air, new BlockTextureSet(-1, -1, -1) } // Air has no texture
+        { BlockDatabase.Blocks["Dirt"], new BlockTextureSet(2, 2, 2) },
+        { BlockDatabase.Blocks["Grass"], new BlockTextureSet(0, 2, 1) },
+        { BlockDatabase.Blocks["Stone"], new BlockTextureSet(3, 3, 3) },
+        { BlockDatabase.Blocks["IronOre"], new BlockTextureSet(6, 6, 6) },
+        { BlockDatabase.Blocks["CoalOre"], new BlockTextureSet(5, 5, 5) },
+        { BlockDatabase.Blocks["CopperOre"],  new BlockTextureSet(7, 7, 7) },
+        { BlockDatabase.Blocks["Air"], new BlockTextureSet(-1, -1, -1) } // Air has no texture
 
     };
 

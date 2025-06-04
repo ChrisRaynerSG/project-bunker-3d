@@ -5,7 +5,7 @@
   "textures": {
     "top": "bunker:grass_block_top",
     "side": "bunker:grass_block_side",
-    "bottom": "bunker:grass_block_bottom"
+    "bottom": "bunker:dirt_block_top"
   },
   "isSolid": true,
   "isMineable": true,

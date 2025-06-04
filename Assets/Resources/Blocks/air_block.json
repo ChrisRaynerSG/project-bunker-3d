@@ -1,0 +1,11 @@
+{
+  "id": "bunker:air_block",
+  "displayName": "Grass Block",
+  "description": "A block of grass",
+  "textures": null,
+  "isSolid": false,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 0,
+  "miningTime": 0
+}

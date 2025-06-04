@@ -1,0 +1,15 @@
+{
+  "id": "bunker:dirt_block",
+  "displayName": "Dirt block",
+  "description": "A block of dirt",
+  "textures": {
+    "top": "bunker:dirt_block_top",
+    "side": "bunker:dirt_block_top",
+    "bottom": "bunker:dirt_block_top"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 1,
+  "miningTime": 1
+}

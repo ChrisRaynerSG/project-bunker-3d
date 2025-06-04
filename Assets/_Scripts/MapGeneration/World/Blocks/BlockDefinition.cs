@@ -7,6 +7,7 @@ public class BlockDefinition
     public bool isSolid;
     public bool isMineable;
     public bool isFlammable;
+    public bool IsRenderable => textures != null;
     public float movementCost;
 
     public float miningTime;

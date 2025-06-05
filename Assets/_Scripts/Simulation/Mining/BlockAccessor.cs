@@ -1,12 +1,15 @@
 using UnityEngine.UIElements;
 using UnityEngine;
+using Unity.Profiling;
 public class BlockAccessor
 {
     private World world;
+    private BlockDatabase blockDatabase;
 
     public BlockAccessor(World world)
     {
         this.world = world;
+        this.blockDatabase = BlockDatabase.Instance;
     }
 
     public void SetBlock(Vector3Int position, BlockDefinition blockType)
@@ -34,11 +37,11 @@ public class BlockAccessor
 
             if (localX == 0)
             {
-                world.RebuildChunkMesh(position.x -1, position.y, position.z);
+                world.RebuildChunkMesh(position.x - 1, position.y, position.z);
             }
             else if (localX == ChunkData.CHUNK_SIZE - 1)
             {
-                world.RebuildChunkMesh(position.x+1, position.y, position.z);
+                world.RebuildChunkMesh(position.x + 1, position.y, position.z);
             }
             if (localZ == 0)
             {
@@ -67,5 +70,15 @@ public class BlockAccessor
             return chunk.Grid[localX][localZ];
         }
         return null;
+    }
+
+    public BlockDefinition GetBlockDef(string blockId)
+    {
+        BlockDefinition block = blockDatabase.GetBlock(blockId);
+        if (block == null)
+        {
+            Debug.LogError($"Block with ID {blockId} not found in the database.");
+        }
+        return block;
     }
 }

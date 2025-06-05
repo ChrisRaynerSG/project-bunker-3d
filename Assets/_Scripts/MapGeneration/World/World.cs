@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using TreeEditor;
 using Unity.Android.Gradle;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,8 +32,12 @@ public class World : MonoBehaviour
     private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
     private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
+    private BlockDatabase blockDatabase;
+
     // definitely may need to change this at some point as what do we do with saved worlds? this class isn't serialzable so we cant save it directly... meaning adding or removing blocks could be a problem.
-    static Dictionary<string, BlockDefinition> blockDefinitions = new();
+    // static Dictionary<string, BlockDefinition> blockDefinitions = new();
+
+
 
     // need to make chunks, 16x1x16 to make updating the world faster
 
@@ -48,7 +53,10 @@ public class World : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        LoadTextures();
+        blockDatabase = BlockDatabase.Instance; // Load block definitions from the database
+        ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
+
+        // LoadTextures();
     }
     void Start()
     {
@@ -62,21 +70,21 @@ public class World : MonoBehaviour
         HandleElevationChange();
     }
 
-    void LoadTextures()
-    {
-        List<BlockDefinition> blocks = BlockLoader.LoadBlockDefinitions();
+    // void LoadTextures()
+    // {
+    //     List<BlockDefinition> blocks = BlockLoader.LoadBlockDefinitions();
 
-        foreach (BlockDefinition block in blocks)
-        {
-            blockDefinitions[block.id] = block;
-            Debug.Log($"Loaded block: {block.id} with textures: Top={block.textures.top}, Bottom={block.textures.bottom}, Side={block.textures.side}");
-        }
+    //     foreach (BlockDefinition block in blocks)
+    //     {
+    //         blockDefinitions[block.id] = block;
+    //         Debug.Log($"Loaded block: {block.id} with textures: Top={block.textures.top}, Bottom={block.textures.bottom}, Side={block.textures.side}");
+    //     }
 
-        HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
-        List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
-        Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
-        ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = textureAtlas; // commented out for now while updating the way textures are applied to blocks.
-    }
+    //     HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
+    //     List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
+    //     Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
+    //     ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = textureAtlas; // commented out for now while updating the way textures are applied to blocks.
+    // }
 
     private IEnumerator GenerateWorldCoroutine()
     {
@@ -127,15 +135,15 @@ public class World : MonoBehaviour
 
                         if (y == heights[x, z] - 1)
                         {
-                            blockData.definition = blockDefinitions["bunker:grass_block"];
+                            blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
                         {
-                            blockData.definition = blockDefinitions["bunker:dirt_block"];
+                            blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
                         }
                         else
                         {
-                            blockData.definition = blockDefinitions["bunker:stone_block"];
+                            blockData.definition = blockDatabase.GetBlock("bunker:stone_block");
 
                             // may need to change this generation logic to be more complex later, but will try with this for now maybe more dense ores lower down to promote mining further down?
 
@@ -147,15 +155,15 @@ public class World : MonoBehaviour
 
                                 if (coalNoiseValue > 0.8f)
                                 {
-                                    blockData.definition = blockDefinitions["bunker:coal_ore_block"];
+                                    blockData.definition = blockDatabase.GetBlock("bunker:coal_ore_block");
                                 }
                                 else if (ironNoiseValue > 0.85f)
                                 {
-                                    blockData.definition = blockDefinitions["bunker:iron_ore_block"];
+                                    blockData.definition = blockDatabase.GetBlock("bunker:iron_ore_block");
                                 }
                                 else if (copperNoiseValue > 0.85f)
                                 {
-                                    blockData.definition = blockDefinitions["bunker:copper_ore_block"];
+                                    blockData.definition = blockDatabase.GetBlock("bunker:copper_ore_block");
                                 }
                             }
                         }
@@ -484,13 +492,12 @@ public class World : MonoBehaviour
 
         return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
     }
-    
-    public Dictionary<string, BlockDefinition> GetBlockDefinitions()
-    {
-        if(blockDefinitions.Count == 0)
-        {
-            Debug.LogWarning("No block definitions loaded. Please ensure that the block definitions are loaded before accessing them.");
-        }
-        return blockDefinitions;
-    }
+    // public Dictionary<string, BlockDefinition> GetBlockDefinitions()
+    // {
+    //     if(blockDefinitions.Count == 0)
+    //     {
+    //         Debug.LogWarning("No block definitions loaded. Please ensure that the block definitions are loaded before accessing them.");
+    //     }
+    //     return blockDefinitions;
+    // }
 }

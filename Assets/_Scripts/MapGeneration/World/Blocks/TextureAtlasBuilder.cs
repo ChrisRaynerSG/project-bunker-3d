@@ -14,29 +14,41 @@ public class TextureAtlasBuilder
             return null;
         }
 
+        int padding = 2; // Padding in pixels
         int tileSize = textures[0].width;
-        int atlasTilesPerRow = Mathf.CeilToInt(Mathf.Sqrt(textures.Count));
-        int atlasSize = atlasTilesPerRow * tileSize;
+        int paddedTileSize = tileSize + padding * 2;
 
-        AtlasTexture = new Texture2D(atlasSize, atlasSize);
+        int atlasTilesPerRow = Mathf.CeilToInt(Mathf.Sqrt(textures.Count));
+        int atlasSize = atlasTilesPerRow * paddedTileSize;
+
+        AtlasTexture = new Texture2D(atlasSize, atlasSize, TextureFormat.RGBA32, false);
         AtlasTexture.filterMode = FilterMode.Point;
         AtlasTexture.wrapMode = TextureWrapMode.Clamp;
+        AtlasTexture.mipMapBias = -10;
 
         for (int i = 0; i < textures.Count; i++)
         {
-            Debug.Log($"Adding texture {i + 1}/{textures.Count}: {names[i]}");
-            Debug.Log($"{textures[i].name}");
+            Texture2D tex = textures[i];
             int x = i % atlasTilesPerRow;
             int y = i / atlasTilesPerRow;
 
-            int px = x * tileSize;
-            int py = y * tileSize;
+            int px = x * paddedTileSize;
+            int py = y * paddedTileSize;
 
-            Color[] pixels = textures[i].GetPixels();
-            AtlasTexture.SetPixels(px, py, tileSize, tileSize, pixels);
+            // Copy padded tile with duplicated edge pixels
+            for (int dx = -padding; dx < tileSize + padding; dx++)
+            {
+                for (int dy = -padding; dy < tileSize + padding; dy++)
+                {
+                    int srcX = Mathf.Clamp(dx, 0, tileSize - 1);
+                    int srcY = Mathf.Clamp(dy, 0, tileSize - 1);
+                    Color color = tex.GetPixel(srcX, srcY);
+                    AtlasTexture.SetPixel(px + dx + padding, py + dy + padding, color);
+                }
+            }
 
-            float u = px / (float)atlasSize;
-            float v = py / (float)atlasSize;
+            float u = (px + padding) / (float)atlasSize;
+            float v = (py + padding) / (float)atlasSize;
             float s = tileSize / (float)atlasSize;
 
             UVRects[names[i]] = new Rect(u, v, s, s);

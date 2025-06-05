@@ -37,7 +37,7 @@ public class BlockPlacementManager : MonoBehaviour
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
 
             // Place a new block at the hit position
-            blockAccessor.SetBlock(hitPosition,World.Instance.GetBlockDefinitions()["bunker:stone_block"]);
+            blockAccessor.SetBlock(hitPosition,blockAccessor.GetBlockDef("bunker:stone_block"));
         }
     }
 

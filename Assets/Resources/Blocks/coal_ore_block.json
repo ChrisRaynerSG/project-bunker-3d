@@ -1,0 +1,15 @@
+{
+  "id": "bunker:coal_ore_block",
+  "displayName": "Coal Ore Block",
+  "description": "A compacted cube of coal ore",
+  "textures": {
+    "top": "bunker:coal_ore_block",
+    "side": "bunker:coal_ore_block",
+    "bottom": "bunker:coal_ore_block"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 1,
+  "miningTime": 1
+}

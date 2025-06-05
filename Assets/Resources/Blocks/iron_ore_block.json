@@ -1,0 +1,15 @@
+{
+  "id": "bunker:iron_ore_block",
+  "displayName": "Iron Ore Block",
+  "description": "A compacted cube of iron ore",
+  "textures": {
+    "top": "bunker:iron_ore_block",
+    "side": "bunker:iron_ore_block",
+    "bottom": "bunker:iron_ore_block"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 3,
+  "miningTime": 2
+}

@@ -65,6 +65,7 @@ public class World : MonoBehaviour
         HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
         List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
         Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
+        // ChunkPrefab.GetComponent<MeshRenderer>().material.mainTexture = textureAtlas; // commented out for now while updating the way textures are applied to blocks.
     }
 
     private IEnumerator GenerateWorldCoroutine()

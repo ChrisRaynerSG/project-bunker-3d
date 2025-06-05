@@ -7,9 +7,9 @@ public static class MeshUtilities
 
     public const int atlasWidth = 4;
     public const int atlasHeight = 4;
-    
 
-    public static void CreateFaceUp(MeshData meshData, Vector3 origin, BlockType type)
+
+    public static void CreateFaceUp(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -20,12 +20,12 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.Up);
+        string textureName = block.textures.top;
 
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
-    public static void CreateFaceDown(MeshData meshData, Vector3 origin, BlockType type)
+    public static void CreateFaceDown(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -36,12 +36,12 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.Down);
+        string textureName = block.textures.bottom;
 
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
-    public static void CreateFaceNorth(MeshData meshData, Vector3 origin, BlockType type)
+    public static void CreateFaceNorth(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -52,12 +52,12 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.North);
+        string textureName = block.textures.side;
 
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
-    public static void CreateFaceEast(MeshData meshData, Vector3 origin, BlockType type)
+    public static void CreateFaceEast(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -68,11 +68,11 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.East);
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        string textureName = block.textures.side;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
-    public static void CreateFaceSouth(MeshData meshData, Vector3 origin, BlockType type)
+    public static void CreateFaceSouth(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -83,12 +83,12 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.South);
+        string textureName = block.textures.side;
 
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
-    public static void CreateFaceWest(MeshData meshData, Vector3 origin, BlockType type)
+    public static void CreateFaceWest(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
 
@@ -99,8 +99,8 @@ public static class MeshUtilities
 
         meshData.vertices.AddRange(vertices);
 
-        int tileIndex = BlockTextures.BlockUVs[type].GetTextureIndex(BlockTextures.FaceDirection.West);
-        AddTrianglesAndUvs(meshData, vertices, tileIndex);
+        string textureName = block.textures.side;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
     private static void AddTriangles(MeshData meshData, Vector3[] vertices)
@@ -117,29 +117,26 @@ public static class MeshUtilities
         meshData.triangles.AddRange(triangles);
     }
 
-    private static void AddUvs(MeshData meshData, int tileIndex)
+    private static void AddUvs(MeshData meshData, string textureName)
     {
-        float tileWidth = 1f / atlasWidth;
-        float tileHeight = 1f / atlasHeight;
-
-        int x = tileIndex % atlasWidth;
-        int y = tileIndex / atlasWidth;
-
-        float uMin = x * tileWidth;
-        float vMin = 1f - (y + 1) * tileHeight;
+        if (!TextureAtlasBuilder.UVRects.TryGetValue(textureName, out Rect uvRect))
+        {
+            Debug.LogWarning($"Texture {textureName} not found in UVRects.");
+            return;
+        }
 
         Vector2[] uvs = new Vector2[4];
-        uvs[0] = new Vector2(uMin + tileWidth, vMin);                 
-        uvs[1] = new Vector2(uMin + tileWidth, vMin + tileHeight);    
-        uvs[2] = new Vector2(uMin, vMin + tileHeight);                
-        uvs[3] = new Vector2(uMin, vMin);                      
+        uvs[0] = new Vector2(uvRect.xMin, uvRect.yMax);
+        uvs[1] = new Vector2(uvRect.xMax, uvRect.yMax);
+        uvs[2] = new Vector2(uvRect.xMax, uvRect.yMin);
+        uvs[3] = new Vector2(uvRect.xMin, uvRect.yMin);
 
         meshData.uvs.AddRange(uvs);
     }
 
-    private static void AddTrianglesAndUvs(MeshData meshData, Vector3[] vertices, int tileIndex)
+    private static void AddTrianglesAndUvs(MeshData meshData, Vector3[] vertices, string textureName)
     {
         AddTriangles(meshData, vertices);
-        AddUvs(meshData, tileIndex);
+        AddUvs(meshData, textureName);
     }
 }

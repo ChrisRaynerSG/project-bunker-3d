@@ -3,9 +3,9 @@
   "displayName": "Copper Ore Block",
   "description": "A compacted cube of copper ore",
   "textures": {
-    "top": "bunker:copper_ore_block_top",
-    "side": "bunker:copper_ore_block_top",
-    "bottom": "bunker:copper_ore_block_top"
+    "top": "bunker_copper_ore_block",
+    "side": "bunker_copper_ore_block",
+    "bottom": "bunker_copper_ore_block"
   },
   "isSolid": true,
   "isMineable": true,

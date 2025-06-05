@@ -1,7 +1,7 @@
 {
   "id": "bunker:air_block",
-  "displayName": "Grass Block",
-  "description": "A block of grass",
+  "displayName": "Air Block",
+  "description": "Empty space",
   "textures": null,
   "isSolid": false,
   "isMineable": true,

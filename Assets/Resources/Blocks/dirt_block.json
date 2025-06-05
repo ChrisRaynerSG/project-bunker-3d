@@ -3,9 +3,9 @@
   "displayName": "Dirt block",
   "description": "A block of dirt",
   "textures": {
-    "top": "bunker:dirt_block_top",
-    "side": "bunker:dirt_block_top",
-    "bottom": "bunker:dirt_block_top"
+    "top": "bunker_dirt_block",
+    "side": "bunker_dirt_block",
+    "bottom": "bunker_dirt_block"
   },
   "isSolid": true,
   "isMineable": true,

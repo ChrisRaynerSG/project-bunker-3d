@@ -3,9 +3,9 @@
   "displayName": "Grass Block",
   "description": "A block of grass",
   "textures": {
-    "top": "bunker:grass_block_top",
-    "side": "bunker:grass_block_side",
-    "bottom": "bunker:dirt_block_top"
+    "top": "bunker_grass_block_top",
+    "side": "bunker_grass_block_side",
+    "bottom": "bunker_dirt_block"
   },
   "isSolid": true,
   "isMineable": true,

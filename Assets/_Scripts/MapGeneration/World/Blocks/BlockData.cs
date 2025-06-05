@@ -36,7 +36,7 @@ public class BlockData
 
 
 
-    public BlockType type { get; set; }
+    public BlockDefinition definition { get; set; }
 
     // private String blockType; // may need to change to enum to make it easier to work with;
     // public String BlockType

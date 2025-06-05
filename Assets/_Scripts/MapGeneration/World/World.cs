@@ -30,6 +30,7 @@ public class World : MonoBehaviour
     public static event Action<int> OnCurrentElevationChanged;
     private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
     private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
+    static Dictionary<string, BlockDefinition> blockDefinitions = new();
 
     // need to make chunks, 16x1x16 to make updating the world faster
 
@@ -62,6 +63,13 @@ public class World : MonoBehaviour
     void LoadTextures()
     {
         List<BlockDefinition> blocks = BlockLoader.LoadBlockDefinitions();
+
+        foreach (BlockDefinition block in blocks)
+        {
+            blockDefinitions[block.id] = block;
+            Debug.Log($"Loaded block: {block.id} with textures: Top={block.textures.top}, Bottom={block.textures.bottom}, Side={block.textures.side}");
+        }
+
         HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
         List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
         Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
@@ -117,15 +125,15 @@ public class World : MonoBehaviour
 
                         if (y == heights[x, z] - 1)
                         {
-                            blockData.type = BlockDatabase.Blocks["Grass"];
+                            blockData.definition = blockDefinitions["bunker:grass_block"];
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
                         {
-                            blockData.type = BlockDatabase.Blocks["Dirt"];
+                            blockData.definition = blockDefinitions["bunker:dirt_block"];
                         }
                         else
                         {
-                            blockData.type = BlockDatabase.Blocks["Stone"];
+                            blockData.definition = blockDefinitions["bunker:stone_block"];
 
                             // may need to change this generation logic to be more complex later, but will try with this for now maybe more dense ores lower down to promote mining further down?
 
@@ -137,15 +145,15 @@ public class World : MonoBehaviour
 
                                 if (coalNoiseValue > 0.8f)
                                 {
-                                    blockData.type = BlockDatabase.Blocks["CoalOre"];
+                                    blockData.definition = blockDefinitions["bunker:coal_ore_block"];
                                 }
                                 else if (ironNoiseValue > 0.85f)
                                 {
-                                    blockData.type = BlockDatabase.Blocks["IronOre"];
+                                    blockData.definition = blockDefinitions["bunker:iron_ore_block"];
                                 }
                                 else if (copperNoiseValue > 0.85f)
                                 {
-                                    blockData.type = BlockDatabase.Blocks["CopperOre"];
+                                    blockData.definition = blockDefinitions["bunker:copper_ore_block"];
                                 }
                             }
                         }
@@ -211,12 +219,12 @@ public class World : MonoBehaviour
 
         // need to figure out how to create faces based on the block data, specifically the block type. CreateFaceUp etc has a third parameter for tileIndex, which is used to get the texture from the atlas
 
-        if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
-        if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.type);
-        if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition,blockData.type);;
-        if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.type);
-        if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition,blockData.type);;
-        if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.type);
+        if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
+        if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
+        if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition,blockData.definition);;
+        if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
+        if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition,blockData.definition);;
+        if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
 
     public void LoadMeshData(MeshData meshData)
@@ -346,12 +354,12 @@ public class World : MonoBehaviour
                         {
                             BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
                             Vector3 targetPosition = new Vector3(x, y, z);
-                            MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.type);
+                            MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
                         }
                     }
                 }
@@ -384,17 +392,17 @@ public class World : MonoBehaviour
                             Vector3 targetPosition = new Vector3(x, y, z);
                             if (currentElevation == y)
                             {
-                                MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
+                                MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
                             }
                             else
                             {
-                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
+                                if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
                             }
-                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.type);
-                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.type);
+                            if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition);
+                            if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
                         }
                     }
                 }
@@ -440,17 +448,17 @@ public class World : MonoBehaviour
                     Vector3 targetPosition = new Vector3(x1, chunkData.OriginY, z1);
                     if (currentElevation == chunkData.OriginY)
                     {
-                        MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
+                        MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
                     }
                     else
                     {
-                        if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.type);
+                        if (!IsSolid(worldX, chunkData.OriginY + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
                     }
-                    if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.type);
-                    if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.type);
-                    if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.type);
-                    if (!IsSolid(worldX, chunkData.OriginY, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.type);
-                    if (!IsSolid(worldX - 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.type);
+                    if (!IsSolid(worldX, chunkData.OriginY - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition);
+                    if (!IsSolid(worldX + 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
+                    if (!IsSolid(worldX, chunkData.OriginY, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition);
+                    if (!IsSolid(worldX - 1, chunkData.OriginY, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
                 }
             }
         }

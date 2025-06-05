@@ -30,6 +30,8 @@ public class World : MonoBehaviour
     public static event Action<int> OnCurrentElevationChanged;
     private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
     private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
+
+    // definitely may need to change this at some point as what do we do with saved worlds? this class isn't serialzable so we cant save it directly... meaning adding or removing blocks could be a problem.
     static Dictionary<string, BlockDefinition> blockDefinitions = new();
 
     // need to make chunks, 16x1x16 to make updating the world faster
@@ -221,9 +223,9 @@ public class World : MonoBehaviour
 
         if (!IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
         if (!IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
-        if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition,blockData.definition);;
+        if (!IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition); ;
         if (!IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
-        if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition,blockData.definition);;
+        if (!IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition); ;
         if (!IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
 
@@ -481,5 +483,14 @@ public class World : MonoBehaviour
             return null;
 
         return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
+    }
+    
+    public Dictionary<string, BlockDefinition> GetBlockDefinitions()
+    {
+        if(blockDefinitions.Count == 0)
+        {
+            Debug.LogWarning("No block definitions loaded. Please ensure that the block definitions are loaded before accessing them.");
+        }
+        return blockDefinitions;
     }
 }

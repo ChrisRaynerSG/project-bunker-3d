@@ -32,8 +32,7 @@ public class MiningManager : MonoBehaviour
             Vector3 hitOffset = hit.point - hit.normal * 0.5f;
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
 
-
-            blockAccessor.SetBlock(hitPosition, BlockDatabase.Blocks["Air"]);
+            blockAccessor.SetBlock(hitPosition, World.Instance.GetBlockDefinitions()["bunker:air_block"]);
         }
     }
 }

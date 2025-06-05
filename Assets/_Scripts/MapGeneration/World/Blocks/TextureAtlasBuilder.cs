@@ -25,6 +25,7 @@ public class TextureAtlasBuilder
         for (int i = 0; i < textures.Count; i++)
         {
             Debug.Log($"Adding texture {i + 1}/{textures.Count}: {names[i]}");
+            Debug.Log($"{textures[i].name}");
             int x = i % atlasTilesPerRow;
             int y = i / atlasTilesPerRow;
 

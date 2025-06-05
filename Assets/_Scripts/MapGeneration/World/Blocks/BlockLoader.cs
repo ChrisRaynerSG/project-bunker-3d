@@ -48,6 +48,7 @@ public class BlockLoader
             Texture2D texture = Resources.Load<Texture2D>($"Textures/{name}");
             if (texture != null)
             {
+                Debug.Log($"Loaded texture: {name} : {texture.name}");
                 textures.Add(texture);
                 nameOrder.Add(name);
             }

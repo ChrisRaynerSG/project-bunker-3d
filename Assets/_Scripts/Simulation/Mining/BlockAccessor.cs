@@ -9,13 +9,13 @@ public class BlockAccessor
         this.world = world;
     }
 
-    public void SetBlock(Vector3Int position, BlockType blockType)
+    public void SetBlock(Vector3Int position, BlockDefinition blockType)
     {
         BlockData block = GetBlock(position);
         if (block != null)
         {
-            block.type = blockType;
-            block.IsSolid = blockType.IsSolid;
+            block.definition = blockType;
+            block.IsSolid = blockType.isSolid;
 
             // world.RebuildMeshAtLevel(position.y);
             // world.RebuildMeshAtLevel(position.y + 1); // Rebuild the mesh at the block's Y level

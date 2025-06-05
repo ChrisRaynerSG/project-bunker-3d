@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class CameraMovementManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class CameraMovementManager : MonoBehaviour
     public float maxY = 50f;
 
     private Camera mainCamera;
+
+    [SerializeField]
+    [Tooltip("Spotlight to illuminate the scene, if any. Optional.")]
+    private GameObject spotLight;
 
     void Start()
     {
@@ -22,6 +27,7 @@ public class CameraMovementManager : MonoBehaviour
 
     void Update()
     {
+        HandleLightControl();
         HandleMovement();
         HandleRotation();
         HandleZoom();
@@ -46,8 +52,8 @@ public class CameraMovementManager : MonoBehaviour
 
         if (direction == Vector3.zero) return;
 
-        
-        
+
+
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
         {
             moveSpeed *= 2; // Double speed when shift is pressed
@@ -97,6 +103,14 @@ public class CameraMovementManager : MonoBehaviour
 
             mainCamera.transform.Rotate(Vector3.up, rotationX, Space.World);
             mainCamera.transform.Rotate(Vector3.left, rotationY);
+        }
+    }
+    
+    private void HandleLightControl()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            spotLight.SetActive(!spotLight.activeSelf); // Toggle light on/off
         }
     }
 

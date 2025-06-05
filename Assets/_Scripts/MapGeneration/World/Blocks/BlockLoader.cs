@@ -27,11 +27,13 @@ public class BlockLoader
         HashSet<string> textureNames = new();
         foreach (BlockDefinition block in blocks)
         {
+            Debug.Log($"Loading block: {block.id}");
             if (block.textures != null)
             {
-                textureNames.Add(block.textures.Top);
-                textureNames.Add(block.textures.Bottom);
-                textureNames.Add(block.textures.Side);
+                Debug.Log($"Block {block.id} textures: Top={block.textures.top}, Bottom={block.textures.bottom}, Side={block.textures.side}");
+                textureNames.Add(block.textures.top);
+                textureNames.Add(block.textures.bottom);
+                textureNames.Add(block.textures.side);
             }
         }
         return textureNames;

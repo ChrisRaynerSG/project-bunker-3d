@@ -17,8 +17,8 @@ public class BlockDefinition
     [System.Serializable]
     public class TextureDefinition
     {
-        public string Top;
-        public string Bottom;
-        public string Side;
+        public string top;
+        public string bottom;
+        public string side;
     }
 }

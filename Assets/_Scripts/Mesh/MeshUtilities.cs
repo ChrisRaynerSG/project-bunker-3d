@@ -126,10 +126,10 @@ public static class MeshUtilities
         }
 
         Vector2[] uvs = new Vector2[4];
-        uvs[0] = new Vector2(uvRect.xMin, uvRect.yMax);
-        uvs[1] = new Vector2(uvRect.xMax, uvRect.yMax);
-        uvs[2] = new Vector2(uvRect.xMax, uvRect.yMin);
-        uvs[3] = new Vector2(uvRect.xMin, uvRect.yMin);
+        uvs[0] = new Vector2(uvRect.xMin, uvRect.yMin); 
+        uvs[1] = new Vector2(uvRect.xMin, uvRect.yMax); 
+        uvs[2] = new Vector2(uvRect.xMax, uvRect.yMax); 
+        uvs[3] = new Vector2(uvRect.xMax, uvRect.yMin); 
 
         meshData.uvs.AddRange(uvs);
     }

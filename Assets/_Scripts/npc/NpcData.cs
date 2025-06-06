@@ -1,5 +1,7 @@
-using Unity.Entities;
 
-public class NpcData : IComponentData{
+
+public class NpcData : ObjectData
+{
+    
     
 }

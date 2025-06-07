@@ -65,15 +65,56 @@ namespace Bunker.World
                 }
             }
         }
-        
+
         private ushort GenerateBlockAt(int3 worldPosition)
         {
 
             // need to implement old noise logic and block selection logic here, somehow need to get seed and frequency and other things eurgh. This is going to be a pain.
-            
+
             return (ushort)(worldPosition.x + worldPosition.y + worldPosition.z);
         }
-        
     }
-    
+
+    public partial struct ChunkMeshingSystem : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<DirtyChunkTag>();
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            // This system would handle meshing the chunks based on the blocks in them.
+            // It would likely involve generating mesh data and applying it to a MeshRenderer or similar component.
+            // For now, this is left as a placeholder for future implementation.
+        }
+    }
+
+    public partial struct DirtyChunkSystem : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<DirtyChunkTag>();
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            // This system would handle marking chunks as dirty, which would trigger regeneration or meshing.
+            // For now, this is left as a placeholder for future implementation.
+        }
+    }    
+
+    public partial struct ChunkUpdateSystem : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<ChunkTag>();
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            // This system would handle updating chunks, such as regenerating them or applying changes.
+            // For now, this is left as a placeholder for future implementation.
+        }
+    }
 }

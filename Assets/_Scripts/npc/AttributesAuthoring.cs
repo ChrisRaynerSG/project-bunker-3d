@@ -4,7 +4,6 @@ using Unity.Entities;
 namespace Bunker.Npc
 {
     public struct AttributesTag : IComponentData { } // Tag component to identify attribute entities
-
     public struct Strength : IComponentData
     {
         public int Value;

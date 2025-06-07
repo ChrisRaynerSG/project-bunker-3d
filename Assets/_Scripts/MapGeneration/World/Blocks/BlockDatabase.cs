@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BlockDatabase
 {
     // static dictionary to hold all block types, created on awake
     private Dictionary<string, BlockDefinition> Blocks = new();
+
+    private Dictionary<string, ushort> nameToId = new();
+    private Dictionary<ushort, BlockDefinition> idToBlock = new();
 
     private Texture2D textureAtlas;
     public Texture2D TextureAtlas
@@ -38,9 +42,24 @@ public class BlockDatabase
         // Build the texture atlas
         TextureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
 
+        ushort id = 0;
+
         // Create block types from definitions
         foreach (BlockDefinition block in blockDefinitions)
         {
+
+            if (!nameToId.ContainsKey(block.id))
+            {
+                nameToId[block.id] = id;
+                idToBlock[id] = block;
+                Debug.Log($"Registered block: {block.id} as ID {id}");
+                id++;
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate Block ID: {block.id}.");
+            }
+
             if (!Blocks.ContainsKey(block.id))
             {
                 Blocks[block.id] = block;
@@ -68,4 +87,25 @@ public class BlockDatabase
             return null;
         }
     }
+
+    public BlockDefinition GetBlock(ushort id)
+    {
+        if (idToBlock.TryGetValue(id, out var def))
+        {
+            return def;
+        }
+        Debug.LogWarning($"No block definition found for ID {id}");
+        return null;
+    }
+
+    public ushort GetBlockId(string blockName)
+    {
+        if (nameToId.TryGetValue(blockName, out var id))
+        {
+            return id;
+        }
+        Debug.LogWarning($"No Block found for name: {blockName}");
+        return 0;
+    }
+    public IReadOnlyDictionary<ushort, BlockDefinition> GetAllBlocks() => idToBlock;
 }

@@ -4,6 +4,7 @@ using Unity.Mathematics;
 
 namespace Bunker.Npc
 {
+    public struct SkillTag : IComponentData { } // Tag component to identify skill entities (most likely enemies and dwellers)
     public struct MedicineSkill : IComponentData
     {
         public int Level;

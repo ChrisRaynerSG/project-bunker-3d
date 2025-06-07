@@ -4,8 +4,10 @@
   "description": "Empty space",
   "textures": null,
   "isSolid": false,
-  "isMineable": true,
+  "isMineable": false,
   "isFlammable": false,
   "hardness": 0,
-  "miningTime": 0
+  "miningTime": 0,
+  "thermalConductivity": 0,
+  "ignitionTemperature": 9999
 }

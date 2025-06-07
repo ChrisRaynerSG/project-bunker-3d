@@ -68,6 +68,8 @@ namespace Bunker.World
 
         private ushort GenerateBlockAt(int3 worldPosition)
         {
+            BlockDecider blockDecider = new BlockDecider();
+            
 
             // need to implement old noise logic and block selection logic here, somehow need to get seed and frequency and other things eurgh. This is going to be a pain.
 

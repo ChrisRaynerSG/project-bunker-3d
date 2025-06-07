@@ -12,6 +12,10 @@ public class BlockDefinition
 
     public float miningTime;
     public float hardness;
+
+    public float thermalConductivity;
+    public float ignitionTemperature;
+    
     public TextureDefinition textures;
 
     [System.Serializable]

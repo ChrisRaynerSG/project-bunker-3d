@@ -1,7 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using Unity.Transforms;
+using Unity.Physics;
 
 namespace Bunker.Npc
 {
@@ -35,7 +35,7 @@ namespace Bunker.Npc
         public void OnUpdate(ref SystemState state) //regular update, called every single frame
         {
             var deltaTime = SystemAPI.Time.DeltaTime;
-            foreach (var (transform, direction, speed) in SystemAPI.Query<RefRW<LocalTransform>, CharacterMoveDirection, CharacterMoveSpeed>())
+            foreach (var (transform, direction, speed) in SystemAPI.Query<RefRW<PhysicsVelocity>, CharacterMoveDirection, CharacterMoveSpeed>())
             {
                 var moveStep3d = direction.Value * speed.Value * deltaTime; // calculate the movement step
                 transform.ValueRW.Position += moveStep3d; // apply the movement step to the entity's position

@@ -14,6 +14,23 @@ namespace Bunker.World
     public struct Block : IBufferElementData // Buffer element data to store blocks in a chunk
     {
         public ushort BlockId;
+    }
 
+    public class ChunkAuthoring : MonoBehaviour
+    {
+        public int3 chunkPosition;
+
+        private class ChunkBaker : Baker<ChunkAuthoring>
+        {
+            public override void Bake(ChunkAuthoring authoring)
+            {
+                var entity = GetEntity(TransformUsageFlags.None); //None because this wont move, doesn't need to be dynamic
+                AddComponent(entity, new ChunkTag());
+                AddComponent(entity, new ChunkPosition { Value = authoring.chunkPosition });
+                AddBuffer<Block>(entity);
+
+            }
+        }
+        
     }
 }

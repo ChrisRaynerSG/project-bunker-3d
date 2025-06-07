@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Burst;
 
 namespace Bunker.World
 {
@@ -31,6 +32,49 @@ namespace Bunker.World
 
             }
         }
+    }
+
+    [BurstCompile]
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    public partial struct ChunkGenerationSystem : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<ChunkTag>();
+        }
+        public void OnUpdate(ref SystemState state)
+        {
+            foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>().WithEntityAccess())
+            {
+                DynamicBuffer<Block> blocks = SystemAPI.GetBuffer<Block>(entity);
+
+                blocks.Clear(); // clear blocks before starting generation
+
+                for (int z = 0; z < 16; z++)
+                {
+                    for (int y = 0; y < 16; y++)
+                    {
+                        for (int x = 0; x < 16; x++)
+                        {
+                            int3 local = new int3(x, y, z);
+                            int3 world = chunkPosition.ValueRO.Value + local; // Calculate world position from chunk position
+
+                            ushort blockId = GenerateBlockAt(world);// Simple example, replace with actual logic
+                            blocks.Add(new Block { BlockId = blockId });
+                        }
+                    }
+                }
+            }
+        }
+        
+        private ushort GenerateBlockAt(int3 worldPosition)
+        {
+
+            // need to implement old noise logic and block selection logic here, somehow need to get seed and frequency and other things eurgh. This is going to be a pain.
+            
+            return (ushort)(worldPosition.x + worldPosition.y + worldPosition.z);
+        }
         
     }
+    
 }

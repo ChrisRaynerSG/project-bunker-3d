@@ -8,6 +8,11 @@ namespace Bunker.World
     public struct ChunkTag : IComponentData { } // Tag component to identify chunk entities
     public struct DirtyChunkTag : IComponentData { } // Tag component to identify dirty chunk entities, which need to be updated
 
+    public struct Seed : IComponentData
+    {
+        public int Value; // Seed value for procedural generation
+    }
+
     public struct ChunkPosition : IComponentData
     {
         public int3 Value; // Position of the chunk in the world
@@ -15,6 +20,8 @@ namespace Bunker.World
     public struct Block : IBufferElementData // Buffer element data to store blocks in a chunk
     {
         public ushort BlockId;
+        public float Temperature;
+        public float Radiation;
     }
 
     public class ChunkAuthoring : MonoBehaviour
@@ -40,9 +47,11 @@ namespace Bunker.World
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ChunkTag>();
+            state.RequireForUpdate<Seed>();
         }
         public void OnUpdate(ref SystemState state)
         {
+            int seed = SystemAPI.GetSingleton<Seed>().Value;
             foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>().WithEntityAccess())
             {
                 DynamicBuffer<Block> blocks = SystemAPI.GetBuffer<Block>(entity);
@@ -58,7 +67,7 @@ namespace Bunker.World
                             int3 local = new int3(x, y, z);
                             int3 world = chunkPosition.ValueRO.Value + local; // Calculate world position from chunk position
 
-                            ushort blockId = GenerateBlockAt(world);// Simple example, replace with actual logic
+                            ushort blockId = GenerateBlockAt(world, seed);// Simple example, replace with actual logic
                             blocks.Add(new Block { BlockId = blockId });
                         }
                     }
@@ -66,14 +75,10 @@ namespace Bunker.World
             }
         }
 
-        private ushort GenerateBlockAt(int3 worldPosition)
+        private ushort GenerateBlockAt(int3 worldPosition, int seed)
         {
-            BlockDecider blockDecider = new BlockDecider();
-            
-
-            // need to implement old noise logic and block selection logic here, somehow need to get seed and frequency and other things eurgh. This is going to be a pain.
-
-            return (ushort)(worldPosition.x + worldPosition.y + worldPosition.z);
+            BlockDecider blockDecider = new BlockDecider(seed);
+            return blockDecider.GetBlockId(worldPosition);
         }
     }
 

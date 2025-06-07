@@ -34,7 +34,6 @@ namespace Bunker.World
         }
     }
 
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct ChunkGenerationSystem : ISystem
     {

@@ -22,6 +22,15 @@ namespace Bunker.Npc
         public const float MAX_VALUE = 100f; // max health value
     }
 
+    public struct BodyTemperature : IComponentData
+    {
+        public float Value;
+    }
+
+    public struct Radiation : IComponentData
+    {
+        public float Value; // radiation level
+    }
 
     // Regular Unity component for authoring
     public class CharacterAuthoring : MonoBehaviour
@@ -39,7 +48,7 @@ namespace Bunker.Npc
             }
         }
     }
-    
+
     public partial struct CharacterMoveSystem : ISystem
     {
         public void OnUpdate(ref SystemState state) //regular update, called every single frame

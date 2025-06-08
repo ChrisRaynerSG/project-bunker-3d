@@ -1,8 +1,5 @@
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Collections;
 using Unity.Burst;
-using UnityEngine.Analytics;
 
 [BurstCompile]
 public partial struct ChunkBlockGenerationSystem : ISystem
@@ -16,7 +13,9 @@ public partial struct ChunkBlockGenerationSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>().WithEntityAccess())
+        foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>()
+        .WithNone<ChunkBlocksInitialisedTag>()
+        .WithEntityAccess())
         {
             var buffer = SystemAPI.GetBuffer<Block>(entity);
             var bufferSize = WorldConstants.CHUNK_SIZE_X * WorldConstants.CHUNK_SIZE_Y * WorldConstants.CHUNK_SIZE_Z;
@@ -36,15 +35,17 @@ public partial struct ChunkBlockGenerationSystem : ISystem
                 {
                     for (int z = 0; z < WorldConstants.CHUNK_SIZE_Z; z++)
                     {
+                        // setup all blocks in the chunk to default values;
                         buffer[index++] = new Block
                         {
-                            Id = 0, // Placeholder for block ID, will be set later
-                            Temperature = 20.0f, // Example temperature, replace with actual logic
-                            Radiation = 0.0f // Example radiation, replace with actual logic
+                            Id = 0,
+                            Temperature = 21.0f,
+                            Radiation = 0.0f
                         };
                     }
                 }
             }
+            state.EntityManager.AddComponent<ChunkBlocksInitialisedTag>(entity); // Mark the chunk as initialised so we don't do this again
         } 
     }
 }

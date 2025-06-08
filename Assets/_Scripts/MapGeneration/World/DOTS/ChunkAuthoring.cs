@@ -18,6 +18,7 @@ public class ChunkAuthoring : MonoBehaviour
             {
                 Value = authoring.chunkPositionInt3
             });
+            AddBuffer<Block>(entity);
         }
     }
 }

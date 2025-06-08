@@ -5,6 +5,12 @@ public partial class NoiseGenerationSystem : SystemBase
 {
     protected override void OnUpdate()
     {
+        if(!SystemAPI.HasSingleton<WorldTag>())
+        {
+            UnityEngine.Debug.Log("No WorldTag singleton yet; skipping NoiseGenerationSystem.");
+            return;
+        }
+
         var worldEntity = SystemAPI.GetSingletonEntity<WorldTag>();
         if (SystemAPI.HasComponent<NoiseGeneratedTag>(worldEntity))
         {

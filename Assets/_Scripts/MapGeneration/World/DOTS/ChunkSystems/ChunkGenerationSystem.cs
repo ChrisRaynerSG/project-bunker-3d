@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.Collections;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(NoiseGenerationSystem))]
@@ -45,8 +46,10 @@ public partial struct ChunkGenerationSystem : ISystem
             typeof(ChunkTag),
             typeof(ChunkPosition),
             typeof(LocalToWorld)
-            
+
         );
+
+        var ecb = new EntityCommandBuffer(Allocator.Temp);
 
         for (int x = 0; x < numChunks; x++)
         {
@@ -57,15 +60,16 @@ public partial struct ChunkGenerationSystem : ISystem
                     // Calculate the position of the chunk
                     var chunkPosition = new int3(x * chunkSize, y * chunkSize, z * chunkSize);
 
-                    // Create a new chunk entity
-                    var chunkEntity = state.EntityManager.CreateEntity(archetype);
+                    // Create a new entity for the chunk
+                    // We use the EntityCommandBuffer to create entities in a safe way
+                    var chunkEntity = ecb.CreateEntity(archetype);
 
-                    state.EntityManager.AddBuffer<Block>(chunkEntity);
+                    ecb.AddBuffer<Block>(chunkEntity);
 
                     // Set the chu
-                    state.EntityManager.SetComponentData(chunkEntity, new ChunkPosition { Value = chunkPosition });
+                    ecb.SetComponent(chunkEntity, new ChunkPosition { Value = chunkPosition });
                     // Optionally, you can set the LocalToWorld component here if needed
-                    state.EntityManager.SetComponentData(chunkEntity, new LocalToWorld
+                    ecb.SetComponent(chunkEntity, new LocalToWorld
                     {
                         Value = float4x4.TRS(
                             new float3(chunkPosition.x, chunkPosition.y, chunkPosition.z),
@@ -77,7 +81,11 @@ public partial struct ChunkGenerationSystem : ISystem
                 }
             }
         }
-            // After generating chunks, we mark the world as having generated chunks
-            state.EntityManager.AddComponent<ChunksGeneratedTag>(SystemAPI.GetSingletonEntity<WorldTag>());
+        // After generating chunks, we mark the world as having generated chunks
+        
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose(); // Dispose of the command buffer to free resources
+        state.EntityManager.AddComponent<ChunksGeneratedTag>(SystemAPI.GetSingletonEntity<WorldTag>());
+        UnityEngine.Debug.Log($"Generated {numChunks * numChunksY * numChunks} chunks in the world.");
     }
 }

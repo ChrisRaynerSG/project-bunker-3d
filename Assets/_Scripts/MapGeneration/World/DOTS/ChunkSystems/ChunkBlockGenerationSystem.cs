@@ -4,6 +4,7 @@ using Unity.Burst;
 [BurstCompile]
 public partial struct ChunkBlockGenerationSystem : ISystem
 {
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<ChunkTag>();
@@ -38,7 +39,7 @@ public partial struct ChunkBlockGenerationSystem : ISystem
                         // setup all blocks in the chunk to default values;
                         buffer[index++] = new Block
                         {
-                            Id = 0,
+                            Id = 0, // need to assign the id of the block based on world generation rules
                             Temperature = 21.0f,
                             Radiation = 0.0f
                         };

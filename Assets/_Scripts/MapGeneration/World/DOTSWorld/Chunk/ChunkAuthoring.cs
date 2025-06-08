@@ -8,11 +8,6 @@ namespace Bunker.World
     public struct ChunkTag : IComponentData { } // Tag component to identify chunk entities
     public struct DirtyChunkTag : IComponentData { } // Tag component to identify dirty chunk entities, which need to be updated
 
-    public struct Seed : IComponentData
-    {
-        public int Value; // Seed value for procedural generation
-    }
-
     public struct ChunkPosition : IComponentData
     {
         public int3 Value; // Position of the chunk in the world
@@ -58,6 +53,8 @@ namespace Bunker.World
 
                 blocks.Clear(); // clear blocks before starting generation
 
+                BlockDecider blockDecider = new BlockDecider(seed);
+
                 for (int z = 0; z < 16; z++)
                 {
                     for (int y = 0; y < 16; y++)
@@ -66,8 +63,7 @@ namespace Bunker.World
                         {
                             int3 local = new int3(x, y, z);
                             int3 world = chunkPosition.ValueRO.Value + local; // Calculate world position from chunk position
-
-                            ushort blockId = GenerateBlockAt(world, seed);// Simple example, replace with actual logic
+                            ushort blockId = blockDecider.GetBlockId(world);
                             blocks.Add(new Block { BlockId = blockId });
                         }
                     }
@@ -75,11 +71,11 @@ namespace Bunker.World
             }
         }
 
-        private ushort GenerateBlockAt(int3 worldPosition, int seed)
-        {
-            BlockDecider blockDecider = new BlockDecider(seed);
-            return blockDecider.GetBlockId(worldPosition);
-        }
+        // private ushort GenerateBlockAt(int3 worldPosition, int seed)
+        // {
+        //     BlockDecider blockDecider = new BlockDecider(seed);
+        //     return blockDecider.GetBlockId(worldPosition);
+        // }
     }
 
     public partial struct ChunkMeshingSystem : ISystem
@@ -109,7 +105,7 @@ namespace Bunker.World
             // This system would handle marking chunks as dirty, which would trigger regeneration or meshing.
             // For now, this is left as a placeholder for future implementation.
         }
-    }    
+    }
 
     public partial struct ChunkUpdateSystem : ISystem
     {

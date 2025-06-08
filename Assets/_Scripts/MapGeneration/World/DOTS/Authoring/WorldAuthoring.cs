@@ -19,7 +19,8 @@ public class WorldAuthoring : MonoBehaviour
         {
             var entity = GetEntity(TransformUsageFlags.WorldSpace);
             AddComponent<WorldTag>(entity); // Add a tag to identify the world entity
-            AddComponent(entity, new global::Seed {Value = authoring.seed}); // Add the seed component to the world entity
+            AddComponent(entity, new global::Seed { Value = authoring.seed }); // Add the seed component to the world entity
+            AddBuffer<HeightNoise>(entity); // Add a buffer to hold height noise values for the world
         }
     }
 }

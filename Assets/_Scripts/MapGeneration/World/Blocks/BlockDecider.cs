@@ -1,41 +1,35 @@
+using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class BlockDecider
+public struct BlockDecider
 {
-    private int _seed;
-    private BlockDatabase _blockDatabase;
-    private FastNoise _heightNoise;
-    private FastNoise _oreNoise;
-
+    [ReadOnly] private BlockDatabase _blockDatabase;
+    private NativeArray<float> _heightMap;
     private int maxY;
 
-    private float frequency = 0.007f;
+    private int dirtDepth;
 
-    private int dirtDepth = 5;
-
-    public BlockDecider(int seed, int maxY = 64)
+    public BlockDecider(NativeArray<float> heightMap, int maxY = 16)
     {
-
-        _seed = seed;
+        dirtDepth = 5;
+        this.maxY = maxY;
+        _heightMap = heightMap; //precompute height map elsewhere to allow for burst compilation with ECS
         _blockDatabase = BlockDatabase.Instance;
-
-        _heightNoise = NoiseProvider.CreateNoise(frequency, seed);
-
-        _oreNoise = NoiseProvider.CreateNoise(frequency * 10, (seed / 2) + 1);
-
     }
 
     public ushort GetBlockId(int3 worldPosition)
     {
-        float rawHeight = _heightNoise.GetNoise(worldPosition.x, worldPosition.z);
-        int surfaceHeight = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxY);
+        (int x, int y, int z) = (worldPosition.x, worldPosition.y, worldPosition.z);
+        float heightMapValue = _heightMap[x + z * 16]; // Assuming heightMap is a 1D array for a 16x16 chunk
+
+        int surfaceHeight = (int)math.floor((heightMapValue + 1f) * 0.5f * maxY);
 
         if (worldPosition.y > surfaceHeight)
         {
             return _blockDatabase.GetBlockId("bunker:air_block");
         }
-        else if(worldPosition.y == surfaceHeight)
+        else if (worldPosition.y == surfaceHeight)
         {
             return _blockDatabase.GetBlockId("bunker:grass_block");
         }
@@ -45,15 +39,7 @@ public class BlockDecider
         }
         else
         {
-            float oreNoiseValue = _oreNoise.GetNoise(worldPosition.x, worldPosition.y, worldPosition.z);
-            if (oreNoiseValue > 0.5f)
-            {
-                return _blockDatabase.GetBlockId("bunker:stone_block");
-            }
-            else
-            {
-                return _blockDatabase.GetBlockId("bunker:bedrock_block");
-            }
+            return _blockDatabase.GetBlockId("bunker:stone_block");
         }
     }
 }

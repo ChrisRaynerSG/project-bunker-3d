@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System;
 using JetBrains.Annotations;
 using Unity.Entities.UniversalDelegates;
+using Unity.Collections;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -25,7 +26,8 @@ public partial struct ChunkBlockGenerationSystem : ISystem
     {
         BlockGenerationJob job = new BlockGenerationJob
         {
-            ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+            ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
+            heightNoiseBuffer = SystemAPI.GetSingletonBuffer<HeightNoise>().AsNativeArray()
         };
 
         job.ScheduleParallel();
@@ -75,8 +77,9 @@ public partial struct ChunkBlockGenerationSystem : ISystem
 public partial struct BlockGenerationJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
+    [ReadOnly] public NativeArray<HeightNoise> heightNoiseBuffer;
 
-    public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks, in DynamicBuffer<HeightNoise> heightNoiseBuffer)
+    public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks)
     {
 
 
@@ -93,19 +96,22 @@ public partial struct BlockGenerationJob : IJobEntity
 
         int index = 0;
         for (int x = 0; x < WorldConstants.CHUNK_SIZE_X; x++)
-        { 
+        {
             for (int z = 0; z < WorldConstants.CHUNK_SIZE_Z; z++)
             {
-                int surfaceY = heightNoiseBuffer[x + z * WorldConstants.CHUNK_SIZE_X].Value; // Get the surface height for this x,z coordinate
+                int worldX = chunkPosition.Value.x + x;
+                int worldZ = chunkPosition.Value.z + z;
+                int surfaceY = heightNoiseBuffer[worldX + worldZ * WorldConstants.WORLD_SIZE].Value; // Get the surface height for this x,z coordinate
 
                 for (int y = 0; y < WorldConstants.CHUNK_SIZE_Y; y++)
                 {
-                    ushort blockId = 0;
+                    int worldY = chunkPosition.Value.y + y;
+                    ushort blockId;
 
-                    if(y < surfaceY)
+                    if (worldY < surfaceY)
                     {
                         // Below the surface, we have dirt and stone
-                        if (y < surfaceY - 5) // Assuming 5 blocks of dirt below the surface
+                        if (worldY < surfaceY - 5) // Assuming 5 blocks of dirt below the surface
                         {
                             blockId = 1; // Stone block
                         }
@@ -114,7 +120,7 @@ public partial struct BlockGenerationJob : IJobEntity
                             blockId = 2; // Dirt block
                         }
                     }
-                    else if (y == surfaceY)
+                    else if (worldY == surfaceY)
                     {
                         blockId = 3; // Grass block at the surface
                     }

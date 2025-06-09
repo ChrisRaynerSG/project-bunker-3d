@@ -77,6 +77,7 @@ public partial struct ChunkGenerationSystem : ISystem
                             new float3(1f, 1f, 1f)
                         )
                     });
+                    ecb.SetName(chunkEntity, $"Chunk_{x}_{y}_{z}");
                     // Optionally, you can initialize other components or buffers here
                 }
             }

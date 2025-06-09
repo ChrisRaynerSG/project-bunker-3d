@@ -9,6 +9,7 @@ using Unity.Collections;
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(ChunkGenerationSystem))]
+[UpdateAfter(typeof(BlockLoadingSystem))]
 public partial struct ChunkBlockGenerationSystem : ISystem
 {
 
@@ -127,7 +128,7 @@ public partial struct BlockGenerationJob : IJobEntity
                     if (worldY < surfaceY)
                     {
                         // Below the surface, we have dirt and stone
-                        if (worldY < surfaceY - 5) // Assuming 5 blocks of dirt below the surface
+                        if (worldY < surfaceY - WorldConstants.DIRT_LEVEL)
                         {
                             blockId = 1; // Stone block
                         }

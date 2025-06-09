@@ -53,7 +53,7 @@ public partial struct ChunkGenerationSystem : ISystem
 
         for (int x = 0; x < numChunks; x++)
         {
-            for (int y = 0; y < numChunksY; y++)
+            for (int y = -numChunksY; y < numChunksY; y++)
             {
                 for (int z = 0; z < numChunks; z++)
                 {

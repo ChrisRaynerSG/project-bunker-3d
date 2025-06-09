@@ -47,7 +47,7 @@ public partial class NoiseGenerationSystem : SystemBase
 
                 float baseNoise = heightNoise.GetNoise(x, z);
                 // normalize the noise value to a range suitable for height
-                float heightValue = (baseNoise + 1f) * 0.5f * WorldConstants.WORLD_HEIGHT;
+                int heightValue = (int)((baseNoise + 1f) * 0.5f * WorldConstants.WORLD_HEIGHT);
                 
                 buffer[index++] = new HeightNoise
                 {

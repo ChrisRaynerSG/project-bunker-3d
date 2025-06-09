@@ -27,7 +27,7 @@ public partial struct ChunkBlockGenerationSystem : ISystem
         {
             ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
         };
-        
+
         job.ScheduleParallel();
         
         /*
@@ -76,7 +76,7 @@ public partial struct BlockGenerationJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;
 
-    public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks)
+    public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks, in DynamicBuffer<HeightNoise> heightNoiseBuffer)
     {
 
 
@@ -93,15 +93,41 @@ public partial struct BlockGenerationJob : IJobEntity
 
         int index = 0;
         for (int x = 0; x < WorldConstants.CHUNK_SIZE_X; x++)
-        {
-            for (int y = 0; y < WorldConstants.CHUNK_SIZE_Y; y++)
+        { 
+            for (int z = 0; z < WorldConstants.CHUNK_SIZE_Z; z++)
             {
-                for (int z = 0; z < WorldConstants.CHUNK_SIZE_Z; z++)
+                int surfaceY = heightNoiseBuffer[x + z * WorldConstants.CHUNK_SIZE_X].Value; // Get the surface height for this x,z coordinate
+
+                for (int y = 0; y < WorldConstants.CHUNK_SIZE_Y; y++)
                 {
+                    ushort blockId = 0;
+
+                    if(y < surfaceY)
+                    {
+                        // Below the surface, we have dirt and stone
+                        if (y < surfaceY - 5) // Assuming 5 blocks of dirt below the surface
+                        {
+                            blockId = 1; // Stone block
+                        }
+                        else
+                        {
+                            blockId = 2; // Dirt block
+                        }
+                    }
+                    else if (y == surfaceY)
+                    {
+                        blockId = 3; // Grass block at the surface
+                    }
+                    else
+                    {
+                        blockId = 0; // Air block above the surface
+                    }
+
+                    // definitely need a better way to handle block ids, need to lookup the block id in a dictionary or something
                     // setup all blocks in the chunk to default values;
                     blocks[index++] = new Block
                     {
-                        Id = 0, // need to assign the id of the block based on world generation rules
+                        Id = blockId, // need to assign the id of the block based on world generation rules
                         Temperature = 21.0f,
                         Radiation = 0.0f
                     };
@@ -111,3 +137,10 @@ public partial struct BlockGenerationJob : IJobEntity
         ecb.AddComponent<ChunkBlocksInitialisedTag>(entityIndex, entity);
     }
 }
+
+// noise is currently a 1d array of height values for the world using x,z coordinates
+// for each x,z coordinate we have a height value that indicates the y coordinate of the surface terrain
+// anything above this height is considered air, at this height we have grass, and below we have dirt for x blocks,
+// followed by stone for the rest of the journey down to the bottom of the world
+// we will need to generate the blocks in the chunks based on this noise data
+

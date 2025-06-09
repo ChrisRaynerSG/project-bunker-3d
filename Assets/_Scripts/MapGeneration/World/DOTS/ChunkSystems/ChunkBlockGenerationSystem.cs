@@ -27,6 +27,7 @@ public partial struct ChunkBlockGenerationSystem : ISystem
         {
             ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
         };
+        
         job.ScheduleParallel();
         
         /*

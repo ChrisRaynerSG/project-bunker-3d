@@ -105,7 +105,7 @@ public class World : MonoBehaviour
             for (int z = 0; z < maxZ; z++)
             {
                 float rawHeight = noise.GetNoise(x, z);
-                int height = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxY);
+                int height = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxY); // Normalize the height to be between 0 and maxY
                 heights[x, z] = height;
             }
         }

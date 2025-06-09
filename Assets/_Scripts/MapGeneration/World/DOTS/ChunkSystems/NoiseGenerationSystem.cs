@@ -5,7 +5,7 @@ public partial class NoiseGenerationSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        if(!SystemAPI.HasSingleton<WorldTag>())
+        if (!SystemAPI.HasSingleton<WorldTag>())
         {
             UnityEngine.Debug.Log("No WorldTag singleton yet; skipping NoiseGenerationSystem.");
             return;
@@ -44,14 +44,24 @@ public partial class NoiseGenerationSystem : SystemBase
         {
             for (int z = 0; z < WorldConstants.WORLD_SIZE; z++)
             {
+
+                float baseNoise = heightNoise.GetNoise(x, z);
+                // normalize the noise value to a range suitable for height
+                float heightValue = (baseNoise + 1f) * 0.5f * WorldConstants.WORLD_HEIGHT;
+                
                 buffer[index++] = new HeightNoise
                 {
-                    Value = heightNoise.GetNoise(x, z)
+                    Value = heightValue
                 };
             }
         }
 
         // After generating noise, we mark the world as having noise generated
         EntityManager.AddComponent<NoiseGeneratedTag>(worldEntity);
+
+        // we now have a 1d array of height noise values for the world indicating where the surface terrain is located
+        // now I need to generate the surface terrain in the chunks based on this noise data
+        // we need some sort of way of deciding what the blocks are going to be, the blocks on top will be grass blocks, then dirt underneath and then stone finally
+        UnityEngine.Debug.Log($"Noise generation complete for world with seed {seed}. Noise values generated for {bufferSize} positions.");
     }
 }

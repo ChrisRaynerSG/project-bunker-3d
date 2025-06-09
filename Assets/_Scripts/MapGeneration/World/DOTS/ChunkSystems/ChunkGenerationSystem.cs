@@ -83,10 +83,14 @@ public partial struct ChunkGenerationSystem : ISystem
             }
         }
         // After generating chunks, we mark the world as having generated chunks
-        
+
         ecb.Playback(state.EntityManager);
         ecb.Dispose(); // Dispose of the command buffer to free resources
         state.EntityManager.AddComponent<ChunksGeneratedTag>(SystemAPI.GetSingletonEntity<WorldTag>());
         UnityEngine.Debug.Log($"Generated {numChunks * numChunksY * numChunks} chunks in the world.");
+
+        // disable this system after generating chunks
+        state.Enabled = false; // Disable this system after chunk generation
+        UnityEngine.Debug.Log("ChunkGenerationSystem has completed chunk generation and is now disabled.");
     }
 }

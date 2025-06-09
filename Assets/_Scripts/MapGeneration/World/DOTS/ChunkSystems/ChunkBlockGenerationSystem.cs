@@ -24,6 +24,7 @@ public partial struct ChunkBlockGenerationSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        bool allInitialised = true;
         BlockGenerationJob job = new BlockGenerationJob
         {
             ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
@@ -31,6 +32,22 @@ public partial struct ChunkBlockGenerationSystem : ISystem
         };
 
         job.ScheduleParallel();
+
+        foreach (var _ in SystemAPI.Query<RefRO<ChunkPosition>>()
+            .WithNone<ChunkBlocksInitialisedTag>())
+        {
+            allInitialised = false;
+            break;
+            // This is where we would normally handle the case where chunks are not initialized
+            // but since we are using a job, we don't need to do anything here.
+        }
+
+        if (allInitialised)
+        {
+            state.Enabled = false; // Disable this system if all chunks are initialized
+            UnityEngine.Debug.Log("All chunks have been initialized with blocks.");
+            return;
+        }
         
         /*
         foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>()
@@ -67,7 +84,6 @@ public partial struct ChunkBlockGenerationSystem : ISystem
             }
         }
     }
-
     */
     }
 }

@@ -14,7 +14,8 @@ public partial class NoiseGenerationSystem : SystemBase
         var worldEntity = SystemAPI.GetSingletonEntity<WorldTag>();
         if (SystemAPI.HasComponent<NoiseGeneratedTag>(worldEntity))
         {
-            // If the world already has noise generation, we skip this system
+            Enabled = false;
+            UnityEngine.Debug.Log("Noise has already been generated for this world. Disabling NoiseGenerationSystem.");
             return;
         }
 

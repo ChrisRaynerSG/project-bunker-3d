@@ -1,16 +1,11 @@
 using Unity.Entities;
 using Unity.Burst;
-using Unity.Mathematics;
-using Unity.Collections;
-using Unity.Transforms;
-using UnityEngine;
 
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(ChunkGenerationSystem))]
 public partial struct ChunkBlockGenerationSystem : ISystem
 {
-    EntityCommandBufferSystem ecbSystem;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -19,14 +14,12 @@ public partial struct ChunkBlockGenerationSystem : ISystem
         state.RequireForUpdate<ChunkPosition>();
         state.RequireForUpdate<ChunksGeneratedTag>();
 
-        ecbSystem = state.World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
 
-        var ecb = ecbSystem.CreateCommandBuffer();
         foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>()
         .WithNone<ChunkBlocksInitialisedTag>()
         .WithEntityAccess())
@@ -59,8 +52,6 @@ public partial struct ChunkBlockGenerationSystem : ISystem
                     }
                 }
             }
-            ecb.AddComponent<ChunkBlocksInitialisedTag>(entity); // Mark the chunk as initialised so we don't do this again
-        } 
-        ecbSystem.AddJobHandleForProducer(state.Dependency);
+        }
     }
 }

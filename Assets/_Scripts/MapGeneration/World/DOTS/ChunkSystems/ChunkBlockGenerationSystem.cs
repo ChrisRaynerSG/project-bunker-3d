@@ -24,12 +24,12 @@ public partial struct ChunkBlockGenerationSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-
-        BlockGenerationJob job = new BlockGenerationJob();
+        BlockGenerationJob job = new BlockGenerationJob
+        {
+            ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+        };
         job.ScheduleParallel();
-
-
-
+        
         /*
         foreach (var (chunkPosition, entity) in SystemAPI.Query<RefRO<ChunkPosition>>()
         .WithNone<ChunkBlocksInitialisedTag>()
@@ -75,7 +75,9 @@ public partial struct ChunkBlockGenerationSystem : ISystem
 [WithAll(typeof(ChunkTag), typeof(ChunkPosition), typeof(ChunksGeneratedTag))]
 public partial struct BlockGenerationJob : IJobEntity
 {
-    public void Execute(in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks)
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks)
     {
 
 
@@ -107,5 +109,6 @@ public partial struct BlockGenerationJob : IJobEntity
                 }
             }
         }
+        ecb.AddComponent<ChunkBlocksInitialisedTag>(entityIndex, entity);
     }
 }

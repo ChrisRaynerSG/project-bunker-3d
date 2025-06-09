@@ -8,7 +8,6 @@ using Unity.Entities.UniversalDelegates;
 [BurstCompile]
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(ChunkGenerationSystem))]
-[WithNone(typeof(ChunkBlocksInitialisedTag))]
 public partial struct ChunkBlockGenerationSystem : ISystem
 {
 
@@ -72,7 +71,6 @@ public partial struct ChunkBlockGenerationSystem : ISystem
 
 [BurstCompile]
 [WithNone(typeof(ChunkBlocksInitialisedTag))]
-[WithAll(typeof(ChunkTag), typeof(ChunkPosition), typeof(ChunksGeneratedTag))]
 public partial struct BlockGenerationJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ecb;

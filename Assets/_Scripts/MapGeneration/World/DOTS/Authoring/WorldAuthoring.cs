@@ -8,8 +8,8 @@ public class WorldAuthoring : MonoBehaviour
 
     [SerializeField]
     private int seed = 0;
-
     public int Seed => seed;
+    public int WorldSize = 128;
 
     // You can add more fields here to configure the world entity as needed.
 
@@ -21,6 +21,7 @@ public class WorldAuthoring : MonoBehaviour
             AddComponent<WorldTag>(entity); // Add a tag to identify the world entity
             AddComponent(entity, new global::Seed { Value = authoring.seed }); // Add the seed component to the world entity
             AddBuffer<HeightNoise>(entity); // Add a buffer to hold height noise values for the world
+            AddComponent<WorldSize>(entity, new global::WorldSize { Value = authoring.WorldSize});
         }
     }
 }

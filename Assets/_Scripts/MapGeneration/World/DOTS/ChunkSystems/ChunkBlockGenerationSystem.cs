@@ -29,7 +29,8 @@ public partial struct ChunkBlockGenerationSystem : ISystem
         BlockGenerationJob job = new BlockGenerationJob
         {
             ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
-            heightNoiseBuffer = SystemAPI.GetSingletonBuffer<HeightNoise>().AsNativeArray()
+            heightNoiseBuffer = SystemAPI.GetSingletonBuffer<HeightNoise>().AsNativeArray(),
+            worldSize = SystemAPI.GetSingleton<WorldSize>().Value
         };
 
         job.ScheduleParallel();
@@ -96,6 +97,8 @@ public partial struct BlockGenerationJob : IJobEntity
     public EntityCommandBuffer.ParallelWriter ecb;
     [ReadOnly] public NativeArray<HeightNoise> heightNoiseBuffer;
 
+    public int worldSize;
+
     public void Execute([EntityIndexInChunk] int entityIndex, Entity entity, in ChunkPosition chunkPosition, ref DynamicBuffer<Block> blocks)
     {
 
@@ -118,7 +121,7 @@ public partial struct BlockGenerationJob : IJobEntity
             {
                 int worldX = chunkPosition.Value.x + x;
                 int worldZ = chunkPosition.Value.z + z;
-                int surfaceY = heightNoiseBuffer[worldX + worldZ * WorldConstants.WORLD_SIZE].Value; // Get the surface height for this x,z coordinate
+                int surfaceY = heightNoiseBuffer[worldX + worldZ * worldSize].Value; // Get the surface height for this x,z coordinate
 
                 for (int y = 0; y < WorldConstants.CHUNK_SIZE_Y; y++)
                 {

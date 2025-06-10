@@ -2,12 +2,15 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Collections;
+using Unity.Rendering;
+using Unity.Burst;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(NoiseGenerationSystem))]
-
+[BurstCompile]
 public partial struct ChunkGenerationSystem : ISystem
 {
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<WorldTag>();
@@ -15,8 +18,10 @@ public partial struct ChunkGenerationSystem : ISystem
         state.RequireForUpdate<NoiseGeneratedTag>();
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        
         // This system is responsible for generating chunks based on the world noise and seed
         // It will create chunks we will burst compile blocks later
         // Check if the world has already generated chunks
@@ -32,7 +37,7 @@ public partial struct ChunkGenerationSystem : ISystem
             return; // Skip chunk generation if noise has not been generated
         }
 
-        int worldSize = WorldConstants.WORLD_SIZE;
+        int worldSize = SystemAPI.GetSingleton<WorldSize>().Value;
         int chunkSize = WorldConstants.CHUNK_SIZE_X; // Assuming square chunks for simplicity
         int numChunks = worldSize / chunkSize;
         int numChunksY = 64 / chunkSize;
@@ -46,7 +51,9 @@ public partial struct ChunkGenerationSystem : ISystem
             typeof(ChunkTag),
             typeof(ChunkPosition),
             typeof(LocalToWorld),
-            typeof(DirtyChunkTag)
+            typeof(DirtyChunkTag),
+            typeof(RenderMeshUnmanaged)
+
 
         );
 
@@ -80,8 +87,14 @@ public partial struct ChunkGenerationSystem : ISystem
                     });
                     // ecb.AddComponent<DirtyChunkTag>(chunkEntity); // Add DirtyChunkTag to the chunk entity
                     ecb.SetComponentEnabled<DirtyChunkTag>(chunkEntity, false); // Adding DirtyChunkTag but disabling it initially
+                    ecb.SetComponent(chunkEntity, new RenderMeshUnmanaged
+                    {
+                        // Set the mesh and material for the chunk
+                        // mesh = Resources.Load<Mesh>("ChunkMesh"), // Load your chunk mesh here
+                        // material = Resources.Load<Material>("ChunkMaterial") // Load your chunk material here
+                    });
                     ecb.SetName(chunkEntity, $"Chunk_{x}_{y}_{z}");
-                
+
                     // Optionally, you can initialize other components or buffers here
                 }
             }

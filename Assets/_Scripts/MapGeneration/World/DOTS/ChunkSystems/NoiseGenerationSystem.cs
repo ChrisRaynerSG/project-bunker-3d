@@ -25,9 +25,10 @@ public partial class NoiseGenerationSystem : SystemBase
         int seed = seedComponent.Value;
 
         FastNoise heightNoise = NoiseProvider.CreateNoise(0.006f, seed);
+        int worldSize = SystemAPI.GetSingleton<WorldSize>().Value;
 
         var buffer = SystemAPI.GetBuffer<HeightNoise>(worldEntity);
-        var bufferSize = WorldConstants.WORLD_SIZE * WorldConstants.WORLD_SIZE;
+        var bufferSize = worldSize * worldSize;
 
         if (buffer.Length != bufferSize)
         {
@@ -39,11 +40,13 @@ public partial class NoiseGenerationSystem : SystemBase
             return; // If the buffer is already the correct size, we skip further processing
         }
 
+        
+
         int index = 0;
 
-        for (int x = 0; x < WorldConstants.WORLD_SIZE; x++)
+        for (int x = 0; x < worldSize; x++)
         {
-            for (int z = 0; z < WorldConstants.WORLD_SIZE; z++)
+            for (int z = 0; z < worldSize; z++)
             {
 
                 float baseNoise = heightNoise.GetNoise(x, z);

@@ -21,6 +21,9 @@ public class WorldAuthoring : MonoBehaviour
             AddComponent<WorldTag>(entity); // Add a tag to identify the world entity
             AddComponent(entity, new global::Seed { Value = authoring.seed }); // Add the seed component to the world entity
             AddBuffer<HeightNoise>(entity); // Add a buffer to hold height noise values for the world
+            AddComponent<ChunksGeneratedTag>(entity); // Add a tag to indicate that chunks have been generated
+            SetComponentEnabled<ChunksGeneratedTag>(entity, false); // Initially, chunks are not generated
+            
         }
     }
 }

@@ -2,10 +2,11 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Collections;
+using Unity.Burst;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(NoiseGenerationSystem))]
-
+[BurstCompile]
 public partial struct ChunkGenerationSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -20,10 +21,15 @@ public partial struct ChunkGenerationSystem : ISystem
         // This system is responsible for generating chunks based on the world noise and seed
         // It will create chunks we will burst compile blocks later
         // Check if the world has already generated chunks
-        if (SystemAPI.HasSingleton<ChunksGeneratedTag>())
-        {
-            return; // Skip chunk generation if chunks are already generated
-        }
+        // foreach(ChunksGeneratedTag tagRef in SystemAPI.Query<RefRO<ChunksGeneratedTag>>())
+        // {
+        //     if (tagRef.)
+        //     {
+        //         UnityEngine.Debug.Log("Chunks have already been generated. Skipping ChunkGenerationSystem.");
+        //         state.Enabled = false; // Disable this system if chunks are already generated
+        //         return;
+        //     }
+        // }
 
         var worldEntity = SystemAPI.GetSingletonEntity<WorldTag>();
         if (!SystemAPI.HasComponent<NoiseGeneratedTag>(worldEntity))
@@ -45,7 +51,9 @@ public partial struct ChunkGenerationSystem : ISystem
         var archetype = state.EntityManager.CreateArchetype(
             typeof(ChunkTag),
             typeof(ChunkPosition),
-            typeof(LocalToWorld)
+            typeof(LocalToWorld),
+            typeof(DirtyChunkTag),
+            typeof(ChunkBlocksInitialisedTag)
 
         );
 
@@ -78,6 +86,8 @@ public partial struct ChunkGenerationSystem : ISystem
                         )
                     });
                     ecb.SetName(chunkEntity, $"Chunk_{x}_{y}_{z}");
+                    ecb.SetComponentEnabled<ChunkBlocksInitialisedTag>(chunkEntity, false); // add a tag to indicate that the chunk blocks are not initialized yet
+                    ecb.SetComponentEnabled<DirtyChunkTag>(chunkEntity, true); // add a tag to indicate that the chunk is dirty and needs to be processed
                     // Optionally, you can initialize other components or buffers here
                 }
             }
@@ -86,7 +96,13 @@ public partial struct ChunkGenerationSystem : ISystem
 
         ecb.Playback(state.EntityManager);
         ecb.Dispose(); // Dispose of the command buffer to free resources
-        state.EntityManager.AddComponent<ChunksGeneratedTag>(SystemAPI.GetSingletonEntity<WorldTag>());
+                       // state.EntityManager.AddComponent<ChunksGeneratedTag>(SystemAPI.GetSingletonEntity<WorldTag>());
+                       // need to set the ChunksGeneratedTag to true to indicate that chunks have been generated
+        foreach (var (tagRef, entity) in SystemAPI.Query<RefRO<ChunksGeneratedTag>>().WithEntityAccess())
+        {
+            // should only be one world entity so lets set chunks generated to true
+            state.EntityManager.SetComponentEnabled<ChunksGeneratedTag>(entity, true);
+        }
         UnityEngine.Debug.Log($"Generated {numChunks * numChunksY * numChunks} chunks in the world.");
 
         // disable this system after generating chunks

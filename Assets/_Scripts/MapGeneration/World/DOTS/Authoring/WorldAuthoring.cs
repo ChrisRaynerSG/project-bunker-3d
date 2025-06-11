@@ -22,10 +22,6 @@ public class WorldAuthoring : MonoBehaviour
             AddComponent(entity, new global::Seed { Value = authoring.seed }); // Add the seed component to the world entity
             AddBuffer<HeightNoise>(entity); // Add a buffer to hold height noise values for the world
             AddComponent<WorldSize>(entity, new global::WorldSize { Value = authoring.WorldSize });
-
-            var blob = BlockLoader.LoadAndCreateBlobAsset();
-            AddComponent(entity, new BlockDefinitionSingleton { Blob = blob });
-
         }
     }
 }

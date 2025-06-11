@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 
 public class BlockLoader
@@ -59,5 +60,11 @@ public class BlockLoader
             }
         }
         return textures;
+    }
+
+    public static BlobAssetReference<BlockDefinitionBlobAsset> LoadAndCreateBlobAsset()
+    {
+        List<BlockDefinition> blocks = LoadBlockDefinitions();
+        return BlockDefinitionBlobBuilder.Create(blocks);
     }
 }

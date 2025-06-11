@@ -4,6 +4,7 @@ using Unity.Transforms;
 using Unity.Collections;
 using Unity.Rendering;
 using Unity.Burst;
+using Unity.Entities.UniversalDelegates;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(NoiseGenerationSystem))]
@@ -52,9 +53,9 @@ public partial struct ChunkGenerationSystem : ISystem
             typeof(ChunkPosition),
             typeof(LocalToWorld),
             typeof(DirtyChunkTag),
-            typeof(RenderMeshUnmanaged)
-
-
+            typeof(RenderMeshArray),
+            typeof(MaterialMeshInfo),
+            typeof(WorldRenderBounds)
         );
 
         var ecb = new EntityCommandBuffer(Allocator.Temp);
@@ -87,14 +88,8 @@ public partial struct ChunkGenerationSystem : ISystem
                     });
                     // ecb.AddComponent<DirtyChunkTag>(chunkEntity); // Add DirtyChunkTag to the chunk entity
                     ecb.SetComponentEnabled<DirtyChunkTag>(chunkEntity, false); // Adding DirtyChunkTag but disabling it initially
-                    ecb.SetComponent(chunkEntity, new RenderMeshUnmanaged
-                    {
-                        // Set the mesh and material for the chunk
-                        // mesh = Resources.Load<Mesh>("ChunkMesh"), // Load your chunk mesh here
-                        // material = Resources.Load<Material>("ChunkMaterial") // Load your chunk material here
-                    });
                     ecb.SetName(chunkEntity, $"Chunk_{x}_{y}_{z}");
-
+                    
                     // Optionally, you can initialize other components or buffers here
                 }
             }

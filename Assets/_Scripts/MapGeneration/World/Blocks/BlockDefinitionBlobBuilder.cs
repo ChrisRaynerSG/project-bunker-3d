@@ -24,9 +24,9 @@ public static class BlockDefinitionBlobBuilder
                 IgnitionTemperature = def.ignitionTemperature,
                 Textures = new BlockTextureDefinition
                 {
-                    Top = def.textures.top,
-                    Bottom = def.textures.bottom,
-                    Side = def.textures.side
+                    Top = def.textures?.top ?? "",
+                    Bottom = def.textures?.bottom ?? "",
+                    Side = def.textures?.side ?? ""
                 }
             };
         }

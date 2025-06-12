@@ -17,7 +17,12 @@ public static class BlockDefinitionBlobBuilder
         for (int i = 0; i < blockDefinitions.Count; i++)
         {
             var def = blockDefinitions[i];
-            
+
+            Debug.Log($"Creating UV reference for block {def.id} with textures: Top={def.textures?.top}, Bottom={def.textures?.bottom}, Side={def.textures?.side}");
+            Debug.Log($"Block {def.id} Rectangles: " +
+                      $"Top={uvRects.GetValueOrDefault(def.textures?.top, new Rect(0, 0, 0, 0))}, " +
+                      $"Bottom={uvRects.GetValueOrDefault(def.textures?.bottom, new Rect(0, 0, 0, 0))}, " +
+                      $"Side={uvRects.GetValueOrDefault(def.textures?.side, new Rect(0, 0, 0, 0))}");
             array[i] = new BlockDefinitionDOTS
             {
                 Id = def.id,
@@ -38,9 +43,16 @@ public static class BlockDefinitionBlobBuilder
                 },
                 UvReference = new BlockDefinitionUvReference
                 {
-                    Top = uvRects.ContainsKey(def.textures?.top) ? new float4(uvRects[def.textures.top].x, uvRects[def.textures.top].y, uvRects[def.textures.top].width, uvRects[def.textures.top].height) : new float4(0, 0, 0, 0),
-                    Side = uvRects.ContainsKey(def.textures?.side) ? new float4(uvRects[def.textures.side].x, uvRects[def.textures.side].y, uvRects[def.textures.side].width, uvRects[def.textures.side].height) : new float4(0, 0, 0, 0),
-                    Bottom = uvRects.ContainsKey(def.textures?.bottom) ? new float4(uvRects[def.textures.bottom].x, uvRects[def.textures.bottom].y, uvRects[def.textures.bottom].width, uvRects[def.textures.bottom].height) : new float4(0, 0, 0, 0)
+                    
+                    Top = !string.IsNullOrEmpty(def.textures?.top) && uvRects.TryGetValue(def.textures.top, out var topRect) 
+                        ? new float4(topRect.x, topRect.y, topRect.width, topRect.height) 
+                        : new float4(0, 0, 0, 0),
+                    Side = !string.IsNullOrEmpty(def.textures?.side) && uvRects.TryGetValue(def.textures.side, out var sideRect) 
+                        ? new float4(sideRect.x, sideRect.y, sideRect.width, sideRect.height) 
+                        : new float4(0, 0, 0, 0),
+                    Bottom = !string.IsNullOrEmpty(def.textures?.bottom) && uvRects.TryGetValue(def.textures.bottom, out var bottomRect) 
+                        ? new float4(bottomRect.x, bottomRect.y, bottomRect.width, bottomRect.height) 
+                        : new float4(0, 0, 0, 0)
                 }
             };
         }

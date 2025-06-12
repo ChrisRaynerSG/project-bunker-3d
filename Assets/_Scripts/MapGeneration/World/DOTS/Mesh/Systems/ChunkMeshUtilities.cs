@@ -128,7 +128,12 @@ public partial struct ChunkMeshUtilities
 
     private static void AddUvs(MeshDataDOTS meshData, FixedString64Bytes textureName, BlockDefinitionDOTS block)
     {
-        meshData.uvs.Add(block.UvReference.Top);
+        if(textureName == block.Textures.Top)
+            meshData.uvs.Add(block.UvReference.Top);
+        else if(textureName == block.Textures.Bottom)
+            meshData.uvs.Add(block.UvReference.Bottom);
+        else
+            meshData.uvs.Add(block.UvReference.Side);
     }
     private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName, BlockDefinitionDOTS block)
     {

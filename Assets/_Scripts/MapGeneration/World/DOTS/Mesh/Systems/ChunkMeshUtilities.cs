@@ -20,7 +20,7 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Top;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     public static void CreateFaceDown(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -38,7 +38,7 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Bottom;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     public static void CreateFaceNorth(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -56,7 +56,7 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Side;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     public static void CreateFaceEast(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -74,7 +74,7 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Side;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     public static void CreateFaceSouth(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -92,7 +92,7 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Side;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     public static void CreateFaceWest(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -110,13 +110,13 @@ public partial struct ChunkMeshUtilities
         }
 
         FixedString64Bytes textureName = block.Textures.Side;
-        AddTrianglesAndUvs(meshData, vertices, textureName);
+        AddTrianglesAndUvs(meshData, vertices, textureName, block);
     }
 
     private static void AddTriangles(MeshDataDOTS meshData, float3[] vertices)
     {
-        int vertexCount = meshData.vertices.Length;
-        int baseIndex = vertexCount;
+    
+        int baseIndex = meshData.vertices.Length - vertices.Length;
 
         meshData.triangles.Add(baseIndex);
         meshData.triangles.Add(baseIndex + 1);
@@ -126,19 +126,13 @@ public partial struct ChunkMeshUtilities
         meshData.triangles.Add(baseIndex + 3);
     }
 
-    private static void AddUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName)
+    private static void AddUvs(MeshDataDOTS meshData, FixedString64Bytes textureName, BlockDefinitionDOTS block)
     {
-        // Assuming a simple UV mapping where each face uses the same texture
-        float4 uv = new float4(0, 0, 1, 1); // Placeholder UVs
-
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            meshData.uvs.Add(uv);
-        }
+        meshData.uvs.Add(block.UvReference.Top);
     }
-    private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName)
+    private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName, BlockDefinitionDOTS block)
     {
         AddTriangles(meshData, vertices);
-        AddUvs(meshData, vertices, textureName);
+        AddUvs(meshData, textureName, block);
     }
 }

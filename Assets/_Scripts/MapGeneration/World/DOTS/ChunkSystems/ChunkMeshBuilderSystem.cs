@@ -13,7 +13,7 @@ public partial struct ChunkMeshBuilderSystem : ISystem
     private RenderMeshArray _renderMeshArray;
     private int _nextMeshIndex;
 
-    
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
@@ -31,24 +31,26 @@ public partial struct ChunkMeshBuilderSystem : ISystem
             .CreateCommandBuffer(state.WorldUnmanaged);
 
 
-        foreach (var (chunkPosition, mesh) in SystemAPI.Query<RefRO<ChunkPosition>, RenderMeshArray>()
+        foreach (var (chunkPosition, mesh) in SystemAPI.Query<RefRW<ChunkPosition>, RenderMeshArray>()
             .WithAll<ChunkTag, ChunkBlocksInitialisedTag, DirtyChunkTag>())
         {
 
-
-
-
-
-            // Build mesh for each chunk
         }
+
+    }
+    private void BuildMeshForChunk(ChunkPosition chunkPosition)
+    {
+
     }
 }
+
+
 
 public struct MeshDataDOTS
 {
     public NativeList<float3> vertices;
     public NativeList<int> triangles;
-    public NativeList<float2> uvs;
+    public NativeList<float4> uvs;
 
     public void Dispose()
     {

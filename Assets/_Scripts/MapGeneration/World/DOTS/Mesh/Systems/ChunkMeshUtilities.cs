@@ -2,6 +2,8 @@ using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Burst;
 using Unity.Entities;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 public partial struct ChunkMeshUtilities
 {
@@ -115,7 +117,7 @@ public partial struct ChunkMeshUtilities
 
     private static void AddTriangles(MeshDataDOTS meshData, float3[] vertices)
     {
-    
+
         int baseIndex = meshData.vertices.Length - vertices.Length;
 
         meshData.triangles.Add(baseIndex);
@@ -128,9 +130,9 @@ public partial struct ChunkMeshUtilities
 
     private static void AddUvs(MeshDataDOTS meshData, FixedString64Bytes textureName, BlockDefinitionDOTS block)
     {
-        if(textureName == block.Textures.Top)
+        if (textureName == block.Textures.Top)
             meshData.uvs.Add(block.UvReference.Top);
-        else if(textureName == block.Textures.Bottom)
+        else if (textureName == block.Textures.Bottom)
             meshData.uvs.Add(block.UvReference.Bottom);
         else
             meshData.uvs.Add(block.UvReference.Side);
@@ -139,5 +141,23 @@ public partial struct ChunkMeshUtilities
     {
         AddTriangles(meshData, vertices);
         AddUvs(meshData, textureName, block);
+    }
+    
+    public static Mesh ToMesh(MeshDataDOTS meshData)
+    {
+        Mesh mesh = new Mesh();
+        mesh.SetVertices(meshData.vertices.ToArray(Allocator.Temp));
+        mesh.SetUVs(0, meshData.uvs.ToArray(Allocator.Temp));
+
+        using (NativeArray<int> triangles = meshData.triangles.ToArray(Allocator.Temp))
+        {
+            int[] triangleArray = new int[triangles.Length];
+            triangles.CopyTo(triangleArray);
+            mesh.SetTriangles(triangleArray, 0, false);
+        }
+
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        return mesh;
     }
 }

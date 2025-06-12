@@ -26,11 +26,6 @@ public struct BlockTextureDefinition : IComponentData
     public FixedString64Bytes Side;
 }
 
-public struct BlockDefinitionBlobAsset
-{
-    public BlobArray<BlockDefinitionDOTS> BlockDefinitions;
-}
-
 public struct BlockDefinitionUvReference
 {
 
@@ -39,3 +34,9 @@ public struct BlockDefinitionUvReference
     public float4 Bottom;
     
 }
+
+public struct BlockDefinitionBlobAsset
+{
+    public BlobArray<BlockDefinitionDOTS> BlockDefinitions;
+}
+

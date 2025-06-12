@@ -1,0 +1,51 @@
+using Unity.Mathematics;
+using Unity.Collections;
+using Unity.Burst;
+using Unity.Entities;
+
+public partial struct ChunkMeshUtilities
+{
+    public static void CreateFaceUp(MeshDataDOTS meshData, float3 origin, BlockDefinition block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x - .5f, origin.y + .5f, origin.z - .5f);
+        vertices[1] = new float3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
+        vertices[2] = new float3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
+        vertices[3] = new float3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
+
+        meshData.vertices.AddRange(vertices);
+
+        string textureName = block.textures.top;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    private static void AddTriangles(MeshDataDOTS meshData, float3[] vertices)
+    {
+        int vertexCount = meshData.vertices.Length;
+        int baseIndex = vertexCount;
+
+        meshData.triangles.Add(baseIndex);
+        meshData.triangles.Add(baseIndex + 1);
+        meshData.triangles.Add(baseIndex + 2);
+        meshData.triangles.Add(baseIndex);
+        meshData.triangles.Add(baseIndex + 2);
+        meshData.triangles.Add(baseIndex + 3);
+    }
+
+    private static void AddUvs(MeshDataDOTS meshData, float3[] vertices, string textureName)
+    {
+        // Assuming a simple UV mapping where each face uses the same texture
+        float4 uv = new float4(0, 0, 1, 1); // Placeholder UVs
+
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            meshData.uvs.Add(uv);
+        }
+    }
+    private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, string textureName)
+    {
+        AddTriangles(meshData, vertices);
+        AddUvs(meshData, vertices, textureName);
+    }
+}

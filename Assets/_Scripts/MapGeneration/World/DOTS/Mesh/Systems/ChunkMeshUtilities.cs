@@ -5,7 +5,7 @@ using Unity.Entities;
 
 public partial struct ChunkMeshUtilities
 {
-    public static void CreateFaceUp(MeshDataDOTS meshData, float3 origin, BlockDefinition block)
+    public static void CreateFaceUp(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
     {
         float3[] vertices = new float3[4];
 
@@ -14,9 +14,102 @@ public partial struct ChunkMeshUtilities
         vertices[2] = new float3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
         vertices[3] = new float3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
 
-        meshData.vertices.AddRange(vertices);
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
 
-        string textureName = block.textures.top;
+        FixedString64Bytes textureName = block.Textures.Top;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    public static void CreateFaceDown(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x - .5f, origin.y - .5f, origin.z + .5f);
+        vertices[1] = new float3(origin.x + .5f, origin.y - .5f, origin.z + .5f);
+        vertices[2] = new float3(origin.x + .5f, origin.y - .5f, origin.z - .5f);
+        vertices[3] = new float3(origin.x - .5f, origin.y - .5f, origin.z - .5f);
+
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
+
+        FixedString64Bytes textureName = block.Textures.Bottom;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    public static void CreateFaceNorth(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x + .5f, origin.y - .5f, origin.z + .5f);
+        vertices[1] = new float3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
+        vertices[2] = new float3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
+        vertices[3] = new float3(origin.x - .5f, origin.y - .5f, origin.z + .5f);
+
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
+
+        FixedString64Bytes textureName = block.Textures.Side;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    public static void CreateFaceEast(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x + .5f, origin.y - .5f, origin.z - .5f);
+        vertices[1] = new float3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
+        vertices[2] = new float3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
+        vertices[3] = new float3(origin.x + .5f, origin.y - .5f, origin.z + .5f);
+
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
+
+        FixedString64Bytes textureName = block.Textures.Side;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    public static void CreateFaceSouth(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x - .5f, origin.y - .5f, origin.z - .5f);
+        vertices[1] = new float3(origin.x - .5f, origin.y + .5f, origin.z - .5f);
+        vertices[2] = new float3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
+        vertices[3] = new float3(origin.x + .5f, origin.y - .5f, origin.z - .5f);
+
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
+
+        FixedString64Bytes textureName = block.Textures.Side;
+        AddTrianglesAndUvs(meshData, vertices, textureName);
+    }
+
+    public static void CreateFaceWest(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
+    {
+        float3[] vertices = new float3[4];
+
+        vertices[0] = new float3(origin.x - .5f, origin.y - .5f, origin.z + .5f);
+        vertices[1] = new float3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
+        vertices[2] = new float3(origin.x - .5f, origin.y + .5f, origin.z - .5f);
+        vertices[3] = new float3(origin.x - .5f, origin.y - .5f, origin.z - .5f);
+
+        using (var nativeVertices = new NativeArray<float3>(vertices, Allocator.Temp))
+        {
+            meshData.vertices.AddRange(nativeVertices);
+        }
+
+        FixedString64Bytes textureName = block.Textures.Side;
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
@@ -33,7 +126,7 @@ public partial struct ChunkMeshUtilities
         meshData.triangles.Add(baseIndex + 3);
     }
 
-    private static void AddUvs(MeshDataDOTS meshData, float3[] vertices, string textureName)
+    private static void AddUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName)
     {
         // Assuming a simple UV mapping where each face uses the same texture
         float4 uv = new float4(0, 0, 1, 1); // Placeholder UVs
@@ -43,7 +136,7 @@ public partial struct ChunkMeshUtilities
             meshData.uvs.Add(uv);
         }
     }
-    private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, string textureName)
+    private static void AddTrianglesAndUvs(MeshDataDOTS meshData, float3[] vertices, FixedString64Bytes textureName)
     {
         AddTriangles(meshData, vertices);
         AddUvs(meshData, vertices, textureName);

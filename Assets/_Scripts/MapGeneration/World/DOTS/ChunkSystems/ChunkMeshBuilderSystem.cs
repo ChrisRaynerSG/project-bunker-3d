@@ -46,16 +46,3 @@ public partial struct ChunkMeshBuilderSystem : ISystem
 
 
 
-public struct MeshDataDOTS
-{
-    public NativeList<float3> vertices;
-    public NativeList<int> triangles;
-    public NativeList<float4> uvs;
-
-    public void Dispose()
-    {
-        vertices.Dispose();
-        triangles.Dispose();
-        uvs.Dispose();
-    }
-}

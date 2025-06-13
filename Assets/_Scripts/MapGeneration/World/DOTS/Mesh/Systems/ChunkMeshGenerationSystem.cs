@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using Unity.Burst;
 using Unity.Rendering;
 using Unity.Transforms;
+using UnityEngine;
 
 
 [UpdateAfter(typeof(ChunkBlockGenerationSystem))]
@@ -23,6 +24,11 @@ public partial class ChunkMeshGenerationSystem : SystemBase
         // we will create faces for each block that is adjacent to air, using ChunkMeshUtilities to create the faces
         // We will also use the EntityCommandBuffer to create the mesh entities and assign the mesh data to them
         EntityCommandBuffer ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+
+        Material material = new Material(Shader.Find("Standard"));
+        material.mainTexture = TextureAtlasBuilder.AtlasTexture;
+        // var material = TextureAtlasBuilder.AtlasTexture;
+        var entityManager = World.EntityManager;
 
         foreach (var (transform, blockbuffer, entity) in SystemAPI.Query<RefRO<LocalTransform>, DynamicBuffer<Block>>()
         .WithEntityAccess()
@@ -60,9 +66,38 @@ public partial class ChunkMeshGenerationSystem : SystemBase
                     continue;
                 }
             }
+
+            Mesh mesh = ChunkMeshUtilities.ToMesh(meshData);
+
+            var renderMeshArray = new RenderMeshArray(new Material[] { material }, new Mesh[] { mesh });
+            entityManager.SetSharedComponentManaged(entity, renderMeshArray);
+            // entityManager.SetComponentData(entity, new MaterialMeshInfo
+            // {
+            //     Material = renderMeshArray.MaterialReferences[0],
+            //     Mesh = renderMeshArray.MeshReferences[0]
+            // });
+            ecb.SetComponent(entity, new WorldRenderBounds
+            {
+                Value = mesh.bounds.ToAABB()
+            });
+
             // Create the mesh entity and assign the mesh data
-            Entity meshEntity = ecb.Instantiate(entity);
+            // Entity meshEntity = ecb.Instantiate(entity);
             // ecb.SetComponent(meshEntity, meshData);
         }
+    }
+}
+
+public struct MeshDataDOTS
+{
+    public NativeList<float3> vertices;
+    public NativeList<int> triangles;
+    public NativeList<float4> uvs;
+
+    public void Dispose()
+    {
+        vertices.Dispose();
+        triangles.Dispose();
+        uvs.Dispose();
     }
 }

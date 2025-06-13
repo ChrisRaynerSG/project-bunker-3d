@@ -3,8 +3,10 @@ using Unity.Collections;
 using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
+
 using UnityEngine.Rendering;
 
+[BurstCompile]
 public partial struct ChunkMeshUtilities
 {
     public static void CreateFaceUp(MeshDataDOTS meshData, float3 origin, BlockDefinitionDOTS block)
@@ -142,7 +144,7 @@ public partial struct ChunkMeshUtilities
         AddTriangles(meshData, vertices);
         AddUvs(meshData, textureName, block);
     }
-    
+
     public static Mesh ToMesh(MeshDataDOTS meshData)
     {
         Mesh mesh = new Mesh();

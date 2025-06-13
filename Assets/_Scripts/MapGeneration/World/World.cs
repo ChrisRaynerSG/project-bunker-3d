@@ -136,6 +136,7 @@ public class World : MonoBehaviour
                         if (y == heights[x, z] - 1)
                         {
                             blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
+                            TreeUtilities.GenerateTree(new Vector3(x, y, z));
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
                         {

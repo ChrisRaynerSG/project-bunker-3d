@@ -42,7 +42,7 @@ public static class TreeUtilities
                     if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) <= 3) // Sphere-like shape
                     {
                         int lx = (int)position.x + dx;
-                        int ly = (int)position.y + trunkHeight + dy;
+                        int ly = trunkHeight + dy;
                         int lz = (int)position.z + dz;
                         // need to get the block info from WorldData from y slice to get chunk to get block info
 

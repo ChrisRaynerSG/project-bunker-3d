@@ -128,7 +128,7 @@ public class World : MonoBehaviour
                             if (treeNoise.GetNoise(x, y, z) > 0.5f)
                             {
                                 // Generate Tree but only according to noise value
-                                TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 4f);
+                                TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 5f);
                                 blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
                             }
                             else

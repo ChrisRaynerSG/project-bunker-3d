@@ -4,15 +4,30 @@ using UnityEngine;
 public static class TreeUtilities
 {
     public static BlockAccessor blockAccessor;
-    public static void GenerateTree(Vector3 position)
+    public static void GenerateTree(Vector3 position, float radius = 5f)
     {
+        blockAccessor = new BlockAccessor(World.Instance);
+
+        if (IsTreeNearby(position, radius))
+        {
+            return; // Don't generate a tree if there's already one nearby
+        }
+        if (IsTreeNearWorldEdge(position, radius))
+        {
+            return; // Don't generate a tree near the world edge
+        }
+
         int trunkHeight = (int)position.y + 5;
 
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
+            BlockData block = blockAccessor.GetBlock(new Vector3Int((int)position.x, y, (int)position.z));
             // Create trunk blocks
             blockAccessor.SetBlock(new Vector3Int((int)position.x, y, (int)position.z),
                 BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block"));
+
+            block.IsSolid = true; // Set the block as solid
+
         }
 
         for (int dy = -2; dy <= 2; dy++)
@@ -26,15 +41,52 @@ public static class TreeUtilities
                         int lx = (int)position.x + dx;
                         int ly = (int)position.y + trunkHeight + dy;
                         int lz = (int)position.z + dz;
-
-                    
                         // need to get the block info from WorldData from y slice to get chunk to get block info
+
+                        BlockData block = blockAccessor.GetBlock(new Vector3Int(lx, ly, lz));
+
+                        if (block.definition.id == BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block").id)
+                        {
+                            // If the block is already a log, skip setting leaves
+                            continue;
+                        }
+                        // Only set leaves if the block is not already a log
                         blockAccessor.SetBlock(new Vector3Int(lx, ly, lz),
-                            BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block"));
+                        BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block"));
+                        block.IsSolid = true;
                     }
                 }
             }
         }
+    }
 
+    public static bool IsTreeNearby(Vector3 position, float radius)
+    {
+        blockAccessor = new BlockAccessor(World.Instance);
+        BlockDefinition targetBlock = BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block");
+
+        for (int x = (int)(position.x - radius); x <= (int)(position.x + radius); x++)
+        {
+            for (int z = (int)(position.z - radius); z <= (int)(position.z + radius); z++)
+            {
+                for (int y = (int)(position.y - radius); y <= (int)(position.y + radius); y++)
+                {
+                    BlockData block = blockAccessor.GetBlock(new Vector3Int(x, y, z));
+                    if (block != null && block.definition != null &&
+                        block.definition.id == targetBlock.id)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static bool IsTreeNearWorldEdge(Vector3 position, float radius)
+    {
+        // need to make sure that the position is further than 4 blocks from the edge of the world
+        int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
+        return position.x < radius || position.x > worldSize - radius || position.z < radius || position.z > worldSize - radius;
     }
 }

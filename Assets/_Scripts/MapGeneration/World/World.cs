@@ -1,11 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using NUnit.Framework;
-using TreeEditor;
-using Unity.Android.Gradle;
 using UnityEngine;
-using UnityEngine.UI;
 public class World : MonoBehaviour
 {
     MeshFilter filter;
@@ -21,6 +17,7 @@ public class World : MonoBehaviour
     public float frequency = 0.1f;
     public int seed = 0;
     public int maxY = 32;
+    public int maxTerrainHeight = 24;
 
     public int minElevation = 0;
     public int currentElevation;
@@ -69,23 +66,6 @@ public class World : MonoBehaviour
     {
         HandleElevationChange();
     }
-
-    // void LoadTextures()
-    // {
-    //     List<BlockDefinition> blocks = BlockLoader.LoadBlockDefinitions();
-
-    //     foreach (BlockDefinition block in blocks)
-    //     {
-    //         blockDefinitions[block.id] = block;
-    //         Debug.Log($"Loaded block: {block.id} with textures: Top={block.textures.top}, Bottom={block.textures.bottom}, Side={block.textures.side}");
-    //     }
-
-    //     HashSet<string> textureNames = BlockLoader.GetTextureNames(blocks);
-    //     List<Texture2D> textures = BlockLoader.LoadTextures(textureNames, out List<string> nameOrder);
-    //     Texture2D textureAtlas = TextureAtlasBuilder.BuildAtlas(textures, nameOrder);
-    //     ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = textureAtlas; // commented out for now while updating the way textures are applied to blocks.
-    // }
-
     private IEnumerator GenerateWorldCoroutine()
     {
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
@@ -97,6 +77,7 @@ public class World : MonoBehaviour
         FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
         FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
         FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
+        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency, (-seed/2) + 4);
 
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
@@ -105,7 +86,7 @@ public class World : MonoBehaviour
             for (int z = 0; z < maxZ; z++)
             {
                 float rawHeight = noise.GetNoise(x, z);
-                int height = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxY); // Normalize the height to be between 0 and maxY
+                int height = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxTerrainHeight); // Normalize the height to be between 0 and maxY
                 heights[x, z] = height;
             }
         }
@@ -132,11 +113,30 @@ public class World : MonoBehaviour
 
                         // for world gen I want to have grass on top, then dirt for the next few layers then stone
                         // Basic terrain generation logic need to do ore distribution and fancier features like trees and bushes later - also have a main road that passes from the edge of the map to the centre
-
-                        if (y == heights[x, z] - 1)
+                        // if (y == heights[x, z])
+                        // {
+                        //     // Generate Tree but only according to noise value
+                        //     float treeNoiseValue = treeNoise.GetNoise(x, y, z);
+                        //     if (treeNoiseValue > 0.5f)
+                        //     {
+                        //         TreeUtilities.GenerateTree(new Vector3(x, y, z));
+                        //     }
+                        // }
+                        /*else*/ if (y == heights[x, z] - 1)
                         {
-                            blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
-                            TreeUtilities.GenerateTree(new Vector3(x, y, z));
+                            if (treeNoise.GetNoise(x, y, z) > 0.5f)
+                            {
+                                // Generate Tree but only according to noise value
+                                TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 10f);
+                                blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
+                            }
+                            else
+                            {
+                                blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
+                            }
+
+                            
+
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
                         {
@@ -181,9 +181,6 @@ public class World : MonoBehaviour
             ySliceObject.name = $"YSlice_{y}";
             ySliceObject.transform.position = new Vector3(0, y, 0);
             ySlices.Add(ySliceObject);
-
-            // int ChunkXCount = maxX / ChunkData.CHUNK_SIZE;
-            // int ChunkZCount = maxZ / ChunkData.CHUNK_SIZE;
 
             for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
             {
@@ -493,12 +490,4 @@ public class World : MonoBehaviour
 
         return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
     }
-    // public Dictionary<string, BlockDefinition> GetBlockDefinitions()
-    // {
-    //     if(blockDefinitions.Count == 0)
-    //     {
-    //         Debug.LogWarning("No block definitions loaded. Please ensure that the block definitions are loaded before accessing them.");
-    //     }
-    //     return blockDefinitions;
-    // }
 }

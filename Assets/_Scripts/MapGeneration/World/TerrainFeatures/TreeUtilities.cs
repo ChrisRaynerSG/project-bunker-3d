@@ -21,7 +21,7 @@ public static class TreeUtilities
 
         rng ??= Randomizer.GetDeterministicRNG(position, World.Instance.seed);
 
-        int trunkHeight = (int)position.y + rng.Next(4, 7);
+        int trunkHeight = (int)position.y + rng.Next(4, 9);
 
         for (int y = (int)position.y; y < trunkHeight; y++)
         {

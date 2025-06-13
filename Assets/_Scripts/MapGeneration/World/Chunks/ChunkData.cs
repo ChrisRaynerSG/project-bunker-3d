@@ -34,6 +34,7 @@ public class ChunkData
                     Z = originZ + z,
                     IsSolid = false // Default value, can be set later
                 };
+                Grid[x][z].definition = BlockDatabase.Instance.GetBlock("bunker:air_block"); // Default block type
             }
         }
     }

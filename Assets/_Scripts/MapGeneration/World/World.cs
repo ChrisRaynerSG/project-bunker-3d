@@ -52,6 +52,7 @@ public class World : MonoBehaviour
 
         blockDatabase = BlockDatabase.Instance; // Load block definitions from the database
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
+        WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
 
         // LoadTextures();
     }
@@ -59,7 +60,6 @@ public class World : MonoBehaviour
     {
         filter = GetComponent<MeshFilter>();
         StartCoroutine(GenerateWorldCoroutine());
-        SetWorldLayerVisibility(maxY, false);
     }
 
     void Update()
@@ -68,7 +68,7 @@ public class World : MonoBehaviour
     }
     private IEnumerator GenerateWorldCoroutine()
     {
-        WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
+
         // MeshData meshData = new MeshData();
 
         // Noises for terrain generation could these be split into different classes?
@@ -77,7 +77,7 @@ public class World : MonoBehaviour
         FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
         FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
         FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
-        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency, (-seed/2) + 4);
+        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency, (-seed / 2) + 4);
 
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
@@ -122,12 +122,13 @@ public class World : MonoBehaviour
                         //         TreeUtilities.GenerateTree(new Vector3(x, y, z));
                         //     }
                         // }
-                        /*else*/ if (y == heights[x, z] - 1)
+                        /*else*/
+                        if (y == heights[x, z] - 1)
                         {
                             if (treeNoise.GetNoise(x, y, z) > 0.5f)
                             {
                                 // Generate Tree but only according to noise value
-                                TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 10f);
+                                TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 4f);
                                 blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
                             }
                             else
@@ -135,7 +136,7 @@ public class World : MonoBehaviour
                                 blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
                             }
 
-                            
+
 
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
@@ -181,6 +182,7 @@ public class World : MonoBehaviour
             ySliceObject.name = $"YSlice_{y}";
             ySliceObject.transform.position = new Vector3(0, y, 0);
             ySlices.Add(ySliceObject);
+            Debug.Log($"YSlices count: {ySlices.Count}");
 
             for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
             {
@@ -220,6 +222,7 @@ public class World : MonoBehaviour
         }
         currentElevation = maxY;
         OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
+        SetWorldLayerVisibility(maxY, false);
     }
 
     private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
@@ -341,8 +344,14 @@ public class World : MonoBehaviour
 
     private void RebuildTopFacesForceTop(int y)
     {
+        if (ySlices.Count < maxY - minElevation)
+        {
+            return;
+        }
         // Rebuild the top faces of the current layer
-        GameObject ySliceObject = ySlices[y - minElevation];
+        Debug.Log($"Rebuilding top faces for layer with index {y-minElevation-1} (Y={y})");
+        Debug.Log($"Y Slices Count: {ySlices.Count}, Min Elevation: {minElevation}, Current Y: {y}");
+        GameObject ySliceObject = ySlices[y - minElevation - 1];
         for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
         {
             for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)

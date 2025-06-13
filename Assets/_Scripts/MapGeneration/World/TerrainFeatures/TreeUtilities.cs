@@ -17,13 +17,16 @@ public static class TreeUtilities
             return; // Don't generate a tree near the world edge
         }
 
+        Debug.Log($"Generating tree at position: {position}");
+
         int trunkHeight = (int)position.y + 5;
 
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
             BlockData block = blockAccessor.GetBlock(new Vector3Int((int)position.x, y, (int)position.z));
             // Create trunk blocks
-            blockAccessor.SetBlock(new Vector3Int((int)position.x, y, (int)position.z),
+            Debug.Log($"Setting trunk block at position: {new Vector3Int((int)position.x, y, (int)position.z)}");
+            blockAccessor.SetBlockNoMeshUpdate(new Vector3Int((int)position.x, y, (int)position.z),
                 BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block"));
 
             block.IsSolid = true; // Set the block as solid
@@ -44,6 +47,10 @@ public static class TreeUtilities
                         // need to get the block info from WorldData from y slice to get chunk to get block info
 
                         BlockData block = blockAccessor.GetBlock(new Vector3Int(lx, ly, lz));
+                        if(block == null || block.definition == null)
+                        {
+                            Debug.LogWarning($"Block at {new Vector3Int(lx, ly, lz)} is null or has no definition.");
+                        }
 
                         if (block.definition.id == BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block").id)
                         {
@@ -51,7 +58,7 @@ public static class TreeUtilities
                             continue;
                         }
                         // Only set leaves if the block is not already a log
-                        blockAccessor.SetBlock(new Vector3Int(lx, ly, lz),
+                        blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz),
                         BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block"));
                         block.IsSolid = true;
                     }

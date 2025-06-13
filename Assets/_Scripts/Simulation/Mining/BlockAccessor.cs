@@ -12,6 +12,18 @@ public class BlockAccessor
         this.blockDatabase = BlockDatabase.Instance;
     }
 
+    public void SetBlockNoMeshUpdate(Vector3Int position, BlockDefinition blockType)
+    {
+        BlockData block = GetBlock(position);
+        if (block != null)
+        {
+            block.definition = blockType;
+            block.IsSolid = blockType.isSolid;
+            //maybe have this in the same method as SetBlock with a flag to control mesh update? would require a refactor... maybe later xD
+            // No mesh update here, just set the block data
+        }
+    }
+
     public void SetBlock(Vector3Int position, BlockDefinition blockType)
     {
         BlockData block = GetBlock(position);

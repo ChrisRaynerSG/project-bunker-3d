@@ -35,7 +35,10 @@ public class WorldData
     public void Initialise(int maxX, int maxY, int maxZ, int minElevation)
     {
         int numberOfslices = maxY - minElevation;
+        Debug.Log($"Initialising WorldData with {numberOfslices} slices from {minElevation} to {maxY} (maxY={maxY})");
         ySlices = new VerticalSliceData[numberOfslices];
+
+        Debug.Log($"Number of slices: {ySlices.Length}, MaxX: {maxX}, MaxZ: {maxZ}");
 
         for (int i = 0; i < numberOfslices; i++)
         {

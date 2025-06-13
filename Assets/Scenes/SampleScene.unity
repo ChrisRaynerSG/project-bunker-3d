@@ -1349,7 +1349,8 @@ MonoBehaviour:
   maxZ: 256
   frequency: 0.007
   seed: 987654321
-  maxY: 32
+  maxY: 64
+  maxTerrainHeight: 32
   minElevation: -32
   currentElevation: 0
   YSlicePrefab: {fileID: 7267588843004917064, guid: 29a8f40d95895804a8385f643f8b0213, type: 3}

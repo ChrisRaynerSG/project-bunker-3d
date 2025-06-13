@@ -4,7 +4,7 @@ using UnityEngine;
 public static class TreeUtilities
 {
     public static BlockAccessor blockAccessor;
-    public static void GenerateTree(Vector3 position, float radius = 5f)
+    public static void GenerateTree(Vector3 position, float radius = 5f, System.Random rng = null)
     {
         blockAccessor = new BlockAccessor(World.Instance);
 
@@ -19,7 +19,9 @@ public static class TreeUtilities
 
         Debug.Log($"Generating tree at position: {position}");
 
-        int trunkHeight = (int)position.y + 5;
+        rng ??= Randomizer.GetDeterministicRNG(position, World.Instance.seed);
+
+        int trunkHeight = (int)position.y + rng.Next(4, 7);
 
         for (int y = (int)position.y; y < trunkHeight; y++)
         {

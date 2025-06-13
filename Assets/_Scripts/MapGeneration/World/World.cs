@@ -77,7 +77,7 @@ public class World : MonoBehaviour
         FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
         FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
         FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
-        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency, (-seed / 2) + 4);
+        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency * 4f, (-seed / 2) + 4);
 
         // Precompute all heights
         int[,] heights = new int[maxX, maxZ];
@@ -125,7 +125,7 @@ public class World : MonoBehaviour
                         /*else*/
                         if (y == heights[x, z] - 1)
                         {
-                            if (treeNoise.GetNoise(x, y, z) > 0.5f)
+                            if (treeNoise.GetNoise(x, y, z) > 0.4f)
                             {
                                 // Generate Tree but only according to noise value
                                 TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 5f);
@@ -205,11 +205,14 @@ public class World : MonoBehaviour
                             if (worldX < 0 || worldZ < 0 || worldX >= maxX || worldZ >= maxZ)
                                 continue;
 
-                            if (worldX < maxX && worldZ < maxZ && y < heights[worldX, worldZ])
+                            if (worldX < maxX && worldZ < maxZ)
                             {
                                 Vector3 targetPosition = new Vector3(x, y, z);
                                 BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
-                                CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
+                                if (blockData.IsSolid)
+                                {
+                                    CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
+                                }
                             }
                         }
                     }

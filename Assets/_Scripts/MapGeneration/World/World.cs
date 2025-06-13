@@ -178,6 +178,8 @@ public class World : MonoBehaviour
             }
         }
 
+        TreeUtilities.GenerateNaturalHedges(30, 40); // Generate natural hedges in the world
+
         // second pass to create faces
         for (int y = minElevation; y < maxY; y++)
         {
@@ -356,9 +358,9 @@ public class World : MonoBehaviour
             return;
         }
         // Rebuild the top faces of the current layer
-        Debug.Log($"Rebuilding top faces for layer with index {y-minElevation-1} (Y={y})");
+        Debug.Log($"Rebuilding top faces for layer with index {y-minElevation} (Y={y})");
         Debug.Log($"Y Slices Count: {ySlices.Count}, Min Elevation: {minElevation}, Current Y: {y}");
-        GameObject ySliceObject = ySlices[y - minElevation - 1];
+        GameObject ySliceObject = ySlices[y - minElevation];
         for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
         {
             for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)

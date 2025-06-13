@@ -49,7 +49,7 @@ public static class TreeUtilities
                         // need to get the block info from WorldData from y slice to get chunk to get block info
 
                         BlockData block = blockAccessor.GetBlock(new Vector3Int(lx, ly, lz));
-                        if(block == null || block.definition == null)
+                        if (block == null || block.definition == null)
                         {
                             Debug.LogWarning($"Block at {new Vector3Int(lx, ly, lz)} is null or has no definition.");
                         }
@@ -97,5 +97,71 @@ public static class TreeUtilities
         // need to make sure that the position is further than 4 blocks from the edge of the world
         int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
         return position.x < radius || position.x > worldSize - radius || position.z < radius || position.z > worldSize - radius;
+    }
+
+    public static void GenerateNaturalHedges(int count = 30, int maxLength = 40)
+    {
+        BlockAccessor blockAccessor = new BlockAccessor(World.Instance);
+        BlockDefinition leavesBlock = BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block");
+        BlockDefinition airBlock = BlockDatabase.Instance.GetBlock("bunker:air_block");
+
+        System.Random rng = new System.Random(World.Instance.seed);
+        int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
+        for (int i = 0; i < count; i++)
+        {
+            int x = rng.Next(4, worldSize - 4);
+            int z = rng.Next(4, worldSize - 4);
+            int dirX = rng.Next(-1, 2); // -1, 0, or 1
+            int dirZ = rng.Next(-1, 2); // -1, 0, or 1
+            if (dirX == 0 && dirZ == 0)
+            {
+                dirX = 1;
+            }
+            int length = rng.Next(10, maxLength);
+            for (int j = 0; j < length; j++)
+            {
+                if (x < 0 || x >= worldSize || z < 0 || z >= worldSize)
+                {
+                    break; // Out of bounds, stop generating
+                }
+                int y = SurfaceUtils.FindSurfaceY(new Vector3Int(x, World.Instance.maxY - World.Instance.minElevation - 1, z));
+                if (y <= 0)
+                {
+                    continue; // Skip if the surface is below ground level
+                }
+                int height = rng.Next(1, 3);
+                for (int h = 0; h < height; h++)
+                {
+                    Vector3Int position = new Vector3Int(x, y + h, z);
+                    blockAccessor.SetBlockNoMeshUpdate(position, leavesBlock);
+                    BlockData block = blockAccessor.GetBlock(position);
+                    if(block == null)
+                    {
+                        Debug.LogWarning($"Block at {position} is null.");
+                        continue; // Skip if the block is null
+                    }
+                    block.IsSolid = true;
+                }
+
+                if (rng.NextDouble() < 0.3f)
+                {
+                    int turn = rng.Next(3) - 1;
+                    if (rng.NextDouble() < 0.5f)
+                    {
+                        dirX = Mathf.Clamp(dirX + turn, -1, 1);
+                    }
+                    else
+                    {
+                        dirZ = Mathf.Clamp(dirZ + turn, -1, 1);
+                    }
+                    if (dirX == 0 && dirZ == 0)
+                    {
+                        dirX = 1; // Ensure we always have a direction
+                    }
+                }
+                x += dirX;
+                z += dirZ;
+            }
+        }
     }
 }

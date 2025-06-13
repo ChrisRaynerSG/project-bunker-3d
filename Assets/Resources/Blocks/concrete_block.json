@@ -1,0 +1,17 @@
+{
+  "id": "bunker:concrete_block",
+  "displayName": "Concrete Block",
+  "description": "A block of concrete",
+  "textures": {
+    "top": "bunker_concrete_block",
+    "side": "bunker_concrete_block",
+    "bottom": "bunker_concrete_block"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 1.5,
+  "miningTime": 1.5,
+  "thermalConductivity": 0.8,
+  "ignitionTemperature": 1000
+}

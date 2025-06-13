@@ -1,0 +1,17 @@
+{
+  "id": "bunker:tarmac_block",
+  "displayName": "Tarmac Block",
+  "description": "A block of tarmac",
+  "textures": {
+    "top": "bunker_tarmac_block",
+    "side": "bunker_tarmac_block",
+    "bottom": "bunker_tarmac_block"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 3,
+  "miningTime": 3,
+  "thermalConductivity": 0.5,
+  "ignitionTemperature": 1200
+}

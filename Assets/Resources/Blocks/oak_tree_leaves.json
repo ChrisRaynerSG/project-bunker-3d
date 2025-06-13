@@ -1,0 +1,17 @@
+{
+  "id": "bunker:oak_tree_leaves_block",
+  "displayName": "Oak leaves",
+  "description": "Some oak leaves",
+  "textures": {
+    "top": "bunker_oak_tree_leaves",
+    "side": "bunker_oak_tree_leaves",
+    "bottom": "bunker_oak_tree_leaves"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": false,
+  "hardness": 0.2,
+  "miningTime": 0.5,
+  "thermalConductivity": 0.1,
+  "ignitionTemperature": 300
+}

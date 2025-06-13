@@ -1,0 +1,17 @@
+{
+  "id": "bunker:oak_tree_log_block",
+  "displayName": "Oak Log",
+  "description": "A sturdy oak log",
+  "textures": {
+    "top": "bunker_oak_tree_log_top",
+    "side": "bunker_oak_tree_log_side",
+    "bottom": "bunker_oak_tree_log_top"
+  },
+  "isSolid": true,
+  "isMineable": true,
+  "isFlammable": true,
+  "hardness": 1,
+  "miningTime": 2,
+  "thermalConductivity": 0.5,
+  "ignitionTemperature": 300
+}

@@ -108,20 +108,6 @@ public class World : MonoBehaviour
         if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
 
-    public void LoadMeshData(MeshData meshData, MeshFilter filter)
-    {
-        Mesh mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-
-        mesh.vertices = meshData.vertices.ToArray();
-        mesh.triangles = meshData.triangles.ToArray();
-        mesh.uv = meshData.uvs.ToArray();
-
-        mesh.RecalculateNormals();
-
-        filter.mesh = mesh;
-    }
-
     private void SetWorldLayerVisibility(int y, bool isGoingUp)
     {
         for (int i = 0; i < ySlices.Count; i++)
@@ -219,7 +205,7 @@ public class World : MonoBehaviour
                         }
                     }
                 }
-                LoadMeshData(meshData, chunkFilter);
+                MeshUtilities.LoadMeshData(meshData, chunkFilter);
             }
         }
     }

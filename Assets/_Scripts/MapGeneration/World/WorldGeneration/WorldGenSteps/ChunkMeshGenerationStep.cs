@@ -102,7 +102,7 @@ public class ChunkMeshGenerationStep : IWorldGenStep
                 }
             }
         }
-        context.world.LoadMeshData(meshData, chunkFilter);
+        MeshUtilities.LoadMeshData(meshData, chunkFilter);
         chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
         chunkObject.layer = 0;
     }

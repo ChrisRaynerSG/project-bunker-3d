@@ -1,17 +1,31 @@
-using UnityEngine.UIElements;
 using UnityEngine;
-using Unity.Profiling;
+
+/// <summary>
+/// Provides methods for accessing and modifying block data within a specific <see cref="World"/> instance.
+/// 
+/// BlockAccessor allows setting and retrieving blocks at given world positions, with or without triggering mesh updates.
+/// It also provides utility methods for retrieving block definitions from the block database.
+/// </summary>
 public class BlockAccessor
 {
     private World world;
     private BlockDatabase blockDatabase;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockAccessor"/> class for the specified world.
+    /// </summary>
+    /// <param name="world">The world instance to operate on.</param>
     public BlockAccessor(World world)
     {
         this.world = world;
         this.blockDatabase = BlockDatabase.Instance;
     }
 
+    /// <summary>
+    /// Sets the block at the given position without updating the mesh.
+    /// </summary>
+    /// <param name="position">The world position of the block.</param>
+    /// <param name="blockType">The block definition to set.</param>
     public void SetBlockNoMeshUpdate(Vector3Int position, BlockDefinition blockType)
     {
         BlockData block = GetBlockDataFromPosition(position);
@@ -19,11 +33,14 @@ public class BlockAccessor
         {
             block.definition = blockType;
             block.IsSolid = blockType.isSolid;
-            //maybe have this in the same method as SetBlock with a flag to control mesh update? would require a refactor... maybe later xD
-            // No mesh update here, just set the block data
         }
     }
 
+    /// <summary>
+    /// Sets the block at the given position and updates the mesh for the affected chunks.
+    /// </summary>
+    /// <param name="position">The world position of the block.</param>
+    /// <param name="blockType">The block definition to set.</param>
     public void SetBlock(Vector3Int position, BlockDefinition blockType)
     {
         BlockData block = GetBlockDataFromPosition(position);
@@ -32,40 +49,44 @@ public class BlockAccessor
             block.definition = blockType;
             block.IsSolid = blockType.isSolid;
 
-            // world.RebuildMeshAtLevel(position.y);
-            // world.RebuildMeshAtLevel(position.y + 1); // Rebuild the mesh at the block's Y level
-            // world.RebuildMeshAtLevel(position.y - 1); // Rebuild the mesh at the block's Y level
-
-            // attempt to reubild only the chunk that contains the block - might not work with adjacent chunks...
             world.RebuildChunkMesh(position.x, position.y, position.z);
             world.RebuildChunkMesh(position.x, position.y + 1, position.z);
             world.RebuildChunkMesh(position.x, position.y - 1, position.z);
 
-            // need to rebuild chunks next to the current chunk if on border
             int chunkX = position.x / ChunkData.CHUNK_SIZE;
             int chunkZ = position.z / ChunkData.CHUNK_SIZE;
             int localX = position.x % ChunkData.CHUNK_SIZE;
             int localZ = position.z % ChunkData.CHUNK_SIZE;
 
             if (localX == 0)
-            {
                 world.RebuildChunkMesh(position.x - 1, position.y, position.z);
-            }
             else if (localX == ChunkData.CHUNK_SIZE - 1)
-            {
                 world.RebuildChunkMesh(position.x + 1, position.y, position.z);
-            }
+
             if (localZ == 0)
-            {
                 world.RebuildChunkMesh(position.x, position.y, position.z - 1);
-            }
             else if (localZ == ChunkData.CHUNK_SIZE - 1)
-            {
                 world.RebuildChunkMesh(position.x, position.y, position.z + 1);
-            }
         }
     }
 
+    /// <summary>
+    /// Retrieves the <see cref="BlockData"/> at the specified world coordinates.
+    /// </summary>
+    /// <param name="x">The world X coordinate.</param>
+    /// <param name="y">The world Y coordinate.</param>
+    /// <param name="z">The world Z coordinate.</param>
+    /// <returns>The block data at the specified position, or null if not found.</returns>
+    public BlockData GetBlockDataFromPosition(int x, int y, int z)
+    {
+        return GetBlockDataFromPosition(new Vector3Int(x, y, z));
+    }
+
+    /// <summary>
+    /// Retrieves the <see cref="BlockData"/> at the specified world position.
+    /// </summary>
+    /// <param name="position">The world position of the block.</param>
+    /// <returns>The block data at the specified position, or null if not found.</returns>
     public BlockData GetBlockDataFromPosition(Vector3Int position)
     {
         ChunkData chunk = world.GetChunkAtPosition(position.x, position.y, position.z);
@@ -77,13 +98,16 @@ public class BlockAccessor
             if (localX < 0) localX += ChunkData.CHUNK_SIZE;
             if (localZ < 0) localZ += ChunkData.CHUNK_SIZE;
 
-            // Debug.Log($"Getting block at local coordinates: ({localX}, {localZ}) in chunk at ({chunk.ChunkX}, {chunk.ChunkZ})");
-
             return chunk.Grid[localX][localZ];
         }
         return null;
     }
 
+    /// <summary>
+    /// Retrieves a <see cref="BlockDefinition"/> by its unique identifier.
+    /// </summary>
+    /// <param name="blockId">The unique identifier of the block.</param>
+    /// <returns>The block definition if found; otherwise, null.</returns>
     public BlockDefinition GetBlockDef(string blockId)
     {
         BlockDefinition block = blockDatabase.GetBlockDefinition(blockId);

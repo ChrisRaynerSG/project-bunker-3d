@@ -64,7 +64,7 @@ public class HeightMapStep : IWorldGenStep
                 {
                     if (y < heights[x, z])
                     {
-                        SetBlockDefinition(context, treeNoise, x, y, z, heights[x, z]);
+                        SetBlockDefinition(context, x, y, z, heights[x, z]);
                     }
                 }
             }
@@ -76,18 +76,16 @@ public class HeightMapStep : IWorldGenStep
     /// using the block accessor and block database from the context.
     /// </summary>
     private void SetBlockDefinition(
-        WorldGenContext context, FastNoise treeNoise, int x, int y, int z, int surfaceHeight)
+        WorldGenContext context, int x, int y, int z, int surfaceHeight)
     {
         if (y == surfaceHeight - 1)
         {
             context.blockAccessor.SetBlockNoMeshUpdate(
                 new Vector3Int(x, y, z),
-                treeNoise.GetNoise(x, y, z) > 0.4f
-                    ? context.blockDatabase.GetBlockDefinition("bunker:dirt_block")
-                    : context.blockDatabase.GetBlockDefinition("bunker:grass_block")
+                context.blockDatabase.GetBlockDefinition("bunker:grass_block")
             );
         }
-        else if (y < surfaceHeight - 1 && y > surfaceHeight - 8)
+        else if (y < surfaceHeight - 1 && y > surfaceHeight - context.dirtHeight)
         {
             context.blockAccessor.SetBlockNoMeshUpdate(
                 new Vector3Int(x, y, z),

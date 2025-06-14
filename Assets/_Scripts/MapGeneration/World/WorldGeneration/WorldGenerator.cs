@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class WorldGenerator
 {
@@ -11,7 +12,7 @@ public class WorldGenerator
         foreach (var step in steps)
         {
             step.Apply(data, context);
+            Debug.Log($"Applied world generation step: {step.GetType().Name}.");
         }
     }
-
 }

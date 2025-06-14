@@ -1,9 +1,25 @@
-using Unity.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Provides utility methods for procedural generation of trees and natural hedges in the world.
+/// 
+/// <see cref="TreeUtilities"/> includes logic for placing trees with collision and edge checks,
+/// as well as generating random hedges for natural scenery. All methods operate directly on the world's block data.
+/// </summary>
 public static class TreeUtilities
 {
+    /// <summary>
+    /// The block accessor used for block manipulation during tree and hedge generation.
+    /// </summary>
     public static BlockAccessor blockAccessor;
+
+    /// <summary>
+    /// Generates a tree at the specified position, with optional radius and random seed.
+    /// Ensures no other tree is nearby and the tree is not too close to the world edge.
+    /// </summary>
+    /// <param name="position">The world position to generate the tree.</param>
+    /// <param name="radius">The minimum distance from other trees and the world edge.</param>
+    /// <param name="rng">Optional random number generator for deterministic placement.</param>
     public static void GenerateTree(Vector3 position, float radius = 5f, System.Random rng = null)
     {
         blockAccessor = new BlockAccessor(World.Instance);
@@ -17,30 +33,29 @@ public static class TreeUtilities
             return; // Don't generate a tree near the world edge
         }
 
-        // Debug.Log($"Generating tree at position: {position}");
-
         rng ??= Randomizer.GetDeterministicRNG(position, World.Instance.seed);
 
         int trunkHeight = (int)position.y + rng.Next(4, 9);
 
+        // Generate trunk
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
             blockAccessor.SetBlockNoMeshUpdate(new Vector3Int((int)position.x, y, (int)position.z),
                 BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
         }
 
+        // Generate leaves in a sphere-like shape
         for (int dy = -2; dy <= 2; dy++)
         {
             for (int dx = -2; dx <= 2; dx++)
             {
                 for (int dz = -2; dz <= 2; dz++)
                 {
-                    if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) <= 3) // Sphere-like shape
+                    if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) <= 3)
                     {
                         int lx = (int)position.x + dx;
                         int ly = trunkHeight + dy;
                         int lz = (int)position.z + dz;
-                        // need to get the block info from WorldData from y slice to get chunk to get block info
 
                         BlockData block = blockAccessor.GetBlockDataFromPosition(new Vector3Int(lx, ly, lz));
                         if (block == null || block.definition == null)
@@ -50,19 +65,22 @@ public static class TreeUtilities
 
                         if (block.definition.id == BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block").id)
                         {
-                            // If the block is already a log, skip setting leaves
-                            continue;
+                            continue; // Skip setting leaves if already a log
                         }
-                        // Only set leaves if the block is not already a log
                         blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz),
-                        BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
-                        // block.IsSolid = true;
+                            BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
                     }
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Checks if there is a tree log block within the given radius of the specified position.
+    /// </summary>
+    /// <param name="position">The position to check around.</param>
+    /// <param name="radius">The radius to search for existing trees.</param>
+    /// <returns>True if a tree is nearby, false otherwise.</returns>
     public static bool IsTreeNearby(Vector3 position, float radius)
     {
         blockAccessor = new BlockAccessor(World.Instance);
@@ -86,27 +104,36 @@ public static class TreeUtilities
         return false;
     }
 
+    /// <summary>
+    /// Checks if the specified position is too close to the world edge to generate a tree.
+    /// </summary>
+    /// <param name="position">The position to check.</param>
+    /// <param name="radius">The minimum distance from the world edge.</param>
+    /// <returns>True if the position is near the world edge, false otherwise.</returns>
     public static bool IsTreeNearWorldEdge(Vector3 position, float radius)
     {
-        // need to make sure that the position is further than 4 blocks from the edge of the world
-        int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
+        int worldSize = World.Instance.maxX;
         return position.x < radius || position.x > worldSize - radius || position.z < radius || position.z > worldSize - radius;
     }
 
+    /// <summary>
+    /// Generates a number of natural-looking hedges in the world using random walks.
+    /// </summary>
+    /// <param name="count">The number of hedges to generate.</param>
+    /// <param name="maxLength">The maximum length of each hedge.</param>
     public static void GenerateNaturalHedges(int count = 30, int maxLength = 40)
     {
         BlockAccessor blockAccessor = new BlockAccessor(World.Instance);
         BlockDefinition leavesBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block");
-        BlockDefinition airBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:air_block");
 
         System.Random rng = new System.Random(World.Instance.seed);
-        int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
+        int worldSize = World.Instance.maxX;
         for (int i = 0; i < count; i++)
         {
             int x = rng.Next(4, worldSize - 4);
             int z = rng.Next(4, worldSize - 4);
-            int dirX = rng.Next(-1, 2); // -1, 0, or 1
-            int dirZ = rng.Next(-1, 2); // -1, 0, or 1
+            int dirX = rng.Next(-1, 2);
+            int dirZ = rng.Next(-1, 2);
             if (dirX == 0 && dirZ == 0)
             {
                 dirX = 1;
@@ -116,12 +143,12 @@ public static class TreeUtilities
             {
                 if (x < 0 || x >= worldSize || z < 0 || z >= worldSize)
                 {
-                    break; // Out of bounds, stop generating
+                    break;
                 }
                 int y = SurfaceUtils.FindSurfaceY(new Vector3Int(x, World.Instance.maxY, z));
                 if (y <= 0)
                 {
-                    continue; // Skip if the surface is below ground level
+                    continue;
                 }
                 int height = rng.Next(1, 3);
                 for (int h = 0; h < height; h++)
@@ -143,7 +170,7 @@ public static class TreeUtilities
                     }
                     if (dirX == 0 && dirZ == 0)
                     {
-                        dirX = 1; // Ensure we always have a direction
+                        dirX = 1;
                     }
                 }
                 x += dirX;

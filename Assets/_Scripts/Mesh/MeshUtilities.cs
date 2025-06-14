@@ -1,18 +1,32 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 
+/// <summary>
+/// Provides static utility methods for procedural mesh generation of block-based worlds.
+/// 
+/// <see cref="MeshUtilities"/> includes methods for creating individual block faces, adding triangles and UVs,
+/// and assembling complete meshes for use with Unity's MeshFilter. It also supports texture atlas UV mapping.
+/// </summary>
 public static class MeshUtilities
 {
-
+    /// <summary>
+    /// The width of the texture atlas (number of tiles).
+    /// </summary>
     public const int atlasWidth = 4;
+
+    /// <summary>
+    /// The height of the texture atlas (number of tiles).
+    /// </summary>
     public const int atlasHeight = 4;
 
-
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the top (upward-facing) face of a block.
+    /// </summary>
+    /// <param name="meshData">The mesh data to append to.</param>
+    /// <param name="origin">The center position of the block.</param>
+    /// <param name="block">The block definition for texture selection.</param>
     public static void CreateFaceUp(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
         vertices[1] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
         vertices[2] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
@@ -21,14 +35,15 @@ public static class MeshUtilities
         meshData.vertices.AddRange(vertices);
 
         string textureName = block.textures.top;
-
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the bottom (downward-facing) face of a block.
+    /// </summary>
     public static void CreateFaceDown(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x - .5f, origin.y - .5f, origin.z - .5f);
         vertices[1] = new Vector3(origin.x + .5f, origin.y - .5f, origin.z - .5f);
         vertices[2] = new Vector3(origin.x + .5f, origin.y - .5f, origin.z + .5f);
@@ -37,14 +52,15 @@ public static class MeshUtilities
         meshData.vertices.AddRange(vertices);
 
         string textureName = block.textures.bottom;
-
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the north (positive Z) face of a block.
+    /// </summary>
     public static void CreateFaceNorth(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x + .5f, origin.y - .5f, origin.z + .5f);
         vertices[1] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
         vertices[2] = new Vector3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
@@ -53,14 +69,15 @@ public static class MeshUtilities
         meshData.vertices.AddRange(vertices);
 
         string textureName = block.textures.side;
-
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the east (positive X) face of a block.
+    /// </summary>
     public static void CreateFaceEast(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x + .5f, origin.y - .5f, origin.z - .5f);
         vertices[1] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
         vertices[2] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z + .5f);
@@ -72,10 +89,12 @@ public static class MeshUtilities
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the south (negative Z) face of a block.
+    /// </summary>
     public static void CreateFaceSouth(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x - .5f, origin.y - .5f, origin.z - .5f);
         vertices[1] = new Vector3(origin.x - .5f, origin.y + .5f, origin.z - .5f);
         vertices[2] = new Vector3(origin.x + .5f, origin.y + .5f, origin.z - .5f);
@@ -84,14 +103,15 @@ public static class MeshUtilities
         meshData.vertices.AddRange(vertices);
 
         string textureName = block.textures.side;
-
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds the vertices, triangles, and UVs for the west (negative X) face of a block.
+    /// </summary>
     public static void CreateFaceWest(MeshData meshData, Vector3 origin, BlockDefinition block)
     {
         Vector3[] vertices = new Vector3[4];
-
         vertices[0] = new Vector3(origin.x - .5f, origin.y - .5f, origin.z + .5f);
         vertices[1] = new Vector3(origin.x - .5f, origin.y + .5f, origin.z + .5f);
         vertices[2] = new Vector3(origin.x - .5f, origin.y + .5f, origin.z - .5f);
@@ -103,6 +123,9 @@ public static class MeshUtilities
         AddTrianglesAndUvs(meshData, vertices, textureName);
     }
 
+    /// <summary>
+    /// Adds triangles to the mesh data for the last four added vertices.
+    /// </summary>
     private static void AddTriangles(MeshData meshData, Vector3[] vertices)
     {
         int[] triangles = new int[6];
@@ -117,6 +140,9 @@ public static class MeshUtilities
         meshData.triangles.AddRange(triangles);
     }
 
+    /// <summary>
+    /// Adds UV coordinates to the mesh data for the last four added vertices, using the texture atlas.
+    /// </summary>
     private static void AddUvs(MeshData meshData, string textureName)
     {
         if (!TextureAtlasBuilder.UVRects.TryGetValue(textureName, out Rect uvRect))
@@ -134,12 +160,20 @@ public static class MeshUtilities
         meshData.uvs.AddRange(uvs);
     }
 
+    /// <summary>
+    /// Adds triangles and UVs for the last four added vertices.
+    /// </summary>
     private static void AddTrianglesAndUvs(MeshData meshData, Vector3[] vertices, string textureName)
     {
         AddTriangles(meshData, vertices);
         AddUvs(meshData, textureName);
     }
 
+    /// <summary>
+    /// Loads the mesh data into a Unity <see cref="MeshFilter"/>, creating a new mesh.
+    /// </summary>
+    /// <param name="meshData">The mesh data to load.</param>
+    /// <param name="filter">The mesh filter to assign the mesh to.</param>
     public static void LoadMeshData(MeshData meshData, MeshFilter filter)
     {
         Mesh mesh = new Mesh();
@@ -153,8 +187,18 @@ public static class MeshUtilities
 
         filter.mesh = mesh;
     }
-    
-        public static void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData, bool forceTop = false)
+
+    /// <summary>
+    /// Creates all visible faces for a block at the given position, based on neighbor solidity.
+    /// </summary>
+    /// <param name="y">The Y coordinate of the block.</param>
+    /// <param name="meshData">The mesh data to append to.</param>
+    /// <param name="worldX">The world X coordinate of the block.</param>
+    /// <param name="worldZ">The world Z coordinate of the block.</param>
+    /// <param name="targetPosition">The local position of the block.</param>
+    /// <param name="blockData">The block data for face/texture selection.</param>
+    /// <param name="forceTop">If true, always creates the top face regardless of neighbors.</param>
+    public static void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData, bool forceTop = false)
     {
         if (forceTop)
         {
@@ -162,7 +206,7 @@ public static class MeshUtilities
         }
         else
         {
-             if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) CreateFaceUp(meshData, targetPosition, blockData.definition);
+            if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) CreateFaceUp(meshData, targetPosition, blockData.definition);
         }
         if (!BlockUtils.IsSolid(worldX, y - 1, worldZ)) CreateFaceDown(meshData, targetPosition, blockData.definition);
         if (!BlockUtils.IsSolid(worldX, y, worldZ + 1)) CreateFaceNorth(meshData, targetPosition, blockData.definition);

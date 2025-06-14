@@ -2,8 +2,18 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
+/// <summary>
+/// Provides utility methods for loading block definitions and textures from resources,
+/// and for creating ECS blob assets for block data.
+/// </summary>
 public class BlockLoader
 {
+    /// <summary>
+    /// Loads all block definitions from JSON files in the Resources/Blocks directory.
+    /// </summary>
+    /// <returns>
+    /// A list of <see cref="BlockDefinition"/> objects parsed from the JSON files.
+    /// </returns>
     public static List<BlockDefinition> LoadBlockDefinitions()
     {
         List<BlockDefinition> blocks = new();
@@ -23,6 +33,13 @@ public class BlockLoader
         return blocks;
     }
 
+    /// <summary>
+    /// Extracts all unique texture names from a list of block definitions.
+    /// </summary>
+    /// <param name="blocks">The list of block definitions to scan.</param>
+    /// <returns>
+    /// A <see cref="HashSet{T}"/> containing all unique texture names used by the blocks.
+    /// </returns>
     public static HashSet<string> GetTextureNames(List<BlockDefinition> blocks)
     {
         HashSet<string> textureNames = new();
@@ -40,6 +57,14 @@ public class BlockLoader
         return textureNames;
     }
 
+    /// <summary>
+    /// Loads textures from the Resources/Textures directory based on the provided texture names.
+    /// </summary>
+    /// <param name="textureNames">A set of texture names to load.</param>
+    /// <param name="nameOrder">Outputs the order of texture names as they are loaded.</param>
+    /// <returns>
+    /// A list of <see cref="Texture2D"/> objects corresponding to the loaded textures.
+    /// </returns>
     public static List<Texture2D> LoadTextures(HashSet<string> textureNames, out List<string> nameOrder)
     {
         List<Texture2D> textures = new();
@@ -62,6 +87,12 @@ public class BlockLoader
         return textures;
     }
 
+    /// <summary>
+    /// Loads block definitions and creates a blob asset for use with Unity ECS.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="BlobAssetReference{T}"/> containing the block definition blob asset.
+    /// </returns>
     public static BlobAssetReference<BlockDefinitionBlobAsset> LoadAndCreateBlobAsset()
     {
         List<BlockDefinition> blocks = LoadBlockDefinitions();

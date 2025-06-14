@@ -1,11 +1,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Utility class for building a texture atlas from a list of textures and generating UV rects for each.
+/// 
+/// <see cref="TextureAtlasBuilder"/> creates a single atlas texture containing all provided textures,
+/// adds padding to prevent texture bleeding, and stores the UV coordinates for each texture by name.
+/// </summary>
 public class TextureAtlasBuilder
 {
+    /// <summary>
+    /// The generated atlas texture containing all block textures.
+    /// </summary>
     public static Texture2D AtlasTexture;
+
+    /// <summary>
+    /// A dictionary mapping texture names to their UV rects within the atlas.
+    /// </summary>
     public static Dictionary<string, Rect> UVRects = new();
 
+    /// <summary>
+    /// Builds a texture atlas from the provided textures and names, and calculates UV rects for each.
+    /// </summary>
+    /// <param name="textures">A list of textures to include in the atlas.</param>
+    /// <param name="names">A list of names corresponding to each texture.</param>
+    /// <returns>The generated atlas texture, or null if no textures are provided.</returns>
     public static Texture2D BuildAtlas(List<Texture2D> textures, List<string> names)
     {
         if (textures == null || textures.Count == 0)

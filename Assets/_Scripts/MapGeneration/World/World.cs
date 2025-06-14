@@ -2,35 +2,68 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>
+/// Manages the voxel world, including world generation, chunk management, and elevation-based rendering.
+/// 
+/// <see cref="World"/> is a singleton MonoBehaviour that holds world parameters, references to chunk and slice prefabs,
+/// and orchestrates the world generation pipeline. It also manages visibility of world layers and responds to elevation changes.
+/// </summary>
 public class World : MonoBehaviour
 {
+    /// <summary>
+    /// The mesh filter attached to the world object (optional).
+    /// </summary>
     MeshFilter filter;
-    // world sizes will be: 
-    // 128x128 small world
-    // 192x192 medium world
-    // 256x256 large world
-    // 400x400 huge world
+
+    // World configuration parameters
+    /// <summary>Maximum X dimension of the world (in blocks).</summary>
     public int maxX = 16;
+    /// <summary>Maximum Z dimension of the world (in blocks).</summary>
     public int maxZ = 16;
+    /// <summary>Noise frequency for terrain generation.</summary>
     public float frequency = 0.1f;
+    /// <summary>Seed for procedural generation.</summary>
     public int seed = 0;
+    /// <summary>Maximum Y dimension (height) of the world (in blocks).</summary>
     public int maxY = 32;
+    /// <summary>Maximum terrain height (surface elevation).</summary>
     public int maxTerrainHeight = 24;
+    /// <summary>Minimum elevation (Y) of the world.</summary>
     public int minElevation = 0;
+    /// <summary>The current elevation (Y layer) being viewed or interacted with.</summary>
     public int currentElevation;
+
+    /// <summary>Singleton instance of the world.</summary>
     public static World Instance;
+
+    /// <summary>Prefab for a vertical slice (Y layer) of the world.</summary>
     public GameObject YSlicePrefab;
+    /// <summary>Prefab for a chunk of the world.</summary>
     public GameObject ChunkPrefab;
+
+    /// <summary>List of GameObjects representing each vertical slice (Y layer) of the world.</summary>
     private List<GameObject> ySlices = new List<GameObject>();
+    /// <summary>Public getter for the list of Y slice GameObjects.</summary>
     public List<GameObject> YSlices => ySlices;
+
+    /// <summary>Event triggered when the current elevation changes.</summary>
     public static event Action<int> OnCurrentElevationChanged;
+
+    /// <summary>The number of chunks along the X axis.</summary>
     public int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
+    /// <summary>The number of chunks along the Z axis.</summary>
     public int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
+    /// <summary>The number of hedges to generate in the world.</summary>
     public int numberOfHedges = 10;
 
+    /// <summary>Reference to the block database for block definitions and textures.</summary>
     private BlockDatabase blockDatabase;
 
+    /// <summary>
+    /// Initializes the world singleton, loads block definitions, and initializes world data.
+    /// </summary>
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -47,16 +80,27 @@ public class World : MonoBehaviour
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
     }
+
+    /// <summary>
+    /// Starts world generation on scene start.
+    /// </summary>
     void Start()
     {
         filter = GetComponent<MeshFilter>();
         StartCoroutine(GenerateWorldCoroutine());
     }
 
+    /// <summary>
+    /// Handles elevation change input each frame.
+    /// </summary>
     void Update()
     {
         HandleElevationChange();
     }
+
+    /// <summary>
+    /// Runs the world generation pipeline and mesh generation as a coroutine.
+    /// </summary>
     private IEnumerator GenerateWorldCoroutine()
     {
         WorldGenerator generator = new WorldGenerator();
@@ -86,7 +130,7 @@ public class World : MonoBehaviour
         // Run all non-mesh steps synchronously
         generator.Generate(WorldData.Instance, context);
 
-        // Run mesh generation as a coroutine for smooth progress at some point add an event to update loading screen UI
+        // Run mesh generation as a coroutine for smooth progress
         var meshStep = new ChunkMeshGenerationStep();
         yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
@@ -95,6 +139,11 @@ public class World : MonoBehaviour
         SetWorldLayerVisibility(currentElevation, false);
     }
 
+    /// <summary>
+    /// Sets the visibility of world layers up to the specified elevation, and rebuilds meshes as needed.
+    /// </summary>
+    /// <param name="y">The elevation (Y layer) to make visible.</param>
+    /// <param name="isGoingUp">Whether the elevation is increasing (for mesh rebuild logic).</param>
     private void SetWorldLayerVisibility(int y, bool isGoingUp)
     {
         for (int i = 0; i < ySlices.Count; i++)
@@ -134,6 +183,9 @@ public class World : MonoBehaviour
         currentElevation = y;
     }
 
+    /// <summary>
+    /// Handles user input for changing the current elevation (PageUp/PageDown).
+    /// </summary>
     private void HandleElevationChange()
     {
         if (Input.GetKeyUp(KeyCode.PageUp))

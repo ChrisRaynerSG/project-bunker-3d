@@ -46,6 +46,7 @@ public static class TreeUtilities
             Vector3Int trunkPosition = new Vector3Int((int)position.x, y, (int)position.z);
             blockAccessor.SetBlockNoMeshUpdate(trunkPosition, BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
             tree.AddLogBlock(blockAccessor.GetBlockDataFromPosition(trunkPosition));
+            tree.LogPositions.Add(trunkPosition);
         }
 
         // Generate leaves in a sphere-like shape
@@ -73,6 +74,7 @@ public static class TreeUtilities
                         }
                         blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz), BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
                         tree.AddLeafBlock(blockAccessor.GetBlockDataFromPosition(lx, ly, lz));
+                        tree.LeafPositions.Add(new Vector3Int(lx, ly, lz));
                     }
                 }
             }

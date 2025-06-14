@@ -97,9 +97,12 @@ public class WorldData
             }
         }
     }
-
     public void AddTree(TreeGameData tree)
     {
         Trees.Add(tree);
+    }
+    public void RemoveTree(TreeGameData tree)
+    {
+        Trees.Remove(tree);
     }
 }

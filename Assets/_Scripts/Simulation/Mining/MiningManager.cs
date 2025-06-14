@@ -32,8 +32,26 @@ public class MiningManager : MonoBehaviour
             Debug.Log($"Hit block at position: {hit.point}, normal: {hit.normal}");
             Vector3 hitOffset = hit.point - hit.normal * 0.5f;
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
-
-            blockAccessor.SetBlock(hitPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+            if (blockAccessor.GetBlockDataFromPosition(hitPosition).definition.id == "bunker:oak_tree_log_block")
+            {
+                TreeGameData tree = WorldData.Instance.Trees.Find(t => t.LogPositions.Contains(hitPosition));
+                if (tree != null)
+                {
+                    foreach (var logPosition in tree.LogPositions)
+                    {
+                        blockAccessor.SetBlock(logPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+                    }
+                    foreach (var leafPosition in tree.LeafPositions)
+                    {
+                        blockAccessor.SetBlock(leafPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+                    }
+                    WorldData.Instance.RemoveTree(tree);
+                }
+            }
+            else
+            {
+                blockAccessor.SetBlock(hitPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+            }
         }
     }
 }

@@ -39,13 +39,18 @@ public class MiningManager : MonoBehaviour
                 {
                     foreach (var logPosition in tree.LogPositions)
                     {
-                        blockAccessor.SetBlock(logPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+                        if (logPosition.y >= hitPosition.y)
+                        {
+                            blockAccessor.SetBlock(logPosition, blockAccessor.GetBlockDef("bunker:air_block"));
+                            BlockData removedLogBlock = blockAccessor.GetBlockDataFromPosition(logPosition);
+                            tree.RemoveLogBlock(removedLogBlock);
+                        }
                     }
                     foreach (var leafPosition in tree.LeafPositions)
                     {
                         blockAccessor.SetBlock(leafPosition, blockAccessor.GetBlockDef("bunker:air_block"));
                     }
-                    WorldData.Instance.RemoveTree(tree);
+                    if(tree.logBlocks.Count == 0) WorldData.Instance.RemoveTree(tree);
                 }
             }
             else

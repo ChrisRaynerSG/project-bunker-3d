@@ -14,11 +14,20 @@ public class TreeGameData
     {
         logBlocks.Add(block);
     }
+    public void RemoveLogBlock(BlockData block)
+    {
+        logBlocks.Remove(block);
+    }
 
     public void AddLeafBlock(BlockData block)
     {
         leafBlocks.Add(block);
     }
+    public void RemoveLeafBlock(BlockData block)
+    {
+        leafBlocks.Remove(block);
+    }
+
     public void AddLogPosition(Vector3Int position)
     {
         LogPositions.Add(position);

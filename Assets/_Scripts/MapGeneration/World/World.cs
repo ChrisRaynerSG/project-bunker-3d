@@ -75,7 +75,7 @@ public class World : MonoBehaviour
         WorldGenerator generator = new WorldGenerator();
         generator.AddStep(new HeightMapStep());
         generator.AddStep(new OreGenerationStep());
-
+        generator.AddStep(new CaveGenerationStep());
         generator.Generate(WorldData.Instance, new WorldGenContext
         {
             maxX = maxX,

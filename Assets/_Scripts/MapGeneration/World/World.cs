@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 public class World : MonoBehaviour
 {
     MeshFilter filter;
-
     // world sizes will be: 
     // 128x128 small world
     // 192x192 medium world
@@ -130,7 +128,7 @@ public class World : MonoBehaviour
             }
         }
 
-        RebuildTopFacesForceTop(y);
+        ChunkUtils.RebuildMeshAtLevel(y, true);
         if (isGoingUp) ChunkUtils.RebuildMeshAtLevel(y - 1);
 
         currentElevation = y;
@@ -154,41 +152,6 @@ public class World : MonoBehaviour
                 currentElevation--;
                 SetWorldLayerVisibility(currentElevation, false);
                 OnCurrentElevationChanged?.Invoke(currentElevation);
-            }
-        }
-    }
-    private void RebuildTopFacesForceTop(int y)
-    {
-        if (ySlices.Count < maxY - minElevation)
-        {
-            return;
-        }
-        // Rebuild the top faces of the current layer
-        GameObject ySliceObject = ySlices[y - minElevation];
-        for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
-        {
-            for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)
-            {
-                GameObject chunkObject = ySliceObject.transform.GetChild(chunkX * ChunkZCount + chunkZ).gameObject;
-                MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
-                MeshData meshData = new MeshData();
-
-                for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
-                {
-                    for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
-                    {
-                        int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
-                        int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
-
-                        if (worldX < maxX && worldZ < maxZ && BlockUtils.IsSolid(worldX, y, worldZ))
-                        {
-                            BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
-                            Vector3 targetPosition = new Vector3(x, y, z);
-                            MeshUtilities.CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData, true);
-                        }
-                    }
-                }
-                MeshUtilities.LoadMeshData(meshData, chunkFilter);
             }
         }
     }

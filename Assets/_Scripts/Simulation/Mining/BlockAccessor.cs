@@ -49,9 +49,11 @@ public class BlockAccessor
             block.definition = blockType;
             block.IsSolid = blockType.isSolid;
 
-            ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z);
-            ChunkUtils.RebuildChunkMesh(position.x, position.y + 1, position.z);
-            ChunkUtils.RebuildChunkMesh(position.x, position.y - 1, position.z);
+            bool forceTop = position.y == world.currentElevation;
+
+            ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z, forceTop);
+            ChunkUtils.RebuildChunkMesh(position.x, position.y + 1, position.z, forceTop);
+            ChunkUtils.RebuildChunkMesh(position.x, position.y - 1, position.z, forceTop);
 
             int chunkX = position.x / ChunkData.CHUNK_SIZE;
             int chunkZ = position.z / ChunkData.CHUNK_SIZE;
@@ -59,14 +61,14 @@ public class BlockAccessor
             int localZ = position.z % ChunkData.CHUNK_SIZE;
 
             if (localX == 0)
-                ChunkUtils.RebuildChunkMesh(position.x - 1, position.y, position.z);
+                ChunkUtils.RebuildChunkMesh(position.x - 1, position.y, position.z, forceTop);
             else if (localX == ChunkData.CHUNK_SIZE - 1)
-                ChunkUtils.RebuildChunkMesh(position.x + 1, position.y, position.z);
+                ChunkUtils.RebuildChunkMesh(position.x + 1, position.y, position.z, forceTop);
 
             if (localZ == 0)
-                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z - 1);
+                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z - 1, forceTop);
             else if (localZ == ChunkData.CHUNK_SIZE - 1)
-                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z + 1);
+                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z + 1, forceTop);
         }
     }
 

@@ -9,16 +9,6 @@ using UnityEngine;
 public static class MeshUtilities
 {
     /// <summary>
-    /// The width of the texture atlas (number of tiles).
-    /// </summary>
-    public const int atlasWidth = 4;
-
-    /// <summary>
-    /// The height of the texture atlas (number of tiles).
-    /// </summary>
-    public const int atlasHeight = 4;
-
-    /// <summary>
     /// Adds the vertices, triangles, and UVs for the top (upward-facing) face of a block.
     /// </summary>
     /// <param name="meshData">The mesh data to append to.</param>

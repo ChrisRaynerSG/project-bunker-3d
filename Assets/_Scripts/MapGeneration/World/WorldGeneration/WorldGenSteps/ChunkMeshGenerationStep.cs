@@ -70,40 +70,25 @@ public class ChunkMeshGenerationStep : IWorldGenStep
     /// Generates a single chunk GameObject, builds its mesh, and attaches it to the given parent.
     /// </summary>
     private void GenerateChunk(
-        WorldData data,
-        WorldGenContext context,
-        Transform parent,
-        int y,
-        int chunkX,
-        int chunkZ)
+    WorldData data,
+    WorldGenContext context,
+    Transform parent,
+    int y,
+    int chunkX,
+    int chunkZ)
     {
         GameObject chunkObject = Object.Instantiate(context.chunkPrefab, parent);
         chunkObject.name = $"Chunk_{chunkX}_{chunkZ}_{y}";
         chunkObject.transform.position = new Vector3(chunkX * ChunkData.CHUNK_SIZE, 0, chunkZ * ChunkData.CHUNK_SIZE);
 
-        MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
-        MeshData meshData = new MeshData();
+        // Optionally, register the chunkObject in your ySlices structure here if needed
 
-        for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
-        {
-            for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
-            {
-                int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
-                int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
-
-                if (worldX < 0 || worldZ < 0 || worldX >= context.maxX || worldZ >= context.maxZ)
-                    continue;
-
-                Vector3 targetPosition = new Vector3(x, y, z);
-                BlockData blockData = data.YSlices[y - context.minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
-                if (blockData.IsSolid)
-                {
-                    MeshUtilities.CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
-                }
-            }
-        }
-        MeshUtilities.LoadMeshData(meshData, chunkFilter);
-        chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
+        // Use ChunkUtils to build the mesh for this chunk
+        // Use the world coordinates of the first block in the chunk
+        int worldX = chunkX * ChunkData.CHUNK_SIZE;
+        int worldZ = chunkZ * ChunkData.CHUNK_SIZE;
+        ChunkUtils.RebuildChunkMesh(worldX, y, worldZ);
+        
         chunkObject.layer = 0;
     }
 }

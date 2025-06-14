@@ -7,4 +7,8 @@ public class WorldGenContext
     public int seed;
     public int minElevation;
     public int maxElevation;
+    public int maxTerrainHeight;
+    public int dirtHeight;
+    public BlockAccessor blockAccessor;
+    public BlockDatabase blockDatabase;
 }

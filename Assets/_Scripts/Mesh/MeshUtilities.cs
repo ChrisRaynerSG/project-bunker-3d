@@ -126,10 +126,10 @@ public static class MeshUtilities
         }
 
         Vector2[] uvs = new Vector2[4];
-        uvs[0] = new Vector2(uvRect.xMin, uvRect.yMin); 
-        uvs[1] = new Vector2(uvRect.xMin, uvRect.yMax); 
-        uvs[2] = new Vector2(uvRect.xMax, uvRect.yMax); 
-        uvs[3] = new Vector2(uvRect.xMax, uvRect.yMin); 
+        uvs[0] = new Vector2(uvRect.xMin, uvRect.yMin);
+        uvs[1] = new Vector2(uvRect.xMin, uvRect.yMax);
+        uvs[2] = new Vector2(uvRect.xMax, uvRect.yMax);
+        uvs[3] = new Vector2(uvRect.xMax, uvRect.yMin);
 
         meshData.uvs.AddRange(uvs);
     }
@@ -138,5 +138,19 @@ public static class MeshUtilities
     {
         AddTriangles(meshData, vertices);
         AddUvs(meshData, textureName);
+    }
+
+        public static void LoadMeshData(MeshData meshData, MeshFilter filter)
+    {
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
+        mesh.vertices = meshData.vertices.ToArray();
+        mesh.triangles = meshData.triangles.ToArray();
+        mesh.uv = meshData.uvs.ToArray();
+
+        mesh.RecalculateNormals();
+
+        filter.mesh = mesh;
     }
 }

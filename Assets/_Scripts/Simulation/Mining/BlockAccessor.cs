@@ -49,9 +49,9 @@ public class BlockAccessor
             block.definition = blockType;
             block.IsSolid = blockType.isSolid;
 
-            world.RebuildChunkMesh(position.x, position.y, position.z);
-            world.RebuildChunkMesh(position.x, position.y + 1, position.z);
-            world.RebuildChunkMesh(position.x, position.y - 1, position.z);
+            ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z);
+            ChunkUtils.RebuildChunkMesh(position.x, position.y + 1, position.z);
+            ChunkUtils.RebuildChunkMesh(position.x, position.y - 1, position.z);
 
             int chunkX = position.x / ChunkData.CHUNK_SIZE;
             int chunkZ = position.z / ChunkData.CHUNK_SIZE;
@@ -59,14 +59,14 @@ public class BlockAccessor
             int localZ = position.z % ChunkData.CHUNK_SIZE;
 
             if (localX == 0)
-                world.RebuildChunkMesh(position.x - 1, position.y, position.z);
+                ChunkUtils.RebuildChunkMesh(position.x - 1, position.y, position.z);
             else if (localX == ChunkData.CHUNK_SIZE - 1)
-                world.RebuildChunkMesh(position.x + 1, position.y, position.z);
+                ChunkUtils.RebuildChunkMesh(position.x + 1, position.y, position.z);
 
             if (localZ == 0)
-                world.RebuildChunkMesh(position.x, position.y, position.z - 1);
+                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z - 1);
             else if (localZ == ChunkData.CHUNK_SIZE - 1)
-                world.RebuildChunkMesh(position.x, position.y, position.z + 1);
+                ChunkUtils.RebuildChunkMesh(position.x, position.y, position.z + 1);
         }
     }
 

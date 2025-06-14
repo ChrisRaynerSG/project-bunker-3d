@@ -76,7 +76,8 @@ public class World : MonoBehaviour
         generator.AddStep(new OreGenerationStep());
         generator.AddStep(new CaveGenerationStep());
         generator.AddStep(new VegetationGenerationStep());
-        generator.Generate(WorldData.Instance, new WorldGenContext
+
+        var context = new WorldGenContext
         {
             maxX = maxX,
             maxY = maxY,
@@ -87,65 +88,26 @@ public class World : MonoBehaviour
             maxTerrainHeight = maxTerrainHeight,
             dirtHeight = 8,
             blockAccessor = new BlockAccessor(this),
-            blockDatabase = blockDatabase
-        });
-        
-        TreeUtilities.GenerateNaturalHedges(numberOfHedges, maxZ); // Generate natural hedges in the world
+            blockDatabase = blockDatabase,
+            ySlicePrefab = YSlicePrefab,
+            chunkPrefab = ChunkPrefab,
+            ySlices = ySlices,
+            world = this
+        };
 
-        // second pass to create faces
-        for (int y = minElevation; y < maxY; y++)
-        {
+        // Run all non-mesh steps synchronously
+        generator.Generate(WorldData.Instance, context);
 
-            GameObject ySliceObject = Instantiate(YSlicePrefab, transform);
-            ySliceObject.name = $"YSlice_{y}";
-            ySliceObject.transform.position = new Vector3(0, y, 0);
-            ySlices.Add(ySliceObject);
+        // Run mesh generation as a coroutine for smooth progress at some point add an event to update loading screen UI
+        var meshStep = new ChunkMeshGenerationStep();
+        yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
-            for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
-            {
-                for (int chunkZ = 0; chunkZ < ChunkZCount; chunkZ++)
-                {
-                    GameObject chunkObject = Instantiate(ChunkPrefab, ySliceObject.transform);
-                    chunkObject.name = $"Chunk_{chunkX}_{chunkZ}_{y}";
-                    chunkObject.transform.position = new Vector3(chunkX * ChunkData.CHUNK_SIZE, 0, chunkZ * ChunkData.CHUNK_SIZE);
-
-                    MeshFilter chunkFilter = chunkObject.GetComponent<MeshFilter>();
-                    MeshData meshData = new MeshData();
-
-                    for (int x = 0; x < ChunkData.CHUNK_SIZE; x++)
-                    {
-                        for (int z = 0; z < ChunkData.CHUNK_SIZE; z++)
-                        {
-                            int worldX = chunkX * ChunkData.CHUNK_SIZE + x;
-                            int worldZ = chunkZ * ChunkData.CHUNK_SIZE + z;
-
-                            if (worldX < 0 || worldZ < 0 || worldX >= maxX || worldZ >= maxZ)
-                                continue;
-
-                            if (worldX < maxX && worldZ < maxZ)
-                            {
-                                Vector3 targetPosition = new Vector3(x, y, z);
-                                BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
-                                if (blockData.IsSolid)
-                                {
-                                    CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
-                                }
-                            }
-                        }
-                    }
-                    LoadMeshData(meshData, chunkFilter);
-                    chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
-                    chunkObject.layer = 0; // Set default tag for chunks
-                }
-            }
-            yield return null;
-        }
         currentElevation = maxY;
-        OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
+        OnCurrentElevationChanged?.Invoke(currentElevation);
         SetWorldLayerVisibility(maxTerrainHeight, false);
     }
 
-    private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
+    public void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
     {
 
         // need to figure out how to create faces based on the block data, specifically the block type. CreateFaceUp etc has a third parameter for tileIndex, which is used to get the texture from the atlas

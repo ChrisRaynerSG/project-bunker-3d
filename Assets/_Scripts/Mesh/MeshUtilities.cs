@@ -206,7 +206,14 @@ public static class MeshUtilities
         }
         else
         {
-            if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) CreateFaceUp(meshData, targetPosition, blockData.definition);
+            if (y == World.Instance.currentElevation)
+            {
+                CreateFaceUp(meshData, targetPosition, blockData.definition);
+            }
+            else
+            {
+                if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) CreateFaceUp(meshData, targetPosition, blockData.definition);
+            }
         }
         if (!BlockUtils.IsSolid(worldX, y - 1, worldZ)) CreateFaceDown(meshData, targetPosition, blockData.definition);
         if (!BlockUtils.IsSolid(worldX, y, worldZ + 1)) CreateFaceNorth(meshData, targetPosition, blockData.definition);

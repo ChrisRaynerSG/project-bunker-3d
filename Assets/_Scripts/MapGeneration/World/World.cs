@@ -157,7 +157,6 @@ public class World : MonoBehaviour
             }
         }
     }
-
     private void RebuildTopFacesForceTop(int y)
     {
         if (ySlices.Count < maxY - minElevation)
@@ -185,12 +184,7 @@ public class World : MonoBehaviour
                         {
                             BlockData blockData = WorldData.Instance.YSlices[y - minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
                             Vector3 targetPosition = new Vector3(x, y, z);
-                            MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
-                            if (!BlockUtils.IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
-                            if (!BlockUtils.IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition);
-                            if (!BlockUtils.IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
-                            if (!BlockUtils.IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition);
-                            if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
+                            MeshUtilities.CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData, true);
                         }
                     }
                 }

@@ -17,7 +17,7 @@ public static class TreeUtilities
             return; // Don't generate a tree near the world edge
         }
 
-        Debug.Log($"Generating tree at position: {position}");
+        // Debug.Log($"Generating tree at position: {position}");
 
         rng ??= Randomizer.GetDeterministicRNG(position, World.Instance.seed);
 
@@ -25,14 +25,8 @@ public static class TreeUtilities
 
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
-            BlockData block = blockAccessor.GetBlock(new Vector3Int((int)position.x, y, (int)position.z));
-            // Create trunk blocks
-            Debug.Log($"Setting trunk block at position: {new Vector3Int((int)position.x, y, (int)position.z)}");
             blockAccessor.SetBlockNoMeshUpdate(new Vector3Int((int)position.x, y, (int)position.z),
-                BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block"));
-
-            block.IsSolid = true; // Set the block as solid
-
+                BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
         }
 
         for (int dy = -2; dy <= 2; dy++)
@@ -48,21 +42,21 @@ public static class TreeUtilities
                         int lz = (int)position.z + dz;
                         // need to get the block info from WorldData from y slice to get chunk to get block info
 
-                        BlockData block = blockAccessor.GetBlock(new Vector3Int(lx, ly, lz));
+                        BlockData block = blockAccessor.GetBlockDataFromPosition(new Vector3Int(lx, ly, lz));
                         if (block == null || block.definition == null)
                         {
                             Debug.LogWarning($"Block at {new Vector3Int(lx, ly, lz)} is null or has no definition.");
                         }
 
-                        if (block.definition.id == BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block").id)
+                        if (block.definition.id == BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block").id)
                         {
                             // If the block is already a log, skip setting leaves
                             continue;
                         }
                         // Only set leaves if the block is not already a log
                         blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz),
-                        BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block"));
-                        block.IsSolid = true;
+                        BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
+                        // block.IsSolid = true;
                     }
                 }
             }
@@ -72,7 +66,7 @@ public static class TreeUtilities
     public static bool IsTreeNearby(Vector3 position, float radius)
     {
         blockAccessor = new BlockAccessor(World.Instance);
-        BlockDefinition targetBlock = BlockDatabase.Instance.GetBlock("bunker:oak_tree_log_block");
+        BlockDefinition targetBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block");
 
         for (int x = (int)(position.x - radius); x <= (int)(position.x + radius); x++)
         {
@@ -80,7 +74,7 @@ public static class TreeUtilities
             {
                 for (int y = (int)(position.y - radius); y <= (int)(position.y + radius); y++)
                 {
-                    BlockData block = blockAccessor.GetBlock(new Vector3Int(x, y, z));
+                    BlockData block = blockAccessor.GetBlockDataFromPosition(new Vector3Int(x, y, z));
                     if (block != null && block.definition != null &&
                         block.definition.id == targetBlock.id)
                     {
@@ -102,8 +96,8 @@ public static class TreeUtilities
     public static void GenerateNaturalHedges(int count = 30, int maxLength = 40)
     {
         BlockAccessor blockAccessor = new BlockAccessor(World.Instance);
-        BlockDefinition leavesBlock = BlockDatabase.Instance.GetBlock("bunker:oak_tree_leaves_block");
-        BlockDefinition airBlock = BlockDatabase.Instance.GetBlock("bunker:air_block");
+        BlockDefinition leavesBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block");
+        BlockDefinition airBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:air_block");
 
         System.Random rng = new System.Random(World.Instance.seed);
         int worldSize = World.Instance.maxX; // Assuming World.Instance.WorldSize gives the size of the world
@@ -124,7 +118,7 @@ public static class TreeUtilities
                 {
                     break; // Out of bounds, stop generating
                 }
-                int y = SurfaceUtils.FindSurfaceY(new Vector3Int(x, World.Instance.maxY - World.Instance.minElevation - 1, z));
+                int y = SurfaceUtils.FindSurfaceY(new Vector3Int(x, World.Instance.maxY, z));
                 if (y <= 0)
                 {
                     continue; // Skip if the surface is below ground level
@@ -134,13 +128,6 @@ public static class TreeUtilities
                 {
                     Vector3Int position = new Vector3Int(x, y + h, z);
                     blockAccessor.SetBlockNoMeshUpdate(position, leavesBlock);
-                    BlockData block = blockAccessor.GetBlock(position);
-                    if(block == null)
-                    {
-                        Debug.LogWarning($"Block at {position} is null.");
-                        continue; // Skip if the block is null
-                    }
-                    block.IsSolid = true;
                 }
 
                 if (rng.NextDouble() < 0.3f)

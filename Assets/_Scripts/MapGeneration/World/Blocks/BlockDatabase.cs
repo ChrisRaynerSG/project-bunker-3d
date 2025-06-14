@@ -75,7 +75,7 @@ public class BlockDatabase
     {
         return Blocks;
     }
-    public BlockDefinition GetBlock(string id)
+    public BlockDefinition GetBlockDefinition(string id)
     {
         if (Blocks.TryGetValue(id, out BlockDefinition block))
         {
@@ -88,7 +88,7 @@ public class BlockDatabase
         }
     }
 
-    public BlockDefinition GetBlock(ushort id)
+    public BlockDefinition GetBlockDefinition(ushort id)
     {
         if (idToBlock.TryGetValue(id, out var def))
         {

@@ -14,7 +14,7 @@ public class BlockAccessor
 
     public void SetBlockNoMeshUpdate(Vector3Int position, BlockDefinition blockType)
     {
-        BlockData block = GetBlock(position);
+        BlockData block = GetBlockDataFromPosition(position);
         if (block != null)
         {
             block.definition = blockType;
@@ -26,7 +26,7 @@ public class BlockAccessor
 
     public void SetBlock(Vector3Int position, BlockDefinition blockType)
     {
-        BlockData block = GetBlock(position);
+        BlockData block = GetBlockDataFromPosition(position);
         if (block != null)
         {
             block.definition = blockType;
@@ -66,7 +66,7 @@ public class BlockAccessor
         }
     }
 
-    public BlockData GetBlock(Vector3Int position)
+    public BlockData GetBlockDataFromPosition(Vector3Int position)
     {
         ChunkData chunk = world.GetChunkAtPosition(position.x, position.y, position.z);
         if (chunk != null)
@@ -86,7 +86,7 @@ public class BlockAccessor
 
     public BlockDefinition GetBlockDef(string blockId)
     {
-        BlockDefinition block = blockDatabase.GetBlock(blockId);
+        BlockDefinition block = blockDatabase.GetBlockDefinition(blockId);
         if (block == null)
         {
             Debug.LogError($"Block with ID {blockId} not found in the database.");

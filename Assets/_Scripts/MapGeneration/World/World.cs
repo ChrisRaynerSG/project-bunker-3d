@@ -133,11 +133,11 @@ public class World : MonoBehaviour
                                     TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 5f);
                                 }
                                 // Generate Tree but only according to noise value
-                                blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
+                                blockData.definition = blockDatabase.GetBlockDefinition("bunker:dirt_block");
                             }
                             else
                             {
-                                blockData.definition = blockDatabase.GetBlock("bunker:grass_block");
+                                blockData.definition = blockDatabase.GetBlockDefinition("bunker:grass_block");
                             }
 
 
@@ -145,11 +145,11 @@ public class World : MonoBehaviour
                         }
                         else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
                         {
-                            blockData.definition = blockDatabase.GetBlock("bunker:dirt_block");
+                            blockData.definition = blockDatabase.GetBlockDefinition("bunker:dirt_block");
                         }
                         else
                         {
-                            blockData.definition = blockDatabase.GetBlock("bunker:stone_block");
+                            blockData.definition = blockDatabase.GetBlockDefinition("bunker:stone_block");
 
                             // may need to change this generation logic to be more complex later, but will try with this for now maybe more dense ores lower down to promote mining further down?
 
@@ -161,15 +161,15 @@ public class World : MonoBehaviour
 
                                 if (coalNoiseValue > 0.8f)
                                 {
-                                    blockData.definition = blockDatabase.GetBlock("bunker:coal_ore_block");
+                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:coal_ore_block");
                                 }
                                 else if (ironNoiseValue > 0.85f)
                                 {
-                                    blockData.definition = blockDatabase.GetBlock("bunker:iron_ore_block");
+                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:iron_ore_block");
                                 }
                                 else if (copperNoiseValue > 0.85f)
                                 {
-                                    blockData.definition = blockDatabase.GetBlock("bunker:copper_ore_block");
+                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:copper_ore_block");
                                 }
                             }
                         }

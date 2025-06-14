@@ -140,7 +140,7 @@ public static class MeshUtilities
         AddUvs(meshData, textureName);
     }
 
-        public static void LoadMeshData(MeshData meshData, MeshFilter filter)
+    public static void LoadMeshData(MeshData meshData, MeshFilter filter)
     {
         Mesh mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -152,5 +152,22 @@ public static class MeshUtilities
         mesh.RecalculateNormals();
 
         filter.mesh = mesh;
+    }
+    
+        public static void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData, bool forceTop = false)
+    {
+        if (forceTop)
+        {
+            CreateFaceUp(meshData, targetPosition, blockData.definition);
+        }
+        else
+        {
+             if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) CreateFaceUp(meshData, targetPosition, blockData.definition);
+        }
+        if (!BlockUtils.IsSolid(worldX, y - 1, worldZ)) CreateFaceDown(meshData, targetPosition, blockData.definition);
+        if (!BlockUtils.IsSolid(worldX, y, worldZ + 1)) CreateFaceNorth(meshData, targetPosition, blockData.definition);
+        if (!BlockUtils.IsSolid(worldX + 1, y, worldZ)) CreateFaceEast(meshData, targetPosition, blockData.definition);
+        if (!BlockUtils.IsSolid(worldX, y, worldZ - 1)) CreateFaceSouth(meshData, targetPosition, blockData.definition);
+        if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
 }

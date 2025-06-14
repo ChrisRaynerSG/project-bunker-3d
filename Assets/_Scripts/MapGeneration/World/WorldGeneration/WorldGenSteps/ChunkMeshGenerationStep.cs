@@ -98,7 +98,7 @@ public class ChunkMeshGenerationStep : IWorldGenStep
                 BlockData blockData = data.YSlices[y - context.minElevation].Chunks[chunkX][chunkZ].Grid[x][z];
                 if (blockData.IsSolid)
                 {
-                    context.world.CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
+                    MeshUtilities.CreateFaces(y, meshData, worldX, worldZ, targetPosition, blockData);
                 }
             }
         }

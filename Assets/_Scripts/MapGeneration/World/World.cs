@@ -97,17 +97,6 @@ public class World : MonoBehaviour
         SetWorldLayerVisibility(currentElevation, false);
     }
 
-    public void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
-    {
-        // need to figure out how to create faces based on the block data, specifically the block type. CreateFaceUp etc has a third parameter for tileIndex, which is used to get the texture from the atlas
-        if (!BlockUtils.IsSolid(worldX, y + 1, worldZ)) MeshUtilities.CreateFaceUp(meshData, targetPosition, blockData.definition);
-        if (!BlockUtils.IsSolid(worldX, y - 1, worldZ)) MeshUtilities.CreateFaceDown(meshData, targetPosition, blockData.definition);
-        if (!BlockUtils.IsSolid(worldX, y, worldZ + 1)) MeshUtilities.CreateFaceNorth(meshData, targetPosition, blockData.definition);
-        if (!BlockUtils.IsSolid(worldX + 1, y, worldZ)) MeshUtilities.CreateFaceEast(meshData, targetPosition, blockData.definition);
-        if (!BlockUtils.IsSolid(worldX, y, worldZ - 1)) MeshUtilities.CreateFaceSouth(meshData, targetPosition, blockData.definition);
-        if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) MeshUtilities.CreateFaceWest(meshData, targetPosition, blockData.definition);
-    }
-
     private void SetWorldLayerVisibility(int y, bool isGoingUp)
     {
         for (int i = 0; i < ySlices.Count; i++)

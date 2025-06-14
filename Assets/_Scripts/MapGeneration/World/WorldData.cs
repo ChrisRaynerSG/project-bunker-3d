@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using TreeEditor;
 using UnityEngine;
 
 /// <summary>
@@ -30,6 +32,8 @@ public class WorldData
         get { return ySlices; }
         set { ySlices = value; }
     }
+
+    public List<TreeGameData> Trees = new();
 
     // (Unused) Grid for block data, can be removed or implemented as needed.
     private BlockData[][,] grid;
@@ -92,5 +96,10 @@ public class WorldData
                 }
             }
         }
+    }
+
+    public void AddTree(TreeGameData tree)
+    {
+        Trees.Add(tree);
     }
 }

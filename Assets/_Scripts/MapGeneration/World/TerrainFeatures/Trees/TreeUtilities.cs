@@ -44,7 +44,7 @@ public static class TreeUtilities
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
             Vector3Int trunkPosition = new Vector3Int((int)position.x, y, (int)position.z);
-            blockAccessor.SetBlockNoMeshUpdate(trunkPosition,BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
+            blockAccessor.SetBlockNoMeshUpdate(trunkPosition, BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
             tree.AddLogBlock(blockAccessor.GetBlockDataFromPosition(trunkPosition));
         }
 
@@ -77,6 +77,7 @@ public static class TreeUtilities
                 }
             }
         }
+        WorldData.Instance.AddTree(tree);
     }
 
     /// <summary>

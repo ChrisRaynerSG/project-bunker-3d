@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 /// <summary>
@@ -35,13 +36,16 @@ public static class TreeUtilities
 
         rng ??= Randomizer.GetDeterministicRNG(position, World.Instance.seed);
 
+        TreeGameData tree = new TreeGameData();
+
         int trunkHeight = (int)position.y + rng.Next(4, 9);
 
         // Generate trunk
         for (int y = (int)position.y; y < trunkHeight; y++)
         {
-            blockAccessor.SetBlockNoMeshUpdate(new Vector3Int((int)position.x, y, (int)position.z),
-                BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
+            Vector3Int trunkPosition = new Vector3Int((int)position.x, y, (int)position.z);
+            blockAccessor.SetBlockNoMeshUpdate(trunkPosition,BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_log_block"));
+            tree.AddLogBlock(blockAccessor.GetBlockDataFromPosition(trunkPosition));
         }
 
         // Generate leaves in a sphere-like shape
@@ -67,8 +71,8 @@ public static class TreeUtilities
                         {
                             continue; // Skip setting leaves if already a log
                         }
-                        blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz),
-                            BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
+                        blockAccessor.SetBlockNoMeshUpdate(new Vector3Int(lx, ly, lz), BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block"));
+                        tree.AddLeafBlock(blockAccessor.GetBlockDataFromPosition(lx, ly, lz));
                     }
                 }
             }

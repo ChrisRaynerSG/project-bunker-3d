@@ -12,7 +12,6 @@ public class World : MonoBehaviour
     // 192x192 medium world
     // 256x256 large world
     // 400x400 huge world
-
     public int maxX = 16;
     public int maxZ = 16;
     public float frequency = 0.1f;
@@ -27,19 +26,12 @@ public class World : MonoBehaviour
     public GameObject ChunkPrefab;
     private List<GameObject> ySlices = new List<GameObject>();
     public static event Action<int> OnCurrentElevationChanged;
-    private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
-    private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
+    public int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
+    public int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
     public int numberOfHedges = 10;
 
     private BlockDatabase blockDatabase;
-
-    // definitely may need to change this at some point as what do we do with saved worlds? this class isn't serialzable so we cant save it directly... meaning adding or removing blocks could be a problem.
-    // static Dictionary<string, BlockDefinition> blockDefinitions = new();
-
-
-
-    // need to make chunks, 16x1x16 to make updating the world faster
 
     void Awake()
     {
@@ -56,8 +48,6 @@ public class World : MonoBehaviour
         blockDatabase = BlockDatabase.Instance; // Load block definitions from the database
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
-
-        // LoadTextures();
     }
     void Start()
     {
@@ -102,9 +92,9 @@ public class World : MonoBehaviour
         var meshStep = new ChunkMeshGenerationStep();
         yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
-        currentElevation = maxY;
+        currentElevation = maxTerrainHeight;
         OnCurrentElevationChanged?.Invoke(currentElevation);
-        SetWorldLayerVisibility(maxTerrainHeight, false);
+        SetWorldLayerVisibility(currentElevation, false);
     }
 
     public void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
@@ -313,7 +303,7 @@ public class World : MonoBehaviour
     {
         //Debug.Log($"Rebuilding chunk mesh at: {x}, {y}, {z}");
 
-        ChunkData chunkData = GetChunkAtPosition(x, y, z);
+        ChunkData chunkData = ChunkUtils.GetChunkAtPosition(x, y, z);
         if (chunkData == null) return;
 
         int chunkX = chunkData.ChunkX;
@@ -325,7 +315,6 @@ public class World : MonoBehaviour
         if (yIndex < 0 || yIndex >= WorldData.Instance.YSlices.Length) return;
 
         GameObject chunkObject = ySlices[yIndex].transform.Find($"Chunk_{chunkX}_{chunkZ}_{chunkData.OriginY}").gameObject;
-        //Debug.Log("Found chunk object: " + chunkObject.name);
 
         if (chunkObject == null) return;
 
@@ -361,22 +350,5 @@ public class World : MonoBehaviour
         }
         LoadMeshData(meshData, chunkFilter);
         chunkObject.GetComponent<MeshCollider>().sharedMesh = chunkFilter.mesh;
-    }
-
-    public ChunkData GetChunkAtPosition(int x, int y, int z)
-    {
-        int chunkX = x / ChunkData.CHUNK_SIZE;
-        int chunkZ = z / ChunkData.CHUNK_SIZE;
-        int chunkLocalX = x % ChunkData.CHUNK_SIZE;
-        int chunkLocalZ = z % ChunkData.CHUNK_SIZE;
-
-        if (chunkX < 0 || chunkZ < 0 || chunkX >= ChunkXCount || chunkZ >= ChunkZCount)
-            return null;
-
-        int yIndex = y - minElevation;
-        if (yIndex < 0 || yIndex >= WorldData.Instance.YSlices.Length)
-            return null;
-
-        return WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ];
     }
 }

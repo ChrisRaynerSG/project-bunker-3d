@@ -89,7 +89,7 @@ public class BlockAccessor
     /// <returns>The block data at the specified position, or null if not found.</returns>
     public BlockData GetBlockDataFromPosition(Vector3Int position)
     {
-        ChunkData chunk = world.GetChunkAtPosition(position.x, position.y, position.z);
+        ChunkData chunk = ChunkUtils.GetChunkAtPosition(position);
         if (chunk != null)
         {
             int localX = position.x % ChunkData.CHUNK_SIZE;

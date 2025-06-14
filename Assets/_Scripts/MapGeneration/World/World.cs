@@ -72,100 +72,24 @@ public class World : MonoBehaviour
     private IEnumerator GenerateWorldCoroutine()
     {
 
-        // MeshData meshData = new MeshData();
+        WorldGenerator generator = new WorldGenerator();
+        generator.AddStep(new HeightMapStep());
+        generator.AddStep(new OreGenerationStep());
 
-        // Noises for terrain generation could these be split into different classes?
-
-        FastNoise noise = NoiseProvider.CreateNoise(frequency, seed);
-        FastNoise coalNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 1);
-        FastNoise ironNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 2);
-        FastNoise copperNoise = NoiseProvider.CreateNoise(frequency * 10f, -seed + 3);
-        FastNoise treeNoise = NoiseProvider.CreateNoise(frequency * 4f, (-seed / 2) + 4);
-
-        // Precompute all heights
-        int[,] heights = new int[maxX, maxZ];
-        for (int x = 0; x < maxX; x++)
+        generator.Generate(WorldData.Instance, new WorldGenContext
         {
-            for (int z = 0; z < maxZ; z++)
-            {
-                float rawHeight = noise.GetNoise(x, z);
-                int height = Mathf.FloorToInt((rawHeight + 1f) * 0.5f * maxTerrainHeight); // Normalize the height to be between 0 and maxY
-                heights[x, z] = height;
-            }
-        }
-
-        // first pass to set solid blocks and block types
-
-        for (int x = 0; x < maxX; x++)
-        {
-            for (int z = 0; z < maxZ; z++)
-            {
-                for (int y = minElevation; y < maxY; y++)
-                {
-                    if (y < heights[x, z])
-                    {
-                        int yIndex = y - minElevation;
-
-                        int chunkX = x / ChunkData.CHUNK_SIZE;
-                        int chunkZ = z / ChunkData.CHUNK_SIZE;
-                        int chunkLocalX = x % ChunkData.CHUNK_SIZE;
-                        int chunkLocalZ = z % ChunkData.CHUNK_SIZE;
-
-                        BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
-                        blockData.IsSolid = true;
-
-                        if (y == heights[x, z] - 1)
-                        {
-                            if (treeNoise.GetNoise(x, y, z) > 0.4f)
-                            {
-                                if (coalNoise.GetNoise(x, y, z) > 0.2f)
-                                {
-                                    TreeUtilities.GenerateTree(new Vector3(x, y + 1, z), 5f);
-                                }
-                                // Generate Tree but only according to noise value
-                                blockData.definition = blockDatabase.GetBlockDefinition("bunker:dirt_block");
-                            }
-                            else
-                            {
-                                blockData.definition = blockDatabase.GetBlockDefinition("bunker:grass_block");
-                            }
-
-
-
-                        }
-                        else if (y < heights[x, z] - 1 && y > heights[x, z] - 8)
-                        {
-                            blockData.definition = blockDatabase.GetBlockDefinition("bunker:dirt_block");
-                        }
-                        else
-                        {
-                            blockData.definition = blockDatabase.GetBlockDefinition("bunker:stone_block");
-
-                            if (y < maxY * 0.8f)
-                            {
-                                float coalNoiseValue = coalNoise.GetNoise(x, y, z);
-                                float ironNoiseValue = ironNoise.GetNoise(x, y, z);
-                                float copperNoiseValue = copperNoise.GetNoise(x, y, z);
-
-                                if (coalNoiseValue > 0.8f)
-                                {
-                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:coal_ore_block");
-                                }
-                                else if (ironNoiseValue > 0.85f)
-                                {
-                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:iron_ore_block");
-                                }
-                                else if (copperNoiseValue > 0.85f)
-                                {
-                                    blockData.definition = blockDatabase.GetBlockDefinition("bunker:copper_ore_block");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+            maxX = maxX,
+            maxY = maxY,
+            maxZ = maxZ,
+            frequency = frequency,
+            seed = seed,
+            minElevation = minElevation,
+            maxTerrainHeight = maxTerrainHeight,
+            dirtHeight = 8,
+            blockAccessor = new BlockAccessor(this),
+            blockDatabase = blockDatabase
+        });
+        
         TreeUtilities.GenerateNaturalHedges(numberOfHedges, maxZ); // Generate natural hedges in the world
 
         // second pass to create faces

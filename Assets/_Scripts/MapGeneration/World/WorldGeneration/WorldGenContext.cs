@@ -11,4 +11,5 @@ public class WorldGenContext
     public int dirtHeight;
     public BlockAccessor blockAccessor;
     public BlockDatabase blockDatabase;
+    public int[,] heights;
 }

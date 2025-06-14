@@ -31,6 +31,8 @@ public class HeightMapStep : IWorldGenStep
 
     /// <summary>
     /// Generates a 2D heightmap array using noise for the given world context.
+    ///  This heightmap determines the surface height at each (x, z) coordinate,
+    ///  And then adds to the context for further processing.
     /// </summary>
     private int[,] GenerateHeights(WorldGenContext context, FastNoise noise)
     {
@@ -44,6 +46,7 @@ public class HeightMapStep : IWorldGenStep
                 heights[x, z] = height;
             }
         }
+        context.heights = heights;
         return heights;
     }
 

@@ -30,6 +30,8 @@ public class World : MonoBehaviour
     private int ChunkXCount => maxX / ChunkData.CHUNK_SIZE;
     private int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
+    public int numberOfHedges = 10;
+
     private BlockDatabase blockDatabase;
 
     // definitely may need to change this at some point as what do we do with saved worlds? this class isn't serialzable so we cant save it directly... meaning adding or removing blocks could be a problem.
@@ -112,18 +114,6 @@ public class World : MonoBehaviour
                         BlockData blockData = WorldData.Instance.YSlices[yIndex].Chunks[chunkX][chunkZ].Grid[chunkLocalX][chunkLocalZ];
                         blockData.IsSolid = true;
 
-                        // for world gen I want to have grass on top, then dirt for the next few layers then stone
-                        // Basic terrain generation logic need to do ore distribution and fancier features like trees and bushes later - also have a main road that passes from the edge of the map to the centre
-                        // if (y == heights[x, z])
-                        // {
-                        //     // Generate Tree but only according to noise value
-                        //     float treeNoiseValue = treeNoise.GetNoise(x, y, z);
-                        //     if (treeNoiseValue > 0.5f)
-                        //     {
-                        //         TreeUtilities.GenerateTree(new Vector3(x, y, z));
-                        //     }
-                        // }
-                        /*else*/
                         if (y == heights[x, z] - 1)
                         {
                             if (treeNoise.GetNoise(x, y, z) > 0.4f)
@@ -151,8 +141,6 @@ public class World : MonoBehaviour
                         {
                             blockData.definition = blockDatabase.GetBlockDefinition("bunker:stone_block");
 
-                            // may need to change this generation logic to be more complex later, but will try with this for now maybe more dense ores lower down to promote mining further down?
-
                             if (y < maxY * 0.8f)
                             {
                                 float coalNoiseValue = coalNoise.GetNoise(x, y, z);
@@ -178,7 +166,7 @@ public class World : MonoBehaviour
             }
         }
 
-        TreeUtilities.GenerateNaturalHedges(30, 40); // Generate natural hedges in the world
+        TreeUtilities.GenerateNaturalHedges(numberOfHedges, maxZ); // Generate natural hedges in the world
 
         // second pass to create faces
         for (int y = minElevation; y < maxY; y++)
@@ -188,7 +176,6 @@ public class World : MonoBehaviour
             ySliceObject.name = $"YSlice_{y}";
             ySliceObject.transform.position = new Vector3(0, y, 0);
             ySlices.Add(ySliceObject);
-            Debug.Log($"YSlices count: {ySlices.Count}");
 
             for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
             {
@@ -231,7 +218,7 @@ public class World : MonoBehaviour
         }
         currentElevation = maxY;
         OnCurrentElevationChanged?.Invoke(currentElevation); // Notify listeners of the initial elevation
-        SetWorldLayerVisibility(maxY, false);
+        SetWorldLayerVisibility(maxTerrainHeight, false);
     }
 
     private void CreateFaces(int y, MeshData meshData, int worldX, int worldZ, Vector3 targetPosition, BlockData blockData)
@@ -358,8 +345,6 @@ public class World : MonoBehaviour
             return;
         }
         // Rebuild the top faces of the current layer
-        Debug.Log($"Rebuilding top faces for layer with index {y-minElevation} (Y={y})");
-        Debug.Log($"Y Slices Count: {ySlices.Count}, Min Elevation: {minElevation}, Current Y: {y}");
         GameObject ySliceObject = ySlices[y - minElevation];
         for (int chunkX = 0; chunkX < ChunkXCount; chunkX++)
         {

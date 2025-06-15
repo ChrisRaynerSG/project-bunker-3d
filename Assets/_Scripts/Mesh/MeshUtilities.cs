@@ -213,6 +213,20 @@ public static class MeshUtilities
         if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
 
+    /// <summary>
+    /// Adds a collection of block positions to a mesh by generating faces for each block.
+    /// </summary>
+    /// <param name="blockAccessor">The accessor used to retrieve block data from the world.</param>
+    /// <param name="positions">A list of world positions for the blocks to add to the mesh.</param>
+    /// <param name="basePosition">
+    /// The base position used to convert each block's world position to a local position for the mesh.
+    /// Typically, this is the origin of the mesh or the root block's position.
+    /// </param>
+    /// <param name="meshData">The mesh data object to which the generated faces will be added.</param>
+    /// <remarks>
+    /// For each block position, this method retrieves the block data, calculates the local position relative to <paramref name="basePosition"/>,
+    /// and generates the block's faces using <see cref="MeshUtilities.CreateFaces"/>.
+    /// </remarks>
     public static void AddBlocksToMesh(
         BlockAccessor blockAccessor,
         List<Vector3Int> positions,
@@ -226,5 +240,4 @@ public static class MeshUtilities
             MeshUtilities.CreateFaces(pos.y, meshData, pos.x, pos.z, localPos, blockData, true);
         }
     }
-
 }

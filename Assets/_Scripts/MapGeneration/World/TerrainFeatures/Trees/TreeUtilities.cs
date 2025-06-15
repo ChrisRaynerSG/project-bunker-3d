@@ -185,4 +185,23 @@ public static class TreeUtilities
             }
         }
     }
+
+    /// <summary>
+    ///  Finds a tree at the specified position by checking its log positions.
+    /// </summary>
+    /// <param name="position">The position to check for a tree.</param>
+    /// <returns>The TreeGameData if a tree is found at the position, otherwise null.</returns>
+    public static TreeGameData FindTreeAtPosition(Vector3Int position)
+    {
+        foreach (var t in WorldData.Instance.Trees)
+        {
+            foreach (var logPos in t.LogPositions)
+            {
+                if (logPos == position)
+                    return t;
+            }
+        }
+        return null;
+    }
+
 }

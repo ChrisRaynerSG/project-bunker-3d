@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Provides static utility methods for procedural mesh generation of block-based worlds.
@@ -211,4 +212,19 @@ public static class MeshUtilities
         if (!BlockUtils.IsSolid(worldX, y, worldZ - 1)) CreateFaceSouth(meshData, targetPosition, blockData.definition);
         if (!BlockUtils.IsSolid(worldX - 1, y, worldZ)) CreateFaceWest(meshData, targetPosition, blockData.definition);
     }
+
+    public static void AddBlocksToMesh(
+        BlockAccessor blockAccessor,
+        List<Vector3Int> positions,
+        Vector3 basePosition,
+        MeshData meshData)
+    {
+        foreach (var pos in positions)
+        {
+            BlockData blockData = blockAccessor.GetBlockDataFromPosition(pos);
+            Vector3 localPos = pos - basePosition;
+            MeshUtilities.CreateFaces(pos.y, meshData, pos.x, pos.z, localPos, blockData, true);
+        }
+    }
+
 }

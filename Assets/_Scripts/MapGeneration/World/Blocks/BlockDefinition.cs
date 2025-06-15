@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents the properties and textures of a block type in the voxel world.
@@ -75,6 +76,11 @@ public class BlockDefinition
     public TextureDefinition textures;
 
     /// <summary>
+    ///  A list of possible drops when this block is mined.
+    ///  </summary>
+    public List<DropDefinition> drops;
+
+    /// <summary>
     /// Holds the texture names for each face of a block.
     /// </summary>
     [Serializable]
@@ -94,5 +100,28 @@ public class BlockDefinition
         /// The texture name for the side faces.
         /// </summary>
         public string side;
+    }
+
+    public class DropDefinition
+    {
+        /// <summary>
+        /// The ID of the block that drops when this block is mined.
+        /// </summary>
+        public string id;
+
+        /// <summary>
+        /// The chance of this drop occurring (0.0 to 1.0).
+        /// </summary>
+        public float chance;
+
+        /// <summary>
+        /// The minimum quantity of this drop.
+        /// </summary>
+        public int minQuantity;
+
+        /// <summary>
+        /// The maximum quantity of this drop.
+        /// </summary>
+        public int maxQuantity;
     }
 }

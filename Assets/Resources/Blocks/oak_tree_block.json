@@ -13,5 +13,13 @@
   "hardness": 1,
   "miningTime": 2,
   "thermalConductivity": 0.5,
-  "ignitionTemperature": 300
+  "ignitionTemperature": 300,
+  "drops": [
+    {
+      "item": "bunker:oak_tree_log",
+      "chance": 1.0,
+      "minQuantity": 1,
+      "maxQuantity": 1
+    }
+  ]
 }

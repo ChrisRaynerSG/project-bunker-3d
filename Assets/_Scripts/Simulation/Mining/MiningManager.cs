@@ -60,7 +60,7 @@ public class MiningManager : MonoBehaviour
                         // 2. Instantiate the prefab at the base position
                         Vector3 basePosition = logsAbove[0];
                         GameObject fallingTree = Instantiate(FallingTreePrefab, basePosition, Quaternion.identity);
-
+                        Destroy(fallingTree, 10f);
                         // 3. Generate mesh for the logs above
                         MeshData meshData = new MeshData();
 
@@ -88,12 +88,21 @@ public class MiningManager : MonoBehaviour
                         MeshRenderer renderer = fallingTree.GetComponent<MeshRenderer>();
                         renderer.material.mainTexture = blockDatabase.TextureAtlas;
 
+                        Rigidbody rb = fallingTree.GetComponent<Rigidbody>();
+
                         fallingTree.GetComponent<MeshFilter>().mesh = mesh;
                         fallingTree.GetComponent<MeshCollider>().sharedMesh = mesh;
                         fallingTree.GetComponent<MeshCollider>().convex = true;
-                        fallingTree.GetComponent<Rigidbody>().isKinematic = false;
-                        fallingTree.GetComponent<Rigidbody>().useGravity = true;
-                        // fallingTree.GetComponent<Rigidbody>().AddForce(Vector3.down * 10f, ForceMode.Impulse);
+                        rb.isKinematic = false;
+                        rb.useGravity = true;
+
+                        // Vector3 randomDirection = (Vector3.right * Random.Range(-1f, 1f) + Vector3.forward * Random.Range(-1f, 1f)).normalized;
+
+                        Vector3 tipDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+                        float pushStrength = Random.Range(1f, 3f);
+                        float randomTorque = Random.Range(2f, 5f);
+                        rb.AddTorque(Vector3.Cross(Vector3.up, tipDirection) * randomTorque, ForceMode.Impulse);
+                        rb.AddForce(tipDirection * pushStrength, ForceMode.Impulse);
                     }
 
                     foreach (var logPosition in tree.LogPositions)

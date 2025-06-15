@@ -103,6 +103,8 @@ public class World : MonoBehaviour
     /// </summary>
     private IEnumerator GenerateWorldCoroutine()
     {
+        currentElevation = maxTerrainHeight;
+
         WorldGenerator generator = new WorldGenerator();
         generator.AddStep(new HeightMapStep());
         generator.AddStep(new OreGenerationStep());
@@ -134,7 +136,7 @@ public class World : MonoBehaviour
         var meshStep = new ChunkMeshGenerationStep();
         yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
-        currentElevation = maxTerrainHeight;
+        
         OnCurrentElevationChanged?.Invoke(currentElevation);
         SetWorldLayerVisibility(currentElevation, false);
     }

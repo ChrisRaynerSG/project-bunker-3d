@@ -38,6 +38,8 @@ public class MiningManager : MonoBehaviour
             Debug.Log($"Hit block at position: {hit.point}, normal: {hit.normal}");
             Vector3 hitOffset = hit.point - hit.normal * 0.5f;
             Vector3Int hitPosition = Vector3Int.RoundToInt(hitOffset);
+            BlockData hitBlockData = blockAccessor.GetBlockDataFromPosition(hitPosition);
+            Debug.Log($"Hit block data: {hitBlockData.definition.id} at position {hitPosition}");
             if (blockAccessor.GetBlockDataFromPosition(hitPosition).definition.id == "bunker:oak_tree_log_block")
             {
                 TreeGameData tree = WorldData.Instance.Trees.Find(t => t.LogPositions.Contains(hitPosition));
@@ -50,7 +52,7 @@ public class MiningManager : MonoBehaviour
                         .Where(pos => pos.x == hitPosition.x && pos.z == hitPosition.z && pos.y > hitPosition.y)
                         .OrderBy(pos => pos.y)
                         .ToList();
-                    
+
                     var leavesAbove = tree.LeafPositions.ToList();
 
                     if (logsAbove.Count > 0)
@@ -107,7 +109,7 @@ public class MiningManager : MonoBehaviour
                     {
                         blockAccessor.SetBlock(leafPosition, blockAccessor.GetBlockDef("bunker:air_block"));
                     }
-                    if(tree.logBlocks.Count == 0) WorldData.Instance.RemoveTree(tree);
+                    if (tree.logBlocks.Count == 0) WorldData.Instance.RemoveTree(tree);
                 }
             }
             else

@@ -42,7 +42,7 @@ public class TreeFellingService
     /// If a tree is found, removes the block, spawns a falling tree, and updates world data.
     /// </summary>
     /// <param name="hitPosition">The position of the mined block.</param>
-    public void FellTreeAt(Vector3Int hitPosition)
+    public void FellTreeAt(Vector3Int hitPosition, float powerMin = 1f, float powerMax = 3f)
     {
         TreeGameData tree = TreeUtilities.FindTreeAtPosition(hitPosition);
         if (tree == null) return;
@@ -54,7 +54,7 @@ public class TreeFellingService
 
         if (logsAbove.Count > 0)
         {
-            InstantiateFallingTree(logsAbove, leavesAbove);
+            InstantiateFallingTree(logsAbove, leavesAbove, powerMin, powerMax);
         }
 
         RemoveLogsAbove(tree, hitPosition);
@@ -92,7 +92,7 @@ public class TreeFellingService
     /// Instantiates the falling tree prefab and generates a mesh for the logs and leaves above the cut.
     /// Applies physics to simulate the tree falling.
     /// </summary>
-    private void InstantiateFallingTree(List<Vector3Int> logsAbove, List<Vector3Int> leavesAbove)
+    private void InstantiateFallingTree(List<Vector3Int> logsAbove, List<Vector3Int> leavesAbove, float powerMin, float powerMax)
     {
         Vector3 basePosition = logsAbove[0];
         GameObject fallingTree = Object.Instantiate(fallingTreePrefab, basePosition, Quaternion.identity);
@@ -119,8 +119,8 @@ public class TreeFellingService
         rb.useGravity = true;
 
         Vector3 tipDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-        float pushStrength = Random.Range(1f, 3f);
-        float randomTorque = Random.Range(2f, 5f);
+        float pushStrength = Random.Range(powerMin, powerMax);
+        float randomTorque = Random.Range(powerMin, powerMax);
         rb.AddTorque(Vector3.Cross(Vector3.up, tipDirection) * randomTorque, ForceMode.Impulse);
         rb.AddForce(tipDirection * pushStrength, ForceMode.Impulse);
     }

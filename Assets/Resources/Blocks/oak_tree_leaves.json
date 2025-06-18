@@ -13,5 +13,13 @@
   "hardness": 0.2,
   "miningTime": 0.5,
   "thermalConductivity": 0.1,
-  "ignitionTemperature": 300
+  "ignitionTemperature": 300,
+  "drops": [
+    {
+      "id": "bunker:acorn",
+      "chance": 0.05,
+      "minQuantity": 1,
+      "maxQuantity": 2
+    }
+  ]
 }

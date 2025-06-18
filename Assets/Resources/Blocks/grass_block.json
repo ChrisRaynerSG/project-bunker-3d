@@ -13,5 +13,55 @@
   "hardness": 1,
   "miningTime": 1,
   "thermalConductivity": 0.5,
-  "ignitionTemperature": 1000
+  "ignitionTemperature": 1000,
+  "drops": [
+    {
+      "id": "bunker:dirt",
+      "chance": 1.0,
+      "minQuantity": 1,
+      "maxQuantity": 1
+    },
+    {
+      "id": "bunker:carrot_seed",
+      "chance": 0.05,
+      "minQuantity": 1,
+      "maxQuantity": 3
+    },
+    {
+      "id": "bunker:wheat_seed",
+      "chance": 0.1,
+      "minQuantity": 1,
+      "maxQuantity": 5
+    },
+    {
+      "id": "bunker:potato_seed",
+      "chance": 0.05,
+      "minQuantity": 1,
+      "maxQuantity": 3
+    },
+    {
+      "id": "bunker:bean_seed",
+      "chance": 0.08,
+      "minQuantity": 1,
+      "maxQuantity": 3
+    },
+    {
+      "id": "bunker:pea_seed",
+      "chance": 0.08,
+      "minQuantity": 1,
+      "maxQuantity": 2
+    },
+    {
+      "id": "bunker:barley_seed",
+      "chance": 0.06,
+      "minQuantity": 1,
+      "maxQuantity": 2
+    },
+    {
+      "id": "bunker:turnip_seed",
+      "chance": 0.05,
+      "minQuantity": 1,
+      "maxQuantity": 2
+    }
+  ]
 }

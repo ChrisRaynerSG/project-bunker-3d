@@ -13,5 +13,19 @@
   "hardness": 2,
   "miningTime": 2,
   "thermalConductivity": 0.6,
-  "ignitionTemperature": 1000
+  "ignitionTemperature": 1000,
+  "drops": [
+    {
+      "id": "bunker:copper_ore",
+      "chance": 0.5,
+      "minQuantity": 1,
+      "maxQuantity": 2
+    },
+    {
+      "id": "bunker:stone",
+      "chance": 0.5,
+      "minQuantity": 1,
+      "maxQuantity": 1
+    }
+  ]
 }

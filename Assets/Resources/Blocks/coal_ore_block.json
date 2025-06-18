@@ -13,5 +13,19 @@
   "hardness": 1,
   "miningTime": 1,
   "thermalConductivity": 0.5,
-  "ignitionTemperature": 1000
+  "ignitionTemperature": 1000,
+  "drops": [
+    {
+      "id": "bunker:coal_ore",
+      "chance": 0.6,
+      "minQuantity": 1,
+      "maxQuantity": 4
+    },
+    {
+      "id": "bunker:stone",
+      "chance": 0.4,
+      "minQuantity": 1,
+      "maxQuantity": 1
+    }
+  ]
 }

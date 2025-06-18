@@ -13,5 +13,13 @@
   "hardness": 1,
   "miningTime": 1,
   "thermalConductivity": 0.5,
-  "ignitionTemperature": 1000
+  "ignitionTemperature": 1000,
+  "drops": [
+    {
+      "id": "bunker:dirt",
+      "chance": 1.0,
+      "minQuantity": 1,
+      "maxQuantity": 1
+    }
+  ]
 }

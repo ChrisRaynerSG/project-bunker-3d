@@ -1,0 +1,6 @@
+{
+  "id": "bunker:seed:turnip",
+  "displayName": "Turnip Seed",
+  "description": "A seed for growing turnips",
+  "model": "bunker_turnip_seed"
+}

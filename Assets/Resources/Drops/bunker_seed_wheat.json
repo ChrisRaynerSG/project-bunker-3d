@@ -1,0 +1,6 @@
+{
+  "id": "bunker:seed:wheat",
+  "displayName": "Wheat Seed",
+  "description": "A seed for growing wheat",
+  "model": "bunker_wheat_seed"
+}

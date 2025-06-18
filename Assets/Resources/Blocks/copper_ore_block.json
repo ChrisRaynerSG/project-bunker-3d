@@ -16,7 +16,7 @@
   "ignitionTemperature": 1000,
   "drops": [
     {
-      "id": "bunker:copper_ore",
+      "id": "bunker:ore:copper",
       "chance": 0.5,
       "minQuantity": 1,
       "maxQuantity": 2

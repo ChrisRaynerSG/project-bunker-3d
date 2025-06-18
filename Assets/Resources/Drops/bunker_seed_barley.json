@@ -1,0 +1,6 @@
+{
+  "id": "bunker:seed:barley",
+  "displayName": "Barley Seed",
+  "description": "A seed for growing barley",
+  "model": "bunker_barley_seed"
+}

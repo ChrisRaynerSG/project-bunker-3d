@@ -16,7 +16,7 @@
   "ignitionTemperature": 1000,
   "drops": [
     {
-      "id": "bunker:iron_ore",
+      "id": "bunker:ore:iron",
       "chance": 0.4,
       "minQuantity": 1,
       "maxQuantity": 2

@@ -1,0 +1,6 @@
+{
+  "id": "bunker:dirt",
+  "displayName": "Dirt",
+  "description": "A pile of dirt",
+  "model": "bunker_dirt"
+}

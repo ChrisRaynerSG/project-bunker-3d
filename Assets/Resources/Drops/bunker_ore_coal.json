@@ -1,0 +1,6 @@
+{
+  "id": "bunker:ore:coal",
+  "displayName": "Coal Ore",
+  "description": "A pile of coal ore",
+  "model": "bunker_coal_ore"
+}

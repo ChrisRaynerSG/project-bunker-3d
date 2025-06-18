@@ -16,7 +16,7 @@
   "ignitionTemperature": 1000,
   "drops": [
     {
-      "id": "bunker:coal_ore",
+      "id": "bunker:ore:coal",
       "chance": 0.6,
       "minQuantity": 1,
       "maxQuantity": 4

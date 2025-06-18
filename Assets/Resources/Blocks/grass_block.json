@@ -22,43 +22,43 @@
       "maxQuantity": 1
     },
     {
-      "id": "bunker:carrot_seed",
+      "id": "bunker:seed:carrot",
       "chance": 0.05,
       "minQuantity": 1,
       "maxQuantity": 3
     },
     {
-      "id": "bunker:wheat_seed",
+      "id": "bunker:seed:wheat",
       "chance": 0.1,
       "minQuantity": 1,
       "maxQuantity": 5
     },
     {
-      "id": "bunker:potato_seed",
+      "id": "bunker:seed:potato",
       "chance": 0.05,
       "minQuantity": 1,
       "maxQuantity": 3
     },
     {
-      "id": "bunker:bean_seed",
+      "id": "bunker:seed:bean",
       "chance": 0.08,
       "minQuantity": 1,
       "maxQuantity": 3
     },
     {
-      "id": "bunker:pea_seed",
+      "id": "bunker:seed:pea",
       "chance": 0.08,
       "minQuantity": 1,
       "maxQuantity": 2
     },
     {
-      "id": "bunker:barley_seed",
+      "id": "bunker:seed:barley",
       "chance": 0.06,
       "minQuantity": 1,
       "maxQuantity": 2
     },
     {
-      "id": "bunker:turnip_seed",
+      "id": "bunker:seed:turnip",
       "chance": 0.05,
       "minQuantity": 1,
       "maxQuantity": 2

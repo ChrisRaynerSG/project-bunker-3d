@@ -1,0 +1,6 @@
+{
+  "id": "bunker:stone",
+  "displayName": "Stone",
+  "description": "Roughly hewn stone",
+  "model": "bunker_stone"
+}

@@ -1,4 +1,3 @@
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 [System.Serializable]
@@ -50,20 +49,11 @@ public class EconomyData
         get => income;
         private set => income = value; // Ensure income does not go below zero
     }
-    /// <summary>
-    /// Gets the change in money per tick, which is calculated as Income - Expense.
-    /// </summary>
-    /// <remarks>
-    /// This property allows you to get the current change in money per tick.
-    /// </remarks>
-    private float _moneyChangePerTick => Income - Expense;
+
     /// <summary>
     /// Gets the change in money per tick.
     /// </summary>
-    public float MoneyChangePerTick
-    {
-        get => _moneyChangePerTick;
-    }
+    public float MoneyChangePerTick => Income - Expense;
 
     /// <summary>
     /// Event that is triggered when the money amount changes.
@@ -100,7 +90,7 @@ public class EconomyData
     {
         Money = 1000f; // Initial amount of money
     }
-
+    
     /// <summary>
     /// Adds money to the economy.
     /// </summary>
@@ -109,11 +99,12 @@ public class EconomyData
     /// This method adds the specified amount of money to the economy.
     /// If the amount is negative, it does nothing.
     /// </remarks>
-    public void AddMoney(float amount)
+    public bool AddMoney(float amount)
     {
-        if (amount < 0) return; // Prevent adding negative money
+        if (amount < 0) return false; // Prevent adding negative money
         Money += amount;
         OnMoneyChanged?.Invoke(Money);
+        return true; // Return true to indicate success
     }
 
     /// <summary>
@@ -124,10 +115,16 @@ public class EconomyData
     /// This method removes the specified amount of money from the economy.
     /// If the amount is negative, it does nothing.
     /// </remarks>
-    public void RemoveMoney(float amount)
+    public bool RemoveMoney(float amount)
     {
-        if (amount < 0) return; // Prevent removing negative money
+        if (amount < 0) return false; // Prevent removing negative money
+        if (Money < amount)
+        {
+            Debug.LogWarning("Not enough money to remove.");
+            return false; // Prevent removing more money than available
+        }
         Money -= amount;
         OnMoneyChanged?.Invoke(Money);
+        return true;
     }
 }

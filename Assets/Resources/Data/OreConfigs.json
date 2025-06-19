@@ -1,0 +1,37 @@
+{
+  "ores": [
+    {
+      "oreBlockId": "bunker:coal_ore_block",
+      "replaceBlockId": "bunker:stone_block",
+      "threshold": 0.75,
+      "frequencyMultiplier": 12.0,
+      "seedOffset": 1,
+      "minDepth": 0,
+      "maxDepth": 50,
+      "minElevation": -2147483648,
+      "maxElevation": 2147483647
+    },
+    {
+      "oreBlockId": "bunker:iron_ore_block",
+      "replaceBlockId": "bunker:stone_block",
+      "threshold": 0.825,
+      "frequencyMultiplier": 16.0,
+      "seedOffset": 2,
+      "minDepth": 5,
+      "maxDepth": 40,
+      "minElevation": -2147483648,
+      "maxElevation": 2147483647
+    },
+    {
+      "oreBlockId": "bunker:copper_ore_block",
+      "replaceBlockId": "bunker:stone_block",
+      "threshold": 0.75,
+      "frequencyMultiplier": 16.0,
+      "seedOffset": 3,
+      "minDepth": 10,
+      "maxDepth": 30,
+      "minElevation": -2147483648,
+      "maxElevation": 2147483647
+    }
+  ]
+}

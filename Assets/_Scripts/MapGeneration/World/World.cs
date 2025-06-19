@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Android.Gradle;
+using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
@@ -55,6 +57,17 @@ public class World : MonoBehaviour
     /// <summary>The number of chunks along the Z axis.</summary>
     public int ChunkZCount => maxZ / ChunkData.CHUNK_SIZE;
 
+    /// <summary>The size of each simulation chunk in blocks (in each dimension).</summary>
+    /// <remarks>
+    /// This value determines the granularity of the simulation updates and the size of the data processed in each chunk.
+    /// </remarks>
+    [SerializeField] private int simulationChunkSize = 16; // Size of each chunk in blocks in each dimension
+
+    private Unity.Entities.World dotsWorld;
+    private EntityManager entityManager;
+
+    private BlockAccessor blockAccessor;
+
     /// <summary>The number of hedges to generate in the world.</summary>
     public int numberOfHedges = 10;
 
@@ -82,6 +95,8 @@ public class World : MonoBehaviour
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
         LoadAllConfigurations(); // Load all ore configurations at startup
+        InitialiseDotsWorld(); // Set up the DOTS world and entity manager
+        blockAccessor = new BlockAccessor(this);
     }
 
     private void LoadAllConfigurations()
@@ -89,6 +104,12 @@ public class World : MonoBehaviour
         oreConfigs = OreConfigLoader.LoadAllOreConfigs();
         Debug.Log($"Loaded {oreConfigs.Count} ore configurations.");
 
+    }
+
+    private void InitialiseDotsWorld()
+    {
+        dotsWorld = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+        entityManager = dotsWorld.EntityManager;
     }
 
     /// <summary>
@@ -121,9 +142,11 @@ public class World : MonoBehaviour
         OreGenerationStep oreGenerationStep = new OreGenerationStep();
         oreGenerationStep.OreConfigs = oreConfigs; // Set the loaded ore configurations
         generator.AddStep(oreGenerationStep);
-        
+
         generator.AddStep(new CaveGenerationStep());
         generator.AddStep(new VegetationGenerationStep());
+
+
 
         var context = new WorldGenContext
         {
@@ -135,7 +158,7 @@ public class World : MonoBehaviour
             minElevation = minElevation,
             maxTerrainHeight = maxTerrainHeight,
             dirtHeight = 8,
-            blockAccessor = new BlockAccessor(this),
+            blockAccessor = blockAccessor,
             blockDatabase = blockDatabase,
             ySlicePrefab = YSlicePrefab,
             chunkPrefab = ChunkPrefab,
@@ -150,7 +173,9 @@ public class World : MonoBehaviour
         var meshStep = new ChunkMeshGenerationStep();
         yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
-        
+        // After mesh generation create DOTS entities for chunk simulation
+        yield return StartCoroutine(CreateSimulationEntitiesCoroutine());
+
         OnCurrentElevationChanged?.Invoke(currentElevation);
         SetWorldLayerVisibility(currentElevation, false);
     }
@@ -223,4 +248,82 @@ public class World : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator CreateSimulationEntitiesCoroutine()
+    {
+        int chunksX = Mathf.CeilToInt((float)maxX / simulationChunkSize);
+        int chunksZ = Mathf.CeilToInt((float)maxZ / simulationChunkSize);
+        int chunksY = Mathf.CeilToInt(((float)maxY - minElevation) / simulationChunkSize);
+
+        Debug.Log($"Creating {chunksX * chunksZ * chunksY} simulation chunks...");
+
+        int processedChunks = 0;
+        for (int x = 0; x < chunksX; x++)
+        {
+            for (int y = 0; y < chunksY; y++)
+            {
+                for (int z = 0; z < chunksZ; z++)
+                {
+                    CreateSimulationChunk(x, y, z);
+                    processedChunks++;
+                    if (processedChunks % 10 == 0)
+                    {
+                        yield return null; // Yield every 10 chunks to avoid freezing the main thread
+                    }
+                }
+            }
+        }
+        Debug.Log($"Created {processedChunks} simulation chunks");
+    }
+
+    private void CreateSimulationChunk(int chunkX, int chunkY, int chunkZ)
+    {
+        Entity chunkEntity = entityManager.CreateEntity();
+        entityManager.AddComponentData(chunkEntity, new ChunkSimulationData
+        {
+            chunkPosition = new Unity.Mathematics.int3(chunkX, chunkY, chunkZ),
+            chunkSize = simulationChunkSize,
+            needsUpdate = true
+        });
+
+        // set up block buffer for the chunk
+        DynamicBuffer<BlockBuffer> blockBuffer = entityManager.AddBuffer<BlockBuffer>(chunkEntity);
+
+        for (int x = 0; x < simulationChunkSize; x++)
+        {
+            for (int y = 0; y < simulationChunkSize; y++)
+            {
+                for (int z = 0; z < simulationChunkSize; z++)
+                {
+                    int worldX = chunkX * simulationChunkSize + x;
+                    int worldY = chunkY * simulationChunkSize + y + minElevation; // Adjust for min elevation
+                    int worldZ = chunkZ * simulationChunkSize + z;
+
+                    if (worldX < maxX && worldY < maxY && worldZ < maxZ)
+                    {
+                        BlockData block = blockAccessor.GetBlockDataFromPosition(worldX, worldY, worldZ);
+                        blockBuffer.Add(new BlockBuffer
+                        {
+                            blockData = new BlockSimulationData
+                            {
+                                temperature = GetInitialTemperature(worldY),
+                                radiationLevel = 0f,
+                                pathfindingCost = (byte)block.definition.pathfindingCost,
+                                isWalkable = block.definition.isWalkable
+                            },
+                            localPosition = new Unity.Mathematics.int3(x, y, z)
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    private float GetInitialTemperature(int worldY)
+    {
+        float surfaceTemperature = 21f; // Average surface temperature in Celsius   
+        float temperatureGradient = 0.5f;
+        return surfaceTemperature + (maxTerrainHeight - worldY) * temperatureGradient;
+    }
+    
 }

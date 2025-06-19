@@ -70,6 +70,9 @@ public class BlockDefinition
     /// </summary>
     public float ignitionTemperature;
 
+    public bool isWalkable = true;
+    public int pathfindingCost = 1;
+
     /// <summary>
     /// The texture references for this block (top, bottom, side).
     /// </summary>

@@ -3,6 +3,6 @@ using Unity.Mathematics;
 
 public struct BlockBuffer : IBufferElementData
 {
-    public BlockSimulationData SimulationData;
+    public BlockSimulationData blockData;
     public int3 localPosition;
 }

@@ -87,15 +87,15 @@ public class BlockLoader
         return textures;
     }
 
-    /// <summary>
-    /// Loads block definitions and creates a blob asset for use with Unity ECS.
-    /// </summary>
-    /// <returns>
-    /// A <see cref="BlobAssetReference{T}"/> containing the block definition blob asset.
-    /// </returns>
-    public static BlobAssetReference<BlockDefinitionBlobAsset> LoadAndCreateBlobAsset()
-    {
-        List<BlockDefinition> blocks = LoadBlockDefinitions();
-        return BlockDefinitionBlobBuilder.Create(blocks);
-    }
+    // /// <summary>
+    // /// Loads block definitions and creates a blob asset for use with Unity ECS.
+    // /// </summary>
+    // /// <returns>
+    // /// A <see cref="BlobAssetReference{T}"/> containing the block definition blob asset.
+    // /// </returns>
+    // public static BlobAssetReference<BlockDefinitionBlobAsset> LoadAndCreateBlobAsset()
+    // {
+    //     List<BlockDefinition> blocks = LoadBlockDefinitions();
+    //     return BlockDefinitionBlobBuilder.Create(blocks);
+    // }
 }

@@ -61,6 +61,8 @@ public class World : MonoBehaviour
     /// <summary>Reference to the block database for block definitions and textures.</summary>
     private BlockDatabase blockDatabase;
 
+    private List<OreConfig> oreConfigs;
+
     /// <summary>
     /// Initializes the world singleton, loads block definitions, and initializes world data.
     /// </summary>
@@ -79,6 +81,14 @@ public class World : MonoBehaviour
         blockDatabase = BlockDatabase.Instance; // Load block definitions from the database
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
+        LoadAllConfigurations(); // Load all ore configurations at startup
+    }
+
+    private void LoadAllConfigurations()
+    {
+        oreConfigs = OreConfigLoader.LoadAllOreConfigs();
+        Debug.Log($"Loaded {oreConfigs.Count} ore configurations.");
+
     }
 
     /// <summary>
@@ -107,7 +117,11 @@ public class World : MonoBehaviour
 
         WorldGenerator generator = new WorldGenerator();
         generator.AddStep(new HeightMapStep());
-        generator.AddStep(new OreGenerationStep());
+
+        OreGenerationStep oreGenerationStep = new OreGenerationStep();
+        oreGenerationStep.OreConfigs = oreConfigs; // Set the loaded ore configurations
+        generator.AddStep(oreGenerationStep);
+        
         generator.AddStep(new CaveGenerationStep());
         generator.AddStep(new VegetationGenerationStep());
 

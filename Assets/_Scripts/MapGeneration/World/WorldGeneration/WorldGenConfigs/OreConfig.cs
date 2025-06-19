@@ -10,7 +10,7 @@ public class OreConfig
     public int minDepth = 0;
     public int maxDepth = int.MaxValue; // maybe change this to a more reasonable default
 
-    public int minElevation = 0;
+    public int minElevation = -32;
     public int maxElevation = int.MaxValue; // maybe change this to a more reasonable default
 
 }

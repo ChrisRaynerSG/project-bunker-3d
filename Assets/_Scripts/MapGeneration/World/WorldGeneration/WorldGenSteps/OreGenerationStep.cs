@@ -20,8 +20,26 @@ public class OreGenerationStep : IWorldGenStep
             threshold = 0.5f,
             frequencyMultiplier = 10f,
             seedOffset = 1,
-            minDepth = 0,
+            minDepth = -12,
             maxDepth = 30 // Adjust as needed
+        },
+        new OreConfig{
+            oreBlockId = "bunker:iron_ore_block",
+            replaceBlockId = "bunker:stone_block",
+            threshold = 0.4f,
+            frequencyMultiplier = 8f,
+            seedOffset = 2,
+            minDepth = -32,
+            maxDepth = 50 // Adjust as needed
+        },
+        new OreConfig{
+            oreBlockId = "bunker:copper_ore_block",
+            replaceBlockId = "bunker:stone_block",
+            threshold = 0.3f,
+            frequencyMultiplier = 6f,
+            seedOffset = 3,
+            minDepth = -20,
+            maxDepth = 60 // Adjust as needed
         }
     };
 

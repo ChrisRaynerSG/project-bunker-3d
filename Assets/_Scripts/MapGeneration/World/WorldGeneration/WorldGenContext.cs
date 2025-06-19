@@ -89,4 +89,5 @@ public class WorldGenContext
     ///  List of GameObjects representing Y-slice objects generated during world generation.
     /// </summary>
     public List<GameObject> ySlices = new List<GameObject>();
+
 }

@@ -35,6 +35,17 @@ public class BlockAccessor
             block.IsSolid = blockType.isSolid;
         }
     }
+    /// <summary>
+    /// Sets the block at the given world coordinates without updating the mesh.
+    /// </summary>
+    /// <param name="x">The world X coordinate.</param>
+    /// <param name="y">The world Y coordinate.</param>
+    /// <param name="z">The world Z coordinate.</param>
+    /// <param name="blockType">The block definition to set.</param>    
+    public void SetBlockNoMeshUpdate(int x, int y, int z, BlockDefinition blockType)
+    {
+        SetBlockNoMeshUpdate(new Vector3Int(x, y, z), blockType);
+    }
 
     /// <summary>
     /// Sets the block at the given position and updates the mesh for the affected chunks.

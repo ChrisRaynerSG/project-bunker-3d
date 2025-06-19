@@ -285,7 +285,7 @@ public class World : MonoBehaviour
             chunkSize = simulationChunkSize,
             needsUpdate = true
         });
-
+        entityManager.SetName(chunkEntity, $"SimulationChunk_{chunkX}_{chunkY}_{chunkZ}");
         // set up block buffer for the chunk
         DynamicBuffer<BlockBuffer> blockBuffer = entityManager.AddBuffer<BlockBuffer>(chunkEntity);
 

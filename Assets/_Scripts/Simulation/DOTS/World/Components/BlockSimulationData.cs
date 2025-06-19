@@ -5,4 +5,5 @@ public struct BlockSimulationData : IComponentData
     public float radiationLevel;
     public byte pathfindingCost;
     public bool isWalkable;
+    public byte blockType;
 }

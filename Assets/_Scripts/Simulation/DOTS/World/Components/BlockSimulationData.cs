@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 public struct BlockSimulationData : IComponentData
 {
@@ -5,5 +6,5 @@ public struct BlockSimulationData : IComponentData
     public float radiationLevel;
     public byte pathfindingCost;
     public bool isWalkable;
-    public byte blockType;
+    public FixedString64Bytes blockType;
 }

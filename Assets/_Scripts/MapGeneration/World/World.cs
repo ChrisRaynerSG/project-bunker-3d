@@ -309,7 +309,8 @@ public class World : MonoBehaviour
                                 temperature = GetInitialTemperature(worldY),
                                 radiationLevel = 0f,
                                 pathfindingCost = (byte)block.definition.pathfindingCost,
-                                isWalkable = block.definition.isWalkable
+                                isWalkable = block.definition.isWalkable,
+                                blockType = block.definition.id
                             },
                             localPosition = new Unity.Mathematics.int3(x, y, z)
                         });

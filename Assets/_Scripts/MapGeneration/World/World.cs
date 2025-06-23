@@ -268,7 +268,8 @@ public class World : MonoBehaviour
                     processedChunks++;
                     if (processedChunks % 10 == 0)
                     {
-                        yield return null; // Yield every 10 chunks to avoid freezing the main thread
+                        yield return null; // Yield every 10 chunks to avoid freezing the main thread potentially add an event here to update progress bar or something
+                        
                     }
                 }
             }

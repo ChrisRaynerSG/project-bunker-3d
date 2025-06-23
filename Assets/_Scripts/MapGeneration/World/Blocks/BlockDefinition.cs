@@ -11,9 +11,14 @@ using System.Collections.Generic;
 public class BlockDefinition
 {
     /// <summary>
-    /// The unique identifier for this block type (e.g., "bunker:stone_block").
+    /// The unique string identifier for this block type (e.g., "bunker:stone_block").
     /// </summary>
     public string id;
+
+    /// <summary>
+    /// A numeric identifier for this block type, used for efficiency within DOTS simulation.
+    /// </summary>
+    public ushort numericId;
 
     /// <summary>
     /// The display name for this block, shown in UI.

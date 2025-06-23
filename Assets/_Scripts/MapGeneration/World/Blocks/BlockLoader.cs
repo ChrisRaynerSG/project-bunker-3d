@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
@@ -24,13 +23,42 @@ public class BlockLoader
             if (block != null)
             {
                 blocks.Add(block);
+                Debug.Log($"Loaded block definition: {block.id}");
             }
             else
             {
                 Debug.LogWarning($"Failed to parse block definition from {jsonFile.name}");
             }
         }
+        AssignNumericIds(blocks);
         return blocks;
+    }
+
+    /// <summary>
+    /// Assigns numeric IDs to each block definition for efficient processing.
+    /// </summary>
+    /// <param name="blocks">The list of block definitions to assign IDs to.</param>
+    private static void AssignNumericIds(List<BlockDefinition> blocks)
+    {
+        foreach(BlockDefinition block in blocks)
+        {
+            if (block.id == "bunker:air_block")
+            {
+                block.numericId = 0; // Assign a default numeric ID for air block
+                break; //Once we find the air block, we can stop searching
+            }
+        }
+        ushort index = 1;
+        foreach (BlockDefinition block in blocks)
+        {
+            if (block.numericId == 0)
+            {
+                // Skip the air block, it already has numeric ID 0
+                continue;
+            }
+            block.numericId = index++;
+            Debug.Log($"Assigned numeric ID {block.numericId} to block {block.id}");
+        }
     }
 
     /// <summary>

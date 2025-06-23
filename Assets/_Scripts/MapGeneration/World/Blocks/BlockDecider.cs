@@ -27,19 +27,19 @@ public struct BlockDecider
 
         if (worldPosition.y > surfaceHeight)
         {
-            return _blockDatabase.GetBlockId("bunker:air_block");
+            return _blockDatabase.GetNumericId("bunker:air_block");
         }
         else if (worldPosition.y == surfaceHeight)
         {
-            return _blockDatabase.GetBlockId("bunker:grass_block");
+            return _blockDatabase.GetNumericId("bunker:grass_block");
         }
         else if (worldPosition.y > surfaceHeight - dirtDepth)
         {
-            return _blockDatabase.GetBlockId("bunker:dirt_block");
+            return _blockDatabase.GetNumericId("bunker:dirt_block");
         }
         else
         {
-            return _blockDatabase.GetBlockId("bunker:stone_block");
+            return _blockDatabase.GetNumericId("bunker:stone_block");
         }
     }
 }

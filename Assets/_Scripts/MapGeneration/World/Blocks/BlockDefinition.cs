@@ -76,7 +76,7 @@ public class BlockDefinition
     public float ignitionTemperature;
 
     public bool isWalkable = true;
-    public int pathfindingCost = 1;
+    public byte pathfindingCost = 1;
 
     /// <summary>
     /// The texture references for this block (top, bottom, side).

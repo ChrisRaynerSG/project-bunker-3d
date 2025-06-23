@@ -40,24 +40,19 @@ public class BlockLoader
     /// <param name="blocks">The list of block definitions to assign IDs to.</param>
     private static void AssignNumericIds(List<BlockDefinition> blocks)
     {
-        foreach(BlockDefinition block in blocks)
+        ushort index = 1;
+        foreach (BlockDefinition block in blocks)
         {
             if (block.id == "bunker:air_block")
             {
                 block.numericId = 0; // Assign a default numeric ID for air block
-                break; //Once we find the air block, we can stop searching
+                Debug.Log($"Assigned numeric ID {block.numericId} to block {block.id}");
             }
-        }
-        ushort index = 1;
-        foreach (BlockDefinition block in blocks)
-        {
-            if (block.numericId == 0)
+            else
             {
-                // Skip the air block, it already has numeric ID 0
-                continue;
+                block.numericId = index++;
+                Debug.Log($"Assigned numeric ID {block.numericId} to block {block.id}");
             }
-            block.numericId = index++;
-            Debug.Log($"Assigned numeric ID {block.numericId} to block {block.id}");
         }
     }
 

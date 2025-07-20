@@ -92,9 +92,54 @@ public class DwellerManager : MonoBehaviour
         var dwellerAuthoring = dweller.GetComponent<DwellerAuthoring>();
         if (dwellerAuthoring != null)
         {
-
+            ApplyRandomSkinColor(dweller);
         }
         return dweller;
+    }
+
+    // may want to move this out to another class
+    private void ApplyRandomSkinColor(GameObject dweller)
+    {
+        // Find the head child object
+        Transform headTransform = dweller.transform.Find("Head");
+        if (headTransform == null)
+        {
+            Debug.LogWarning($"Head child not found on dweller: {dweller.name}");
+            return;
+        }
+
+        // Get the renderer component
+        Renderer headRenderer = headTransform.GetComponent<Renderer>();
+        if (headRenderer == null)
+        {
+            Debug.LogWarning($"Renderer not found on head: {headTransform.name}");
+            return;
+        }
+
+        // Create a new material instance (so each dweller has their own)
+        Material headMaterial = new Material(headRenderer.material);
+
+        // Apply random skin color
+        headMaterial.color = GetRandomSkinColor();
+        headRenderer.material = headMaterial;
+
+        Debug.Log($"Applied skin color {headMaterial.color} to dweller head");
+    }
+
+    // maybe this should be in a separate dweller utility class or something. At some point when dwellers have offspring we will need to combine the parents' skin
+    private Color GetRandomSkinColor()
+    {
+        Color[] skinColors = new Color[]
+        {
+            new Color32(0xFD, 0xBC, 0xB4, 0xFF), // #FDBCB4 - Very light peach
+            new Color32(0xED, 0xBA, 0xA6, 0xFF), // #EDBAA6 - Light peach
+            new Color32(0xE8, 0xB6, 0x8A, 0xFF), // #E8B68A - Light tan
+            new Color32(0xC6, 0x86, 0x42, 0xFF), // #C68642 - Medium tan
+            new Color32(0xA0, 0x52, 0x2D, 0xFF), // #A0522D - Sienna brown
+            new Color32(0x8D, 0x55, 0x24, 0xFF), // #8D5524 - Medium brown
+            new Color32(0x65, 0x43, 0x21, 0xFF), // #654321 - Dark brown
+        };
+        return skinColors[UnityEngine.Random.Range(0, skinColors.Length)];
     }
 
     private Vector3 GetValidSpawnPosition(Vector3 position)

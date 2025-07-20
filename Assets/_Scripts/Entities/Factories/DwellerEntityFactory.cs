@@ -14,6 +14,12 @@ using Unity.Mathematics;
 /// </remarks>  
 public static class DwellerEntityFactory
 {
+    static DwellerEntityFactory()
+    {
+        // Initialize any static data or configurations if needed
+        NameDatabase.LoadNameDatabase();
+    }
+
     /// <summary>
     /// Creates a new Dweller entity.
     /// </summary>
@@ -24,7 +30,7 @@ public static class DwellerEntityFactory
     public static Entity CreateDwellerEntity(EntityManager entityManager, DwellerAuthoring authoring, Vector3 position)
     {
         var entity = entityManager.CreateEntity();
-        entityManager.SetName(entity, GenerateDwellerName(true /* for now, will need to update later */ ));
+        entityManager.SetName(entity, $"Dweller_{GenerateDwellerName(true /* for now, will need to update later */ )}_{UnityEngine.Random.Range(1000, 9999)}");
 
         // Core transform
         entityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform

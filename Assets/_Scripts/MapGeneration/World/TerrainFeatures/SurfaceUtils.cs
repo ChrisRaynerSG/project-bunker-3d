@@ -18,11 +18,12 @@ public static class SurfaceUtils
         BlockAccessor accessor = new BlockAccessor(World.Instance);
 
         BlockDefinition airBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:air_block");
+        BlockDefinition leafBlock = BlockDatabase.Instance.GetBlockDefinition("bunker:oak_tree_leaves_block");
         int y = startPosition.y;
         while (y > 1)
         {
             var blockBelow = accessor.GetBlockDataFromPosition(new Vector3Int(startPosition.x, y - 1, startPosition.z));
-            if (blockBelow == null || blockBelow.definition == null || blockBelow.definition != airBlock)
+            if (blockBelow == null || blockBelow.definition == null || (blockBelow.definition != airBlock && blockBelow.definition != leafBlock)) // probably not a good idea to use leaf block but eh.
             {
                 break; // Found a non-air block below, stop searching
             }

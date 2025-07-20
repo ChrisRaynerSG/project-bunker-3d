@@ -76,6 +76,8 @@ public class World : MonoBehaviour
 
     private List<OreConfig> oreConfigs;
 
+    public static event Action OnWorldGenerated;
+
     /// <summary>
     /// Initializes the world singleton, loads block definitions, and initializes world data.
     /// </summary>
@@ -173,6 +175,8 @@ public class World : MonoBehaviour
         var meshStep = new ChunkMeshGenerationStep();
         yield return StartCoroutine(meshStep.ApplyCoroutine(WorldData.Instance, context));
 
+        OnWorldGenerated?.Invoke();
+        
         // After mesh generation create DOTS entities for chunk simulation
         yield return StartCoroutine(CreateSimulationEntitiesCoroutine());
 

@@ -1,3 +1,4 @@
+using Unity.Entities;
 using UnityEngine;
 
 public class DwellerAuthoring : MonoBehaviour
@@ -9,6 +10,4 @@ public class DwellerAuthoring : MonoBehaviour
             var entity = GetEntity(TransformUsageFlags.Dynamic);
         }
     }
-
-
 }

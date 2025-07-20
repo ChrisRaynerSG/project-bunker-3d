@@ -93,8 +93,36 @@ public class DwellerManager : MonoBehaviour
         if (dwellerAuthoring != null)
         {
             ApplyRandomSkinColor(dweller);
+            Entity dwellerEntity = CreateDwellerEntityFromAuthoring(dwellerAuthoring, position);
         }
         return dweller;
+    }
+
+    private Entity CreateDwellerEntityFromAuthoring(DwellerAuthoring authoring, Vector3 position)
+    {
+        var entity = entityManager.CreateEntity();
+        entityManager.SetName(entity, "Dweller_" + UnityEngine.Random.Range(1000, 9999)); // set a better name later
+        entityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform
+        {
+            Position = position,
+            Rotation = quaternion.identity,
+            Scale = 1f
+        });
+
+        // Add all the components your Baker adds
+        entityManager.AddComponent<Bunker.Entities.Components.Tags.Dweller.Dweller>(entity);
+        entityManager.AddComponent<Bunker.Entities.Components.Tags.Common.Moveable>(entity);
+
+        entityManager.AddComponentData(entity, new Bunker.Entities.Movement.MoveDirection { Value = float3.zero });
+        entityManager.AddComponentData(entity, new Bunker.Entities.Movement.MoveSpeed
+        {
+            Value = authoring.moveSpeed,
+            BaseSpeed = authoring.moveSpeed,
+            SpeedModifier = 1f
+        });
+
+        Debug.Log($"Created dweller entity: {entity}");
+        return entity;
     }
 
     // may want to move this out to another class
@@ -120,26 +148,8 @@ public class DwellerManager : MonoBehaviour
         Material headMaterial = new Material(headRenderer.material);
 
         // Apply random skin color
-        headMaterial.color = GetRandomSkinColor();
-        headRenderer.material = headMaterial;
+        DwellerAppearance.ApplyRandomSkinColor(dweller);
 
-        Debug.Log($"Applied skin color {headMaterial.color} to dweller head");
-    }
-
-    // maybe this should be in a separate dweller utility class or something. At some point when dwellers have offspring we will need to combine the parents' skin
-    private Color GetRandomSkinColor()
-    {
-        Color[] skinColors = new Color[]
-        {
-            new Color32(0xFD, 0xBC, 0xB4, 0xFF), // #FDBCB4 - Very light peach
-            new Color32(0xED, 0xBA, 0xA6, 0xFF), // #EDBAA6 - Light peach
-            new Color32(0xE8, 0xB6, 0x8A, 0xFF), // #E8B68A - Light tan
-            new Color32(0xC6, 0x86, 0x42, 0xFF), // #C68642 - Medium tan
-            new Color32(0xA0, 0x52, 0x2D, 0xFF), // #A0522D - Sienna brown
-            new Color32(0x8D, 0x55, 0x24, 0xFF), // #8D5524 - Medium brown
-            new Color32(0x65, 0x43, 0x21, 0xFF), // #654321 - Dark brown
-        };
-        return skinColors[UnityEngine.Random.Range(0, skinColors.Length)];
     }
 
     private Vector3 GetValidSpawnPosition(Vector3 position)

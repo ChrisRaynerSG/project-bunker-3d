@@ -8,7 +8,7 @@ namespace Bunker.Entities.Components.Tags
         /// Represents a tag for dwellers in the bunker.
         /// This component is used to identify entities that are considered dwellers.
         /// </summary>
-        public struct DwellerTag : IComponentData { }
+        public struct Dweller : IComponentData { }
         
     }
 }

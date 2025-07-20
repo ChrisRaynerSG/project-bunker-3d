@@ -93,38 +93,12 @@ public class DwellerManager : MonoBehaviour
         if (dwellerAuthoring != null)
         {
             ApplyRandomSkinColor(dweller);
-            Entity dwellerEntity = CreateDwellerEntityFromAuthoring(dwellerAuthoring, position);
+            DwellerEntityFactory.CreateDwellerEntity(entityManager, dwellerAuthoring, position);
         }
         return dweller;
     }
 
-    private Entity CreateDwellerEntityFromAuthoring(DwellerAuthoring authoring, Vector3 position)
-    {
-        var entity = entityManager.CreateEntity();
-        entityManager.SetName(entity, "Dweller_" + UnityEngine.Random.Range(1000, 9999)); // set a better name later
-        entityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform
-        {
-            Position = position,
-            Rotation = quaternion.identity,
-            Scale = 1f
-        });
-
-        // Add all the components your Baker adds
-        entityManager.AddComponent<Bunker.Entities.Components.Tags.Dweller.Dweller>(entity);
-        entityManager.AddComponent<Bunker.Entities.Components.Tags.Common.Moveable>(entity);
-
-        entityManager.AddComponentData(entity, new Bunker.Entities.Movement.MoveDirection { Value = float3.zero });
-        entityManager.AddComponentData(entity, new Bunker.Entities.Movement.MoveSpeed
-        {
-            Value = authoring.moveSpeed,
-            BaseSpeed = authoring.moveSpeed,
-            SpeedModifier = 1f
-        });
-
-        Debug.Log($"Created dweller entity: {entity}");
-        return entity;
-    }
-
+    
     // may want to move this out to another class
     private void ApplyRandomSkinColor(GameObject dweller)
     {

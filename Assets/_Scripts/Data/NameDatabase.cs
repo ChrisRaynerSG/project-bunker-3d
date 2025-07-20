@@ -121,10 +121,53 @@ public static class NameDatabase
             }
             else
             {
-                Debug.LogWarning($"No neutral names found for category: {category}");
-                return null;
+                genderData = UnityEngine.Random.value > 0.5f
+                ? _nameData.nameCategories[category].male
+                : _nameData.nameCategories[category].female;
             }
         }
+        else
+        {
+            genderData = isMale.Value
+            ? _nameData.nameCategories[category].male
+            : _nameData.nameCategories[category].female;
+        }
+
+        string firstName = GetRandomFromArray(genderData.first);
+        string lastName = GetRandomFromArray(genderData.last);
+
+        if (string.IsNullOrEmpty(format))
+        {
+            format = GetRandomFromArray(_nameData.nameFormats);
+        }
+
+        return FormatName(format, firstName, lastName);
+    }
+
+    private static string FormatName(string format, string firstName, string lastName)
+    {
+        string result = format;
+        result = result.Replace("{first}", firstName);
+        result = result.Replace("{last}", lastName);
+
+        if (result.Contains("{nickname}"))
+        {
+            string nickname = GetRandomFromArray(_nameData.nicknames);
+            result = result.Replace("{nickname}", nickname);
+        }
+
+        if (result.Contains("{job}"))
+        {
+            string job = GetRandomFromArray(_nameData.jobs);
+            result = result.Replace("{job}", job);
+        }
+        return result;
+    }
+
+    private static string GetRandomFromArray(string[] array)
+    {
+        if (array == null || array.Length == 0) return "Unknown";
+        return array[UnityEngine.Random.Range(0, array.Length)];
     }
 
     private static void LogNameStats()

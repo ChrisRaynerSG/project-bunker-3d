@@ -1398,7 +1398,7 @@ MonoBehaviour:
   maxX: 256
   maxZ: 256
   frequency: 0.007
-  seed: 567
+  seed: 123
   maxY: 64
   maxTerrainHeight: 32
   minElevation: -32

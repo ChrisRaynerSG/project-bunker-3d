@@ -67,14 +67,6 @@ public static class DwellerEntityFactory
     /// </remarks>
     private static string GenerateDwellerName(bool isMale)
     {
-        string[] maleNames = { "John", "Alex", "Chris" };
-        string[] femaleNames = { "Jane", "Emily", "Katie" };
-
-        // Randomly select a name from the appropriate list
-        string selectedName = isMale
-            ? maleNames[UnityEngine.Random.Range(0, maleNames.Length)]
-            : femaleNames[UnityEngine.Random.Range(0, femaleNames.Length)];
-
-        return selectedName;
+        return NameDatabase.GenerateRandomName("human", isMale);
     }
 }

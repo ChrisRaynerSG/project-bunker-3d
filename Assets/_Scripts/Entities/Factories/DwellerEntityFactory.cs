@@ -30,7 +30,8 @@ public static class DwellerEntityFactory
     public static Entity CreateDwellerEntity(EntityManager entityManager, DwellerAuthoring authoring, Vector3 position)
     {
         var entity = entityManager.CreateEntity();
-        entityManager.SetName(entity, $"Dweller_{GenerateDwellerName(true /* for now, will need to update later */ )}_{UnityEngine.Random.Range(1000, 9999)}");
+        var (firstName, lastName) = GenerateDwellerName(true /* for now, will need to update later */);
+        entityManager.SetName(entity, $"Dweller_{firstName}_{lastName}_{UnityEngine.Random.Range(1000, 9999)}");
 
         // Core transform
         entityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform
@@ -65,7 +66,7 @@ public static class DwellerEntityFactory
     /// This method currently uses a simple random selection from predefined lists.
     /// In the future, it can be expanded to include more complex naming logic.
     /// </remarks>
-    private static string GenerateDwellerName(bool isMale)
+    private static (string firstName, string lastName) GenerateDwellerName(bool isMale)
     {
         return NameDatabase.GenerateRandomName("human", isMale);
     }

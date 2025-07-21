@@ -108,7 +108,21 @@ public static class NameDatabase
         }
     }
 
-    public static string GenerateRandomName(string category = "human", bool? isMale = null, string format = null)
+    /// <summary>
+    /// Generates a random name based on the specified category and gender.
+    /// </summary>
+    /// <param name="category">The name category (e.g., "human").</param>
+    /// <param name="isMale">Indicates if the generated name should be male or female.</param>
+    /// <returns>A tuple containing the first and last name.</returns>
+    /// <remarks>
+    /// This method currently uses a simple random selection from predefined lists.
+    /// </remarks>
+    /// <example>
+    /// var (firstName, lastName) = NameDatabase.GenerateRandomName("human", true);
+    /// Debug.Log($"Generated name: {firstName} {lastName}");
+    /// </example>
+
+    public static (string firstName, string lastName) GenerateRandomName(string category = "human", bool? isMale = null)
     {
         if (!_isLoaded) LoadNameDatabase();
 
@@ -136,14 +150,24 @@ public static class NameDatabase
         string firstName = GetRandomFromArray(genderData.first);
         string lastName = GetRandomFromArray(genderData.last);
 
-        if (string.IsNullOrEmpty(format))
-        {
-            format = GetRandomFromArray(_nameData.nameFormats);
-        }
-
-        return FormatName(format, firstName, lastName);
+        return (firstName, lastName);
     }
 
+
+    /// <summary>
+    /// Formats a name based on the specified format string.
+    /// </summary>
+    /// <param name="format">The format string containing placeholders for first, last, nickname, and job.</param>
+    /// <param name="firstName">The first name to insert into the format.</param>
+    /// <param name="lastName">The last name to insert into the format.</param>
+    /// <returns>The formatted name string.</returns>
+    /// <remarks>
+    /// This method currently uses a simple string replacement for formatting.
+    /// </remarks>
+    /// <example>
+    /// var formattedName = NameDatabase.FormatName("{first} {last}", "John", "Doe");
+    /// Debug.Log($"Formatted name: {formattedName}");
+    /// </example>
     private static string FormatName(string format, string firstName, string lastName)
     {
         string result = format;
@@ -164,12 +188,33 @@ public static class NameDatabase
         return result;
     }
 
+
+    /// <summary>
+    /// Gets a random name from the specified array.
+    /// </summary>
+    /// <param name="array">The array of names to choose from.</param>
+    /// <returns>A random name from the array.</returns>
+    /// <remarks>
+    /// This method currently uses Unity's Random.Range to select a random index.
+    /// </remarks>
+    /// <example>
+    /// var randomName = NameDatabase.GetRandomFromArray(new[] { "Alice", "Bob", "Charlie" });
+    /// Debug.Log($"Random name: {randomName}");
+    /// </example>
     private static string GetRandomFromArray(string[] array)
     {
         if (array == null || array.Length == 0) return "Unknown";
         return array[UnityEngine.Random.Range(0, array.Length)];
     }
-
+    /// <summary>
+    /// Logs the statistics of names in each category.
+    /// </summary>
+    /// <remarks>
+    /// This method iterates through each category and logs the name counts.
+    /// </remarks>
+    /// <example>
+    /// NameDatabase.LogNameStats();
+    /// </example>
     private static void LogNameStats()
     {
         foreach (var category in _nameData.nameCategories)
@@ -181,7 +226,18 @@ public static class NameDatabase
             Debug.Log($"Category: {category.Key}, Male Names: {maleCount}, Female Names: {femaleCount}, Neutral Names: {neutralCount}");
         }
     }
-
+    
+    /// <summary>
+    /// Creates a fallback name database with default names.
+    /// This is used when the main database fails to load.
+    /// </summary>
+    /// <remarks>
+    /// This method initializes a simple set of names to ensure the game can still function.
+    /// It can be extended with more names or categories as needed.
+    /// </remarks>
+    /// <example>
+    /// NameDatabase.CreateFallbackDatabase();
+    /// </example>
     private static void CreateFallbackDatabase()
     {
         _nameData = new NameData
@@ -209,5 +265,4 @@ public static class NameDatabase
         };
         _isLoaded = true;
     }
-
 }

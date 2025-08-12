@@ -2,8 +2,6 @@ using Bunker.Entities.Components.Tags.Common;
 using Unity.Entities;
 using UnityEngine;
 using Unity.Mathematics;
-using Bunker.Entities.Movement;
-using Unity.VisualScripting;
 using Bunker.Entities.Health;
 
 public class DwellerAuthoring : MonoBehaviour

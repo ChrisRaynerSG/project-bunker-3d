@@ -1,6 +1,6 @@
 {
   "id": "bunker:stone_block",
-  "displayName": "Grass Block",
+  "displayName": "Stone Block",
   "description": "A block of stone",
   "textures": {
     "top": "bunker_stone_block",

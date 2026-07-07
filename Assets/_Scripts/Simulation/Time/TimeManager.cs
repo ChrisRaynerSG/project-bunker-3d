@@ -3,7 +3,7 @@ using System;
 using TMPro;
 
 
-public class TimeManager : MonoBehaviour
+public class TimeManager : MonoBehaviour, IUpdatable
 {
     // reference to simulation manager
     private ISimulation simulationManager;
@@ -29,7 +29,17 @@ public class TimeManager : MonoBehaviour
         simulationManager.PauseSimulation();
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         HandleInput();
         HandleTimeUpdate();

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SimulationSpeedManager : MonoBehaviour
+public class SimulationSpeedManager : MonoBehaviour, IUpdatable
 {
 
     private static SimulationSpeedManager Instance { get; set;} // do I need to get this anywhere?
@@ -26,7 +26,17 @@ public class SimulationSpeedManager : MonoBehaviour
         
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         HandleKeyboardInput();
         simulationManager.UpdateSimulationTime();

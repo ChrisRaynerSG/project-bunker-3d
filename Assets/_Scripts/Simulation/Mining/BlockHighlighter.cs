@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BlockHighlighter : MonoBehaviour
+public class BlockHighlighter : MonoBehaviour, IUpdatable
 {
     public Camera mainCamera;
     public GameObject highlightCube;
@@ -22,7 +22,17 @@ public class BlockHighlighter : MonoBehaviour
         _highlightRenderer.enabled = false;
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.H))
         {

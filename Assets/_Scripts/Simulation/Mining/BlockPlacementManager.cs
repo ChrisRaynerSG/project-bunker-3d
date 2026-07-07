@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BlockPlacementManager : MonoBehaviour
+public class BlockPlacementManager : MonoBehaviour, IUpdatable
 {
     public Camera mainCamera;
     private BlockAccessor blockAccessor;
@@ -14,7 +14,17 @@ public class BlockPlacementManager : MonoBehaviour
         blockAccessor = new BlockAccessor(World.Instance);
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         HandleInput();
     }

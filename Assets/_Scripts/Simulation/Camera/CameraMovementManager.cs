@@ -2,13 +2,20 @@ using System;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 
-public class CameraMovementManager : MonoBehaviour
+public class CameraMovementManager : MonoBehaviour, IUpdatable
 {
     public float moveSpeed = 20f;
     public float scrollSpeed = 20f;
     public float rotationSpeed = 400f;
     public float minY = -50f;
     public float maxY = 50f;
+
+    [Header("Terrain Collision")]
+    [SerializeField]
+    private LayerMask terrainLayerMask = 1; // Default layer
+
+    [SerializeField]
+    private float minHeightAboveTerrain = 2f;
 
     private Camera mainCamera;
 
@@ -25,12 +32,23 @@ public class CameraMovementManager : MonoBehaviour
         }
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         HandleLightControl();
         HandleMovement();
         HandleRotation();
         HandleZoom();
+        ClampPositionToTerrain();
     }
 
     private void HandleMovement()
@@ -114,5 +132,38 @@ public class CameraMovementManager : MonoBehaviour
         }
     }
 
-    // @todo: need to set the minY as the current vertical slice so that we don't go underneath the world
+    private void ClampPositionToTerrain()
+    {
+        if (mainCamera == null) return;
+
+        Vector3 pos = mainCamera.transform.position;
+        float currentMinY = minY;
+
+        // Use the current elevation as the base floor (vertical slice)
+        if (World.Instance != null)
+        {
+            currentMinY = Mathf.Max(minY, World.Instance.currentElevation);
+        }
+
+        // Raycast from above the world to find the highest point of the visible terrain
+        float rayHeight = 100f;
+        if (World.Instance != null)
+        {
+            rayHeight = World.Instance.maxY + 10f;
+        }
+
+        Ray ray = new Ray(new Vector3(pos.x, rayHeight, pos.z), Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hit, rayHeight + 100f, terrainLayerMask))
+        {
+            // Ensure we are above the terrain mesh
+            currentMinY = Mathf.Max(currentMinY, hit.point.y);
+        }
+
+        if (pos.y < currentMinY + minHeightAboveTerrain)
+        {
+            pos.y = currentMinY + minHeightAboveTerrain;
+            mainCamera.transform.position = pos;
+        }
+    }
+
 }

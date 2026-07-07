@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class DaylightManager : MonoBehaviour
+public class DaylightManager : MonoBehaviour, IUpdatable
 {
     public GameObject SunDirectionLight;
     //private SimulationTimeModel timeModel;
@@ -17,7 +17,17 @@ public class DaylightManager : MonoBehaviour
         SimulationTimeModel.OnTimeChanged += HandleSunMovement;
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         if (Time.timeScale == 0) return;
     }

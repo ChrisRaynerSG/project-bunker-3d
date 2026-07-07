@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Android.Gradle;
 using Unity.Entities;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ using UnityEngine;
 /// <see cref="World"/> is a singleton MonoBehaviour that holds world parameters, references to chunk and slice prefabs,
 /// and orchestrates the world generation pipeline. It also manages visibility of world layers and responds to elevation changes.
 /// </summary>
-public class World : MonoBehaviour
+public class World : MonoBehaviour, IUpdatable
 {
     /// <summary>
     /// The mesh filter attached to the world object (optional).
@@ -97,7 +96,6 @@ public class World : MonoBehaviour
         ChunkPrefab.GetComponent<MeshRenderer>().sharedMaterial.mainTexture = blockDatabase.TextureAtlas; // Set a default material for the chunk prefabs
         WorldData.Instance.Initialise(maxX, maxY, maxZ, minElevation);
         LoadAllConfigurations(); // Load all ore configurations at startup
-        InitialiseDotsWorld(); // Set up the DOTS world and entity manager
         blockAccessor = new BlockAccessor(this);
     }
 
@@ -106,12 +104,6 @@ public class World : MonoBehaviour
         oreConfigs = OreConfigLoader.LoadAllOreConfigs();
         Debug.Log($"Loaded {oreConfigs.Count} ore configurations.");
 
-    }
-
-    private void InitialiseDotsWorld()
-    {
-        dotsWorld = Unity.Entities.World.DefaultGameObjectInjectionWorld;
-        entityManager = dotsWorld.EntityManager;
     }
 
     /// <summary>
@@ -124,9 +116,25 @@ public class World : MonoBehaviour
     }
 
     /// <summary>
+    /// Registers this component with the centralized update loop.
+    /// </summary>
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    /// <summary>
+    /// Unregisters this component from the centralized update loop.
+    /// </summary>
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    /// <summary>
     /// Handles elevation change input each frame.
     /// </summary>
-    void Update()
+    public void OnUpdate()
     {
         HandleElevationChange();
     }
@@ -178,7 +186,7 @@ public class World : MonoBehaviour
         OnWorldGenerated?.Invoke();
         
         // After mesh generation create DOTS entities for chunk simulation
-        yield return StartCoroutine(CreateSimulationEntitiesCoroutine());
+        // yield return StartCoroutine(CreateSimulationEntitiesCoroutine());
 
         OnCurrentElevationChanged?.Invoke(currentElevation);
         SetWorldLayerVisibility(currentElevation, false);
@@ -252,84 +260,4 @@ public class World : MonoBehaviour
             }
         }
     }
-
-    private IEnumerator CreateSimulationEntitiesCoroutine()
-    {
-        int chunksX = Mathf.CeilToInt((float)maxX / simulationChunkSize);
-        int chunksZ = Mathf.CeilToInt((float)maxZ / simulationChunkSize);
-        int chunksY = Mathf.CeilToInt(((float)maxY - minElevation) / simulationChunkSize);
-
-        Debug.Log($"Creating {chunksX * chunksZ * chunksY} simulation chunks...");
-
-        int processedChunks = 0;
-        for (int x = 0; x < chunksX; x++)
-        {
-            for (int y = 0; y < chunksY; y++)
-            {
-                for (int z = 0; z < chunksZ; z++)
-                {
-                    CreateSimulationChunk(x, y, z);
-                    processedChunks++;
-                    if (processedChunks % 10 == 0)
-                    {
-                        yield return null; // Yield every 10 chunks to avoid freezing the main thread potentially add an event here to update progress bar or something
-                        
-                    }
-                }
-            }
-        }
-        Debug.Log($"Created {processedChunks} simulation chunks");
-    }
-
-    private void CreateSimulationChunk(int chunkX, int chunkY, int chunkZ)
-    {
-        Entity chunkEntity = entityManager.CreateEntity();
-        entityManager.AddComponentData(chunkEntity, new ChunkSimulationData
-        {
-            chunkPosition = new Unity.Mathematics.int3(chunkX, chunkY, chunkZ),
-            chunkSize = simulationChunkSize,
-            needsUpdate = true
-        });
-        entityManager.SetName(chunkEntity, $"SimulationChunk_{chunkX}_{chunkY}_{chunkZ}");
-        // set up block buffer for the chunk
-        DynamicBuffer<BlockBuffer> blockBuffer = entityManager.AddBuffer<BlockBuffer>(chunkEntity);
-
-        for (int x = 0; x < simulationChunkSize; x++)
-        {
-            for (int y = 0; y < simulationChunkSize; y++)
-            {
-                for (int z = 0; z < simulationChunkSize; z++)
-                {
-                    int worldX = chunkX * simulationChunkSize + x;
-                    int worldY = chunkY * simulationChunkSize + y + minElevation; // Adjust for min elevation
-                    int worldZ = chunkZ * simulationChunkSize + z;
-
-                    if (worldX < maxX && worldY < maxY && worldZ < maxZ)
-                    {
-                        BlockData block = blockAccessor.GetBlockDataFromPosition(worldX, worldY, worldZ);
-                        blockBuffer.Add(new BlockBuffer
-                        {
-                            blockData = new BlockSimulationData
-                            {
-                                temperature = GetInitialTemperature(worldY),
-                                radiationLevel = 0f,
-                                pathfindingCost = (byte)block.definition.pathfindingCost,
-                                isWalkable = block.definition.isWalkable,
-                                blockType = block.definition.id
-                            },
-                            localPosition = new Unity.Mathematics.int3(x, y, z)
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    private float GetInitialTemperature(int worldY)
-    {
-        float surfaceTemperature = 21f; // Average surface temperature in Celsius   
-        float temperatureGradient = 0.5f;
-        return surfaceTemperature + (maxTerrainHeight - worldY) * temperatureGradient;
-    }
-    
 }

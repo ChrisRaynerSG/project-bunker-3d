@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class DwellerManager : MonoBehaviour
+public class DwellerManager : MonoBehaviour, IUpdatable
 {
     [Header("Spawning")]
     public GameObject dwellerPrefab;
@@ -21,14 +21,24 @@ public class DwellerManager : MonoBehaviour
 
 
     private EntityManager entityManager;
-    private bool hasSpawnedInitialDwellers = false;
+    private bool _hasSpawnedInitialDwellers = false;
     void Start()
     {
         entityManager = Unity.Entities.World.DefaultGameObjectInjectionWorld.EntityManager;
         World.OnWorldGenerated += OnWorldReady;
     }
 
-    void Update()
+    void OnEnable()
+    {
+        UpdateManager.Register(this);
+    }
+
+    void OnDisable()
+    {
+        UpdateManager.Unregister(this);
+    }
+
+    public void OnUpdate()
     {
         if (Input.GetKeyDown(spawnKey))
         {
@@ -43,14 +53,14 @@ public class DwellerManager : MonoBehaviour
 
     void OnWorldReady()
     {
-        if (hasSpawnedInitialDwellers) return;
+        if (_hasSpawnedInitialDwellers) return;
 
         Vector3 initialSpawnPosition = GetInitialSpawnLocation();
         spawnLocation = initialSpawnPosition;
         Debug.Log($"Initial spawn location set to: {spawnLocation}");
         
         SpawnInitialDwellers();
-        hasSpawnedInitialDwellers = true;
+        _hasSpawnedInitialDwellers = true;
         
     }
 
@@ -87,13 +97,7 @@ public class DwellerManager : MonoBehaviour
         }
 
         GameObject dweller = Instantiate(dwellerPrefab, position, Quaternion.identity);
-
-        var dwellerAuthoring = dweller.GetComponent<DwellerAuthoring>();
-        if (dwellerAuthoring != null)
-        {
-            ApplyRandomSkinColor(dweller);
-            DwellerEntityFactory.CreateDwellerEntity(entityManager, dwellerAuthoring, position);
-        }
+        ApplyRandomSkinColor(dweller);
         return dweller;
     }
 

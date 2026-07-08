@@ -11,7 +11,7 @@
   "isMineable": true,
   "isFlammable": false,
   "hardness": 2,
-  "miningTime": 2,
+  "miningTime": 8,
   "thermalConductivity": 0.6,
   "ignitionTemperature": 1000,
   "drops": [

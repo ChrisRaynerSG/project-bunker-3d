@@ -29,6 +29,12 @@ public class MiningManager : MonoBehaviour, IUpdatable
         _blockAccessor = new BlockAccessor(World.Instance);
         _blockDatabase = BlockDatabase.Instance;
         _treeFellingService = new TreeFellingService(_blockAccessor, _blockDatabase, FallingTreePrefab);
+
+        // Hand the shared world-modification services to the job system so that a
+        // dweller can actually remove the block (or fell the tree) when it finishes
+        // a mining job.
+        JobManager.Instance.Configure(_blockAccessor, _blockDatabase, _treeFellingService);
+
         CreateSelectionPreview();
     }
 
@@ -69,7 +75,9 @@ public class MiningManager : MonoBehaviour, IUpdatable
                     {
                         for (int z = minPos.z; z <= maxPos.z; z++)
                         {
-                            TryMineBlock(new Vector3Int(x, y, z));
+                            // Instead of removing the block instantly, queue a mining
+                            // job. A dweller will path to it and carry out the work.
+                            JobManager.Instance.EnqueueMiningJob(new Vector3Int(x, y, z));
                         }
                     }
                 }
@@ -88,18 +96,6 @@ public class MiningManager : MonoBehaviour, IUpdatable
             {
                 HideSelectionPreview();
             }
-        }
-    }
-
-    private void TryMineBlock(Vector3Int hitPosition)
-    {
-        if (_blockAccessor.GetBlockDataFromPosition(hitPosition).definition.id == "bunker:oak_tree_log_block")
-        {
-            _treeFellingService.FellTreeAt(hitPosition);
-        }
-        else
-        {
-            _blockAccessor.SetBlock(hitPosition, _blockAccessor.GetBlockDef("bunker:air_block"));
         }
     }
 

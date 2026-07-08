@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
+
 public class DwellerManager : MonoBehaviour, IUpdatable
 {
     [Header("Spawning")]
@@ -98,6 +99,14 @@ public class DwellerManager : MonoBehaviour, IUpdatable
 
         GameObject dweller = Instantiate(dwellerPrefab, position, Quaternion.identity);
         ApplyRandomSkinColor(dweller);
+
+        // Give the dweller its worker behaviour so it will pick up mining jobs, walk
+        // to them and carry them out. Added at runtime so the prefab stays data-only.
+        if (dweller.GetComponent<DwellerAgent>() == null)
+        {
+            dweller.AddComponent<DwellerAgent>();
+        }
+
         return dweller;
     }
 

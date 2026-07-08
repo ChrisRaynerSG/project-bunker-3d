@@ -23,9 +23,4 @@ namespace _Scripts.Simulation.Jobs
     {
         Mining
     }
-    
-    
-        
-    
-    
 } 

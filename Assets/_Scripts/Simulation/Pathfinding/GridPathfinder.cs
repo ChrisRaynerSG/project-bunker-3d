@@ -129,8 +129,13 @@ public static class GridPathfinder
     /// goal cells using A*. Returns the list of cells to walk through (including the
     /// reached goal, excluding the start) or null if no goal is reachable within the
     /// node budget.
+    ///
+    /// Cells in <paramref name="blocked"/> (e.g. those reserved by other dwellers) are
+    /// treated as impassable so the route steers around them. The start cell is never
+    /// blocked; a goal that is blocked simply becomes unreachable.
     /// </summary>
-    public static List<Vector3Int> FindPath(Vector3Int start, ICollection<Vector3Int> goals, int maxNodes = 4000)
+    public static List<Vector3Int> FindPath(Vector3Int start, ICollection<Vector3Int> goals, int maxNodes = 4000,
+        HashSet<Vector3Int> blocked = null)
     {
         if (goals == null || goals.Count == 0) return null;
 
@@ -159,7 +164,7 @@ public static class GridPathfinder
 
             float currentG = gScore.TryGetValue(current, out float g) ? g : float.PositiveInfinity;
 
-            foreach (Vector3Int neighbour in GetNeighbours(current))
+            foreach (Vector3Int neighbour in GetNeighbours(current, blocked))
             {
                 float tentative = currentG + StepCost(neighbour);
                 float known = gScore.TryGetValue(neighbour, out float ng) ? ng : float.PositiveInfinity;
@@ -175,7 +180,7 @@ public static class GridPathfinder
         return null;
     }
 
-    private static IEnumerable<Vector3Int> GetNeighbours(Vector3Int cell)
+    private static IEnumerable<Vector3Int> GetNeighbours(Vector3Int cell, HashSet<Vector3Int> blocked)
     {
         foreach (Vector3Int dir in HorizontalDirections)
         {
@@ -184,6 +189,10 @@ public static class GridPathfinder
                 Vector3Int neighbour = new Vector3Int(cell.x + dir.x, cell.y + dy, cell.z + dir.z);
 
                 if (!IsStandable(neighbour)) continue;
+
+                // A cell reserved by another dweller is treated as an obstacle so routes
+                // steer around it rather than trying to share it.
+                if (blocked != null && blocked.Contains(neighbour)) continue;
 
                 // Stepping up requires clearance above the current cell so the dweller
                 // does not clip through the block it is climbing past.
